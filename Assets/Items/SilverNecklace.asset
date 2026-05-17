@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e976ae5566286845b37c51031801d11, type: 3}
+  m_Name: SilverNecklace
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  itemName: SilverNecklace
+  itemIcon: {fileID: 21300000, guid: be9209d584191474e9a85c266c591587, type: 3}
+  itemType: 1
+  strengthBonus: 0
+  dexterityBonus: 0
+  intelligenceBonus: 0
+  enduranceBonus: 2
+  armorBonus: 2
+  resistanceBonus: 8
+  healthBonus: 5
+  manaBonus: 5
