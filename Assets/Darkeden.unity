@@ -2377,12 +2377,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 655054969}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 529.62476, y: 0.00001, z: 24.72266}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -29.643612, y: -428.61844, z: 43.428642}
+  m_LocalScale: {x: 1.756633, y: 1.756633, z: 1.756633}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 908300756}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &675560787
 GameObject:
@@ -4386,6 +4386,7 @@ RectTransform:
   - {fileID: 569618737}
   - {fileID: 1679084480}
   - {fileID: 407817511}
+  - {fileID: 655054971}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -6515,7 +6516,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aeb85490ace912e44af6fbb4d2378f8d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
-  enemyPrefab: {fileID: 1998358470167521832, guid: 296c4a12f6c94c44d9e18f573c5e411d, type: 3}
+  enemyPrefab: {fileID: 1767432769423197496, guid: 8aff9bec60554324c8af1e672fd7c2df, type: 3}
   maxEnemies: 10
   spawnRadius: 15
   spawnInterval: 2
@@ -9092,4 +9093,3 @@ SceneRoots:
   - {fileID: 1656295111}
   - {fileID: 1623734783}
   - {fileID: 908300756}
-  - {fileID: 655054971}

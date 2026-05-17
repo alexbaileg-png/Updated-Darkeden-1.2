@@ -1,0 +1,108 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &8693836165913224441
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8098169881513260187, guid: 2cb4a71e191172a4f8b692e60383c94a, type: 3}
+      propertyPath: m_Name
+      value: Meshy_AI_Arms_Wide_in_Desolati_0517012835_texture
+      objectReference: {fileID: 0}
+    - target: {fileID: 3447742079981357586, guid: 2cb4a71e191172a4f8b692e60383c94a, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.29726
+      objectReference: {fileID: 0}
+    - target: {fileID: 3447742079981357586, guid: 2cb4a71e191172a4f8b692e60383c94a, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3447742079981357586, guid: 2cb4a71e191172a4f8b692e60383c94a, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.93015
+      objectReference: {fileID: 0}
+    - target: {fileID: 3447742079981357586, guid: 2cb4a71e191172a4f8b692e60383c94a, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3447742079981357586, guid: 2cb4a71e191172a4f8b692e60383c94a, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3447742079981357586, guid: 2cb4a71e191172a4f8b692e60383c94a, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3447742079981357586, guid: 2cb4a71e191172a4f8b692e60383c94a, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3447742079981357586, guid: 2cb4a71e191172a4f8b692e60383c94a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3447742079981357586, guid: 2cb4a71e191172a4f8b692e60383c94a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3447742079981357586, guid: 2cb4a71e191172a4f8b692e60383c94a, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: -8098169881513260187, guid: 2cb4a71e191172a4f8b692e60383c94a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4922124876635965220}
+    - targetCorrespondingSourceObject: {fileID: -8098169881513260187, guid: 2cb4a71e191172a4f8b692e60383c94a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9114813975902080994}
+  m_SourcePrefab: {fileID: 3150474306388093854, guid: 2cb4a71e191172a4f8b692e60383c94a, type: 3}
+--- !u!1 &8591514075971792796 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -8098169881513260187, guid: 2cb4a71e191172a4f8b692e60383c94a, type: 3}
+  m_PrefabInstance: {fileID: 8693836165913224441}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &4922124876635965220
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8591514075971792796}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 59e64615f2d75b24597ecb4187b1096d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
+  player: {fileID: 0}
+  moveSpeed: 3
+  chaseRange: 30
+  stopDistance: 1
+  attackDamage: 10
+  attackRange: 1.2
+  attackCooldown: 1.25
+  attackHitDelay: 0.25
+  modelTransform: {fileID: 0}
+  modelAnimator: {fileID: 0}
+--- !u!114 &9114813975902080994
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8591514075971792796}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 20984d183cbc2494ea5311b2ab5b39cf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
+  maxHealth: 50
+  currentHealth: 0
+  healthBar: {fileID: 0}
+  destroyDelay: 10
