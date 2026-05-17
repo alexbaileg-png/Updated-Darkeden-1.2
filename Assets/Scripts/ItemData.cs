@@ -13,10 +13,13 @@ public enum ItemType
 [CreateAssetMenu(fileName = "New Item", menuName = "ARPG/Item")]
 public class ItemData : ScriptableObject
 {
+    [Header("Basic Info")]
     public string itemName;
     public Sprite itemIcon;
-
     public ItemType itemType;
+
+    [Header("World Loot")]
+    public GameObject worldLootPrefab;
 
     [Header("Stat Bonuses")]
     public int strengthBonus;

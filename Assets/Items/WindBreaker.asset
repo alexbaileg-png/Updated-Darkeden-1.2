@@ -15,6 +15,7 @@ MonoBehaviour:
   itemName: WindBreaker
   itemIcon: {fileID: 21300000, guid: 7c9b9469fc18d104cb6aa1f64257f8b7, type: 3}
   itemType: 2
+  worldLootPrefab: {fileID: 8391398390538279617, guid: 62fca5f627efb4942afe2fc68cba03be, type: 3}
   strengthBonus: 0
   dexterityBonus: 0
   intelligenceBonus: 0

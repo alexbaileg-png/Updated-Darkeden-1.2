@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: ee8a80acd5fc7dd4da46de959b425d6d
+guid: b0236765df91ffd4fa8f1ea4ab11ded5
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
@@ -7,10 +7,10 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: No Name
-    second: {fileID: 3263931781923126087, guid: 2cb4a71e191172a4f8b692e60383c94a, type: 3}
+      name: Material.001
+    second: {fileID: 3263931781923126087, guid: a46b3055a45a9f04e87ca85fd9b22021, type: 3}
   materials:
-    materialImportMode: 1
+    materialImportMode: 2
     materialName: 0
     materialSearch: 1
     materialLocation: 1
@@ -27,43 +27,14 @@ ModelImporter:
     animationDoRetargetingWarnings: 0
     importAnimatedCustomProperties: 0
     importConstraints: 0
-    animationCompression: 1
+    animationCompression: 3
     animationRotationError: 0.5
     animationPositionError: 0.5
     animationScaleError: 0.5
     animationWrapMode: 0
     extraExposedTransformPaths: []
     extraUserProperties: []
-    clipAnimations:
-    - serializedVersion: 16
-      name: mixamo.com
-      takeName: mixamo.com
-      internalID: -203655887218126122
-      firstFrame: 0
-      lastFrame: 59
-      wrapMode: 0
-      orientationOffsetY: 0
-      level: 0
-      cycleOffset: 0
-      loop: 0
-      hasAdditiveReferencePose: 0
-      loopTime: 1
-      loopBlend: 1
-      loopBlendOrientation: 0
-      loopBlendPositionY: 0
-      loopBlendPositionXZ: 0
-      keepOriginalOrientation: 0
-      keepOriginalPositionY: 1
-      keepOriginalPositionXZ: 0
-      heightFromFeet: 0
-      mirror: 0
-      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
-      curves: []
-      events: []
-      transformMask: []
-      maskType: 3
-      maskSource: {instanceID: 0}
-      additiveReferencePoseFrame: 0
+    clipAnimations: []
     isReadable: 0
   meshes:
     lODScreenPercentages: []
@@ -132,9 +103,9 @@ ModelImporter:
     skeletonHasParents: 1
   lastHumanDescriptionAvatarSource: {instanceID: 0}
   autoGenerateAvatarMappingIfUnspecified: 1
-  animationType: 2
+  animationType: 3
   humanoidOversampling: 1
-  avatarSetup: 0
+  avatarSetup: 1
   addHumanoidExtraRootOnlyWhenUsingAvatar: 1
   importBlendShapeDeformPercent: 1
   remapMaterialsIfMaterialImportModeIsNone: 0

@@ -243,6 +243,7 @@ GameObject:
   - component: {fileID: 2122587727983555116}
   - component: {fileID: 7797086104571976362}
   - component: {fileID: 8873388908105989821}
+  - component: {fileID: 5583362921374742940}
   m_Layer: 0
   m_Name: Enemy 1
   m_TagString: Untagged
@@ -378,10 +379,10 @@ MonoBehaviour:
   chaseRange: 30
   stopDistance: 0.5
   attackDamage: 10
-  attackRange: 1
+  attackRange: 0.6
   attackCooldown: 1
   attackHitDelay: 0.1
-  modelTransform: {fileID: 0}
+  modelTransform: {fileID: 4668743937568155487}
   modelAnimator: {fileID: 8873388908105989821}
 --- !u!114 &7797086104571976362
 MonoBehaviour:
@@ -418,6 +419,35 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &5583362921374742940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1767432769423197496}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c0dc96d2d7280894dabadc3e2e6e33ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LootDropTable
+  defaultGroundLootPrefab: {fileID: 0}
+  possibleDrops:
+  - item: {fileID: 11400000, guid: 63435b7e2f30bbf47a66f146d45c93d5, type: 2}
+    dropChance: 10
+  - item: {fileID: 11400000, guid: fdbfad13e6bac824caab746e9433458d, type: 2}
+    dropChance: 10
+  - item: {fileID: 11400000, guid: 4ff8746adb6320d4fbd7a0ccd0687f74, type: 2}
+    dropChance: 10
+  - item: {fileID: 11400000, guid: d3ab716537d595f4598a8bab0d6acfca, type: 2}
+    dropChance: 10
+  - item: {fileID: 11400000, guid: 1f1bfaa7121857b4c911a37f58037dd9, type: 2}
+    dropChance: 10
+  - item: {fileID: 11400000, guid: 43d318145df03cd4fb63876179fbbc8f, type: 2}
+    dropChance: 10
+  maxDrops: 2
+  dropScatterRadius: 1.2
+  dropHeight: -0.4
 --- !u!1 &1840938806691661711
 GameObject:
   m_ObjectHideFlags: 0

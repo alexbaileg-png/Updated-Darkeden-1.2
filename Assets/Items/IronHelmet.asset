@@ -15,6 +15,7 @@ MonoBehaviour:
   itemName: Iron Helmet
   itemIcon: {fileID: 21300000, guid: dbf56748f25e2904ebe65773d668b282, type: 3}
   itemType: 0
+  worldLootPrefab: {fileID: 655367368841965685, guid: b4a9d5b1fe2ab684d981be88024b5e0a, type: 3}
   strengthBonus: 2
   dexterityBonus: 0
   intelligenceBonus: 0

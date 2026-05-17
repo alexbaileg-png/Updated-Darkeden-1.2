@@ -15,6 +15,7 @@ MonoBehaviour:
   itemName: LeatherBoots
   itemIcon: {fileID: 21300000, guid: e6aa9b55b1aba5d4189612ad1ce4adb2, type: 3}
   itemType: 4
+  worldLootPrefab: {fileID: 6766717417952144756, guid: 9195a283f822b364895e21f4314fc56b, type: 3}
   strengthBonus: 0
   dexterityBonus: 0
   intelligenceBonus: 0

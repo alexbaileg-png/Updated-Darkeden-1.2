@@ -1,16 +1,11 @@
 fileFormatVersion: 2
-guid: ee8a80acd5fc7dd4da46de959b425d6d
+guid: 0316ddb6af6895f4cbd736db0831ad58
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects:
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: No Name
-    second: {fileID: 3263931781923126087, guid: 2cb4a71e191172a4f8b692e60383c94a, type: 3}
+  externalObjects: {}
   materials:
-    materialImportMode: 1
+    materialImportMode: 2
     materialName: 0
     materialSearch: 1
     materialLocation: 1
@@ -34,41 +29,12 @@ ModelImporter:
     animationWrapMode: 0
     extraExposedTransformPaths: []
     extraUserProperties: []
-    clipAnimations:
-    - serializedVersion: 16
-      name: mixamo.com
-      takeName: mixamo.com
-      internalID: -203655887218126122
-      firstFrame: 0
-      lastFrame: 59
-      wrapMode: 0
-      orientationOffsetY: 0
-      level: 0
-      cycleOffset: 0
-      loop: 0
-      hasAdditiveReferencePose: 0
-      loopTime: 1
-      loopBlend: 1
-      loopBlendOrientation: 0
-      loopBlendPositionY: 0
-      loopBlendPositionXZ: 0
-      keepOriginalOrientation: 0
-      keepOriginalPositionY: 1
-      keepOriginalPositionXZ: 0
-      heightFromFeet: 0
-      mirror: 0
-      bodyMask: 01000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000
-      curves: []
-      events: []
-      transformMask: []
-      maskType: 3
-      maskSource: {instanceID: 0}
-      additiveReferencePoseFrame: 0
+    clipAnimations: []
     isReadable: 0
   meshes:
     lODScreenPercentages: []
     globalScale: 1
-    meshCompression: 0
+    meshCompression: 2
     addColliders: 0
     useSRGBMaterialColor: 1
     sortHierarchyByName: 1

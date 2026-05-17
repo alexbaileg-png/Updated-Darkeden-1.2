@@ -15,6 +15,7 @@ MonoBehaviour:
   itemName: Cargo Pants
   itemIcon: {fileID: 21300000, guid: 03f588f64c685e74fa85e47ebf2e844f, type: 3}
   itemType: 3
+  worldLootPrefab: {fileID: 5648383419603476059, guid: 4fb95bb1e56028f44b170e0178958b02, type: 3}
   strengthBonus: 0
   dexterityBonus: 0
   intelligenceBonus: 0

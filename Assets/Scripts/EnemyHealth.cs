@@ -16,6 +16,7 @@ public class EnemyHealth : MonoBehaviour, IDamageable
 
     private EnemyAI enemyAI;
     private Animator animator;
+    private LootDropTable lootDropTable;
 
     void Start()
     {
@@ -23,6 +24,7 @@ public class EnemyHealth : MonoBehaviour, IDamageable
 
         enemyAI = GetComponent<EnemyAI>();
         animator = GetComponentInChildren<Animator>();
+        lootDropTable = GetComponent<LootDropTable>();
 
         UpdateHealthBar();
     }
@@ -57,7 +59,13 @@ public class EnemyHealth : MonoBehaviour, IDamageable
 
     void Die()
     {
+        if (isDead)
+            return;
+
         isDead = true;
+
+        if (lootDropTable != null)
+            lootDropTable.DropLoot();
 
         if (enemyAI != null)
             enemyAI.enabled = false;
