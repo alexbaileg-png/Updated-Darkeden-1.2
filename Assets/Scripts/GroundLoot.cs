@@ -9,6 +9,11 @@ public class GroundLoot : MonoBehaviour
     public bool canAutoPickup = true;
     public float pickupDelay = 0.5f;
 
+    [Header("Manual Pickup")]
+    public bool canClickPickup = true;
+    public KeyCode pickupKey = KeyCode.E;
+    public float manualPickupRange = 3f;
+
     [Header("Despawn")]
     public float despawnTime = 180f;
 
@@ -41,26 +46,23 @@ public class GroundLoot : MonoBehaviour
     void Update()
     {
         if (rotate)
-        {
             transform.Rotate(Vector3.up, rotateSpeed * Time.deltaTime, Space.World);
-        }
 
         if (bob)
         {
             float newY = startPosition.y + Mathf.Sin(Time.time * bobSpeed) * bobHeight;
+            transform.position = new Vector3(transform.position.x, newY, transform.position.z);
+        }
 
-            transform.position = new Vector3(
-                transform.position.x,
-                newY,
-                transform.position.z
-            );
+        if (Input.GetKeyDown(pickupKey))
+        {
+            TryManualPickup();
         }
     }
 
     public void SetItem(ItemData item)
     {
         itemData = item;
-
         RefreshVisuals();
         HideLabel();
     }
@@ -71,9 +73,40 @@ public class GroundLoot : MonoBehaviour
             return;
 
         if (itemNameText != null)
-        {
             itemNameText.text = itemData.itemName;
-        }
+    }
+
+    void OnMouseDown()
+    {
+        if (!canClickPickup)
+            return;
+
+        TryManualPickup();
+    }
+
+    void TryManualPickup()
+    {
+        PlayerLootPickup playerPickup = FindObjectOfType<PlayerLootPickup>();
+
+        if (playerPickup == null)
+            return;
+
+        float distance = Vector3.Distance(playerPickup.transform.position, transform.position);
+
+        if (distance > manualPickupRange)
+            return;
+
+        playerPickup.TryPickupSpecificLoot(this);
+    }
+
+    void OnMouseEnter()
+    {
+        ShowLabel();
+    }
+
+    void OnMouseExit()
+    {
+        HideLabel();
     }
 
     public void ShowLabel()
@@ -86,16 +119,6 @@ public class GroundLoot : MonoBehaviour
     {
         if (labelRoot != null)
             labelRoot.SetActive(false);
-    }
-
-    void OnMouseEnter()
-    {
-        ShowLabel();
-    }
-
-    void OnMouseExit()
-    {
-        HideLabel();
     }
 
     public bool CanBeAutoPickedUp()

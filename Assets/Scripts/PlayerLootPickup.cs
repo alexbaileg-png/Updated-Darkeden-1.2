@@ -33,16 +33,27 @@ public class PlayerLootPickup : MonoBehaviour
 
             if (distance <= pickupRadius)
             {
-                if (inventoryGrid == null)
-                    return;
-
-                bool added = inventoryGrid.AddItem(loot.itemData);
-
-                if (added)
-                {
-                    Destroy(loot.gameObject);
-                }
+                TryPickupSpecificLoot(loot);
             }
         }
+    }
+
+    public bool TryPickupSpecificLoot(GroundLoot loot)
+    {
+        if (loot == null || loot.itemData == null)
+            return false;
+
+        if (inventoryGrid == null)
+            return false;
+
+        bool added = inventoryGrid.AddItem(loot.itemData);
+
+        if (added)
+        {
+            Destroy(loot.gameObject);
+            return true;
+        }
+
+        return false;
     }
 }
