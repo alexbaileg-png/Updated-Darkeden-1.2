@@ -126,10 +126,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d0e20ec0312e2942b4282a8c4ce6ca6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Projectile
+  attacker: {fileID: 0}
   damage: 100
+  damageType: 2
+  canCrit: 1
   speed: 8
   lifetime: 3
-  hitRadius: 0.5
+  hitRadius: 1.5
   turnSpeed: 25
   impactEffectPrefab: {fileID: 7143359627972612211, guid: 5cd0e5c973f43984d97d50547fc29efd, type: 3}
 --- !u!54 &4969014728076961176

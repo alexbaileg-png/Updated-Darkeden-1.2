@@ -9,6 +9,9 @@ public class EnemyHealth : MonoBehaviour, IDamageable
 
     public Slider healthBar;
 
+    [Header("XP Reward")]
+    public int xpReward = 25;
+
     [Header("Death")]
     public float destroyDelay = 10f;
 
@@ -64,6 +67,8 @@ public class EnemyHealth : MonoBehaviour, IDamageable
 
         isDead = true;
 
+        GiveXPToPlayer();
+
         if (lootDropTable != null)
             lootDropTable.DropLoot();
 
@@ -87,6 +92,22 @@ public class EnemyHealth : MonoBehaviour, IDamageable
             col.enabled = false;
 
         StartCoroutine(DestroyAfterDeath());
+    }
+
+    void GiveXPToPlayer()
+    {
+        GameObject playerObject = GameObject.Find("Player");
+
+        if (playerObject == null)
+            return;
+
+        PlayerStats playerStats = playerObject.GetComponent<PlayerStats>();
+
+        if (playerStats != null)
+        {
+            playerStats.GainXP(xpReward);
+            Debug.Log("Player gained " + xpReward + " XP.");
+        }
     }
 
     IEnumerator DestroyAfterDeath()

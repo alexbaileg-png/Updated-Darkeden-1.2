@@ -6,13 +6,16 @@ public class StatsPanelUI : MonoBehaviour
     [Header("Player")]
     public PlayerStats playerStats;
 
-    [Header("Main Stats Labels")]
+    [Header("Available Points")]
+    public TMP_Text availablePointsText;
+
+    [Header("Main Stat Values")]
     public TMP_Text strengthValue;
     public TMP_Text dexterityValue;
     public TMP_Text intelligenceValue;
     public TMP_Text enduranceValue;
 
-    [Header("Derived Stats")]
+    [Header("Derived Stat Values")]
     public TMP_Text armorValue;
     public TMP_Text resistanceValue;
     public TMP_Text healthValue;
@@ -33,18 +36,51 @@ public class StatsPanelUI : MonoBehaviour
         if (playerStats == null)
             return;
 
-        strengthValue.text = playerStats.strength.ToString();
-        dexterityValue.text = playerStats.dexterity.ToString();
-        intelligenceValue.text = playerStats.intelligence.ToString();
-        enduranceValue.text = playerStats.endurance.ToString();
+        if (availablePointsText != null)
+            availablePointsText.text = "Points: " + playerStats.availableStatPoints;
 
-        armorValue.text = Mathf.RoundToInt(playerStats.armor).ToString();
-        resistanceValue.text = Mathf.RoundToInt(playerStats.resistance).ToString();
+        if (strengthValue != null)
+            strengthValue.text = playerStats.strength.ToString();
 
-        healthValue.text =
-            playerStats.currentHealth + " / " + playerStats.maxHealth;
+        if (dexterityValue != null)
+            dexterityValue.text = playerStats.dexterity.ToString();
 
-        manaValue.text =
-            playerStats.currentMana + " / " + playerStats.maxMana;
+        if (intelligenceValue != null)
+            intelligenceValue.text = playerStats.intelligence.ToString();
+
+        if (enduranceValue != null)
+            enduranceValue.text = playerStats.endurance.ToString();
+
+        if (armorValue != null)
+            armorValue.text = Mathf.RoundToInt(playerStats.armor).ToString();
+
+        if (resistanceValue != null)
+            resistanceValue.text = Mathf.RoundToInt(playerStats.resistance).ToString();
+
+        if (healthValue != null)
+            healthValue.text = playerStats.currentHealth + " / " + playerStats.maxHealth;
+
+        if (manaValue != null)
+            manaValue.text = playerStats.currentMana + " / " + playerStats.maxMana;
+    }
+
+    public void AddStrength()
+    {
+        playerStats.SpendStatPoint("Strength");
+    }
+
+    public void AddDexterity()
+    {
+        playerStats.SpendStatPoint("Dexterity");
+    }
+
+    public void AddIntelligence()
+    {
+        playerStats.SpendStatPoint("Intelligence");
+    }
+
+    public void AddEndurance()
+    {
+        playerStats.SpendStatPoint("Endurance");
     }
 }

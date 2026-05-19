@@ -8,11 +8,11 @@ public class EnemyAI : MonoBehaviour
     [Header("Movement")]
     public float moveSpeed = 3f;
     public float chaseRange = 30f;
-    public float stopDistance = 1.8f;
+    public float stopDistance = 2.0f;
 
     [Header("Attack")]
     public int attackDamage = 10;
-    public float attackRange = 2.5f;
+    public float attackRange = 2.8f;
     public float attackCooldown = 1.25f;
     public float attackHitDelay = 0.25f;
 
@@ -73,9 +73,13 @@ public class EnemyAI : MonoBehaviour
         }
 
         if (distance > stopDistance && !isAttacking)
+        {
             Move(direction.normalized);
+        }
         else
+        {
             SetMoving(false);
+        }
     }
 
     void Move(Vector3 direction)
@@ -111,7 +115,10 @@ public class EnemyAI : MonoBehaviour
 
         if (player != null)
         {
-            float distance = Vector3.Distance(transform.position, player.position);
+            Vector3 direction = player.position - transform.position;
+            direction.y = 0f;
+
+            float distance = direction.magnitude;
 
             if (distance <= attackRange)
             {

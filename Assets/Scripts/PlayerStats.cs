@@ -7,6 +7,10 @@ public class PlayerStats : MonoBehaviour, IDamageable
     public int currentXP = 0;
     public int xpToNextLevel = 100;
 
+    [Header("Assignable Stat Points")]
+    public int availableStatPoints = 0;
+    public int statPointsPerLevel = 3;
+
     [Header("Base Core Stats")]
     public int baseStrength = 10;
     public int baseDexterity = 10;
@@ -67,6 +71,7 @@ public class PlayerStats : MonoBehaviour, IDamageable
 
         magicalSkillPower = intelligence * 2.25f;
         magicalArmorPenetration = intelligence * 0.5f;
+
         buffEffectivenessBonus = intelligence * 0.01f;
         buffDurationBonus = intelligence * 0.015f;
 
@@ -88,6 +93,71 @@ public class PlayerStats : MonoBehaviour, IDamageable
 
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
         currentMana = Mathf.Clamp(currentMana, 0, maxMana);
+    }
+
+    public int GetMagicalHealing(int baseHealing)
+    {
+        return Mathf.RoundToInt(baseHealing + magicalSkillPower);
+    }
+
+    public void Heal(int amount)
+    {
+        if (isDead)
+            return;
+
+        currentHealth += amount;
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+    }
+
+    public void GainXP(int amount)
+    {
+        currentXP += amount;
+
+        while (currentXP >= xpToNextLevel)
+        {
+            currentXP -= xpToNextLevel;
+            LevelUp();
+        }
+    }
+
+    void LevelUp()
+    {
+        level++;
+        xpToNextLevel = Mathf.RoundToInt(xpToNextLevel * 1.35f);
+
+        baseStrength += 2;
+        baseDexterity += 2;
+        baseIntelligence += 2;
+        baseEndurance += 2;
+
+        availableStatPoints += statPointsPerLevel;
+
+        RecalculateStats();
+
+        currentHealth = maxHealth;
+        currentMana = maxMana;
+    }
+
+    public bool SpendStatPoint(string statName)
+    {
+        if (availableStatPoints <= 0)
+            return false;
+
+        if (statName == "Strength")
+            baseStrength++;
+        else if (statName == "Dexterity")
+            baseDexterity++;
+        else if (statName == "Intelligence")
+            baseIntelligence++;
+        else if (statName == "Endurance")
+            baseEndurance++;
+        else
+            return false;
+
+        availableStatPoints--;
+        RecalculateStats();
+
+        return true;
     }
 
     public void ClearGearBonuses()
@@ -138,16 +208,6 @@ public class PlayerStats : MonoBehaviour, IDamageable
         return Mathf.RoundToInt(baseDamage + magicalSkillPower);
     }
 
-    public float GetBuffEffectiveness(float baseEffect)
-    {
-        return baseEffect * (1f + buffEffectivenessBonus);
-    }
-
-    public float GetBuffDuration(float baseDuration)
-    {
-        return baseDuration * (1f + buffDurationBonus);
-    }
-
     public bool RollCritical()
     {
         float roll = Random.Range(0f, 100f);
@@ -157,10 +217,7 @@ public class PlayerStats : MonoBehaviour, IDamageable
     public int ApplyCriticalDamage(int damage)
     {
         if (RollCritical())
-        {
-            Debug.Log("Critical Hit!");
             return Mathf.RoundToInt(damage * 1.5f);
-        }
 
         return damage;
     }
@@ -180,8 +237,6 @@ public class PlayerStats : MonoBehaviour, IDamageable
 
         currentHealth -= damageTaken;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-
-        Debug.Log("Player took " + damageTaken + " " + damageType + " damage.");
 
         if (currentHealth <= 0)
             Die();
@@ -216,6 +271,7 @@ public class PlayerStats : MonoBehaviour, IDamageable
 
         currentMana -= amount;
         currentMana = Mathf.Clamp(currentMana, 0, maxMana);
+
         return true;
     }
 
@@ -223,15 +279,6 @@ public class PlayerStats : MonoBehaviour, IDamageable
     {
         currentMana += amount;
         currentMana = Mathf.Clamp(currentMana, 0, maxMana);
-    }
-
-    public void Heal(int amount)
-    {
-        if (isDead)
-            return;
-
-        currentHealth += amount;
-        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
     }
 
     void Die()

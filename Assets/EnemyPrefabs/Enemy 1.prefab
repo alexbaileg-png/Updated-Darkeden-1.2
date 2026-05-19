@@ -260,7 +260,7 @@ Transform:
   m_GameObject: {fileID: 1767432769423197496}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.455, y: 2.9, z: 1.92}
+  m_LocalPosition: {x: -0.455, y: 3, z: 1.92}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -345,7 +345,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Center: {x: 0, y: 0.3, z: 0}
 --- !u!114 &8372414133179288515
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -359,8 +359,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
   maxHealth: 200
-  currentHealth: 0
+  currentHealth: 200
   healthBar: {fileID: 717267395925834411}
+  xpReward: 20000
   destroyDelay: 5
 --- !u!114 &2122587727983555116
 MonoBehaviour:
@@ -380,8 +381,8 @@ MonoBehaviour:
   stopDistance: 0.5
   attackDamage: 10
   attackRange: 0.6
-  attackCooldown: 1
-  attackHitDelay: 0.1
+  attackCooldown: 2.4
+  attackHitDelay: 1.2
   modelTransform: {fileID: 4668743937568155487}
   modelAnimator: {fileID: 8873388908105989821}
 --- !u!114 &7797086104571976362
@@ -554,6 +555,7 @@ MonoBehaviour:
   maxHealth: 50
   currentHealth: 0
   healthBar: {fileID: 0}
+  xpReward: 25
   destroyDelay: 10
 --- !u!1 &6289278516138488872
 GameObject:
@@ -679,7 +681,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 782c9f7a77c4f0a4b8b75e46b4a759e8, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.529
+      value: -0.481
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 782c9f7a77c4f0a4b8b75e46b4a759e8, type: 3}
       propertyPath: m_LocalPosition.z
