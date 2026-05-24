@@ -3,7 +3,7 @@ using TMPro;
 
 public class FloatingCombatText : MonoBehaviour
 {
-    public TMP_Text text;
+    public TextMeshPro text;
     public float floatSpeed = 1.5f;
     public float lifetime = 1f;
 
@@ -14,7 +14,7 @@ public class FloatingCombatText : MonoBehaviour
 
     void Update()
     {
-        transform.position += Vector3.up * floatSpeed * Time.deltaTime;
+        transform.position += Camera.main.transform.up * floatSpeed * Time.deltaTime;
 
         if (Camera.main != null)
             transform.forward = Camera.main.transform.forward;

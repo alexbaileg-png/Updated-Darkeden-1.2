@@ -264,6 +264,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 422659186199408455}
   - {fileID: 5741883079678456472}
   - {fileID: 5274237339131747405}
   m_Father: {fileID: 0}
@@ -435,17 +436,19 @@ MonoBehaviour:
   defaultGroundLootPrefab: {fileID: 0}
   possibleDrops:
   - item: {fileID: 11400000, guid: 63435b7e2f30bbf47a66f146d45c93d5, type: 2}
-    dropChance: 10
+    dropChance: 5
   - item: {fileID: 11400000, guid: fdbfad13e6bac824caab746e9433458d, type: 2}
-    dropChance: 10
+    dropChance: 5
   - item: {fileID: 11400000, guid: 4ff8746adb6320d4fbd7a0ccd0687f74, type: 2}
-    dropChance: 10
+    dropChance: 5
   - item: {fileID: 11400000, guid: d3ab716537d595f4598a8bab0d6acfca, type: 2}
-    dropChance: 10
+    dropChance: 5
   - item: {fileID: 11400000, guid: 1f1bfaa7121857b4c911a37f58037dd9, type: 2}
-    dropChance: 10
+    dropChance: 5
   - item: {fileID: 11400000, guid: 43d318145df03cd4fb63876179fbbc8f, type: 2}
-    dropChance: 10
+    dropChance: 5
+  - item: {fileID: 11400000, guid: dbe6450ff3be25147b8b53151ddb8693, type: 2}
+    dropChance: 80.2
   maxDrops: 2
   dropScatterRadius: 1.2
   dropHeight: -0.4
@@ -632,6 +635,37 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!1 &6494831197692735099
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 422659186199408455}
+  m_Layer: 0
+  m_Name: CombatTextPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &422659186199408455
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6494831197692735099}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.4, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 4668743937568155487}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7207008633066554887
 GameObject:
   m_ObjectHideFlags: 0

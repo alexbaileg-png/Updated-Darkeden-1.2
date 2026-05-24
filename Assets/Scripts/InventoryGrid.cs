@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.UI;
 
 public class InventoryGrid : MonoBehaviour
 {
@@ -54,22 +53,48 @@ public class InventoryGrid : MonoBehaviour
             return;
 
         foreach (ItemData item in startingItems)
-        {
             AddItem(item);
-        }
     }
 
     public bool AddItem(ItemData item)
     {
-        if (item == null || slots == null)
+        return AddItem(item, 1);
+    }
+
+    public bool AddItem(ItemData item, int amount)
+    {
+        if (item == null || slots == null || amount <= 0)
             return false;
+
+        int remaining = amount;
+
+        if (item.isStackable)
+        {
+            foreach (InventorySlot slot in slots)
+            {
+                if (slot != null && slot.CanStack(item))
+                {
+                    remaining = slot.AddToStack(remaining);
+
+                    if (remaining <= 0)
+                        return true;
+                }
+            }
+        }
 
         foreach (InventorySlot slot in slots)
         {
             if (slot != null && !slot.HasItem())
             {
-                slot.SetItem(item);
-                return true;
+                int stackAmount = item.isStackable
+                    ? Mathf.Min(remaining, item.maxStackSize)
+                    : 1;
+
+                slot.SetItem(item, stackAmount);
+                remaining -= stackAmount;
+
+                if (remaining <= 0)
+                    return true;
             }
         }
 

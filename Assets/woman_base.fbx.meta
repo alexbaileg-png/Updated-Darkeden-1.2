@@ -8,7 +8,7 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: No Name
-    second: {fileID: -8205024132658386507, guid: 7c2a991f2db34204ba4b9ab0f70ae021, type: 3}
+    second: {fileID: 2100000, guid: 3e7ed34f0074b914ebf903d083a2ee9a, type: 2}
   materials:
     materialImportMode: 1
     materialName: 0
@@ -70,7 +70,7 @@ ModelImporter:
     globalScale: 1
     meshCompression: 0
     addColliders: 0
-    useSRGBMaterialColor: 1
+    useSRGBMaterialColor: 0
     sortHierarchyByName: 1
     importPhysicalCameras: 1
     importVisibility: 1

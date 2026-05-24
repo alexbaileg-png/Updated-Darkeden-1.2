@@ -58,14 +58,27 @@ public class EnemyHealth : MonoBehaviour, IDamageable
         if (CombatTextSpawner.Instance == null)
             return;
 
-        Vector3 textPosition = transform.position + Vector3.up * 1.8f;
-
-        if (healthBar != null)
-            textPosition = healthBar.transform.position + Vector3.up * 0.4f;
-        else if (animator != null)
-            textPosition = animator.transform.position + Vector3.up * 1.8f;
+        Vector3 textPosition = GetEnemyVisualCenter();
+        textPosition.y += 1.2f;
 
         CombatTextSpawner.Instance.SpawnText(textPosition, damage.ToString());
+    }
+
+    Vector3 GetEnemyVisualCenter()
+    {
+        Renderer[] renderers = GetComponentsInChildren<Renderer>();
+
+        if (renderers == null || renderers.Length == 0)
+            return transform.position;
+
+        Bounds bounds = renderers[0].bounds;
+
+        for (int i = 1; i < renderers.Length; i++)
+        {
+            bounds.Encapsulate(renderers[i].bounds);
+        }
+
+        return bounds.center;
     }
 
     void UpdateHealthBar()

@@ -1,11 +1,32 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using TMPro;
 
-public class InventorySlot : MonoBehaviour, IPointerClickHandler, IBeginDragHandler, IDragHandler, IEndDragHandler, IDropHandler, IPointerEnterHandler, IPointerExitHandler
+public class InventorySlot : MonoBehaviour,
+    IPointerClickHandler,
+    IBeginDragHandler,
+    IDragHandler,
+    IEndDragHandler,
+    IDropHandler,
+    IPointerEnterHandler,
+    IPointerExitHandler
 {
+    [Header("Item Data")]
     public ItemData currentItem;
+    public int quantity = 0;
+
+    [Header("UI")]
     public Image itemIcon;
+    public Image rarityBorder;
+    public TMP_Text quantityText;
+
+    [Header("Rarity Borders")]
+    public Sprite commonBorder;
+    public Sprite uncommonBorder;
+    public Sprite rareBorder;
+    public Sprite epicBorder;
+    public Sprite legendaryBorder;
 
     private Canvas parentCanvas;
     private CanvasGroup canvasGroup;
@@ -15,6 +36,7 @@ public class InventorySlot : MonoBehaviour, IPointerClickHandler, IBeginDragHand
     void Start()
     {
         parentCanvas = GetComponentInParent<Canvas>();
+
         canvasGroup = GetComponent<CanvasGroup>();
 
         if (canvasGroup == null)
@@ -26,15 +48,19 @@ public class InventorySlot : MonoBehaviour, IPointerClickHandler, IBeginDragHand
         RefreshSlot();
     }
 
-    public void SetItem(ItemData newItem)
+    public void SetItem(ItemData newItem, int amount = 1)
     {
         currentItem = newItem;
+        quantity = Mathf.Max(1, amount);
+
         RefreshSlot();
     }
 
     public void ClearSlot()
     {
         currentItem = null;
+        quantity = 0;
+
         RefreshSlot();
         HideTooltip();
     }
@@ -44,59 +70,138 @@ public class InventorySlot : MonoBehaviour, IPointerClickHandler, IBeginDragHand
         return currentItem != null;
     }
 
+    public bool CanStack(ItemData item)
+    {
+        return currentItem == item &&
+               currentItem != null &&
+               currentItem.isStackable &&
+               quantity < currentItem.maxStackSize;
+    }
+
+    public int AddToStack(int amount)
+    {
+        if (currentItem == null || !currentItem.isStackable)
+            return amount;
+
+        int spaceLeft = currentItem.maxStackSize - quantity;
+        int amountToAdd = Mathf.Min(spaceLeft, amount);
+
+        quantity += amountToAdd;
+
+        RefreshSlot();
+
+        return amount - amountToAdd;
+    }
+
     public void RefreshSlot()
     {
-        if (itemIcon == null)
-            return;
+        bool hasItem = currentItem != null;
 
-        if (currentItem != null && currentItem.itemIcon != null)
+        // ITEM ICON
+        if (itemIcon != null)
         {
-            itemIcon.enabled = true;
-            itemIcon.sprite = currentItem.itemIcon;
-            itemIcon.raycastTarget = true;
-        }
-        else
-        {
-            itemIcon.enabled = false;
-            itemIcon.sprite = null;
-            itemIcon.raycastTarget = false;
+            itemIcon.enabled = hasItem &&
+                               currentItem.itemIcon != null;
+
+            itemIcon.sprite = hasItem
+                ? currentItem.itemIcon
+                : null;
+
+            itemIcon.raycastTarget = hasItem;
         }
 
+        // RARITY BORDER
+        if (rarityBorder != null)
+        {
+            rarityBorder.enabled = hasItem;
+
+            if (hasItem)
+            {
+                rarityBorder.sprite = GetBorderSprite(currentItem.rarity);
+                rarityBorder.color = Color.white;
+            }
+        }
+
+        // STACK QUANTITY
+        if (quantityText != null)
+        {
+            bool showQuantity =
+                hasItem &&
+                currentItem.isStackable &&
+                quantity > 1;
+
+            quantityText.gameObject.SetActive(showQuantity);
+
+            quantityText.text = showQuantity
+                ? quantity.ToString()
+                : "";
+        }
+
+        // RESET ICON POSITION
         if (iconRectTransform != null)
             iconRectTransform.anchoredPosition = Vector2.zero;
     }
 
+    Sprite GetBorderSprite(ItemRarity rarity)
+    {
+        switch (rarity)
+        {
+            case ItemRarity.Common:
+                return commonBorder;
+
+            case ItemRarity.Uncommon:
+                return uncommonBorder;
+
+            case ItemRarity.Rare:
+                return rareBorder;
+
+            case ItemRarity.Epic:
+                return epicBorder;
+
+            case ItemRarity.Legendary:
+                return legendaryBorder;
+        }
+
+        return commonBorder;
+    }
+
     public void OnDrop(PointerEventData eventData)
     {
-        EquipmentSlot equipmentSlot = eventData.pointerDrag.GetComponent<EquipmentSlot>();
+        EquipmentSlot equipmentSlot =
+            eventData.pointerDrag.GetComponent<EquipmentSlot>();
 
-        if (equipmentSlot == null || equipmentSlot.currentItem == null)
+        if (equipmentSlot == null ||
+            equipmentSlot.currentItem == null)
             return;
 
         if (currentItem != null)
-        {
-            Debug.Log("Inventory slot already has item.");
             return;
-        }
 
-        SetItem(equipmentSlot.currentItem);
+        SetItem(equipmentSlot.currentItem, 1);
+
         equipmentSlot.ClearSlot();
-
-        Debug.Log("Moved equipped item back to inventory.");
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
         if (currentItem != null)
-            Debug.Log("Clicked inventory item: " + currentItem.itemName);
-        else
-            Debug.Log("Clicked empty inventory slot.");
+        {
+            Debug.Log(
+                "Clicked inventory item: " +
+                currentItem.itemName +
+                " x" +
+                quantity
+            );
+        }
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (currentItem != null && ItemTooltip.Instance != null)
+        if (currentItem != null &&
+            ItemTooltip.Instance != null)
+        {
             ItemTooltip.Instance.ShowTooltip(currentItem);
+        }
     }
 
     public void OnPointerExit(PointerEventData eventData)
@@ -112,31 +217,37 @@ public class InventorySlot : MonoBehaviour, IPointerClickHandler, IBeginDragHand
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        if (currentItem == null || itemIcon == null)
+        if (currentItem == null ||
+            itemIcon == null)
             return;
 
         HideTooltip();
 
-        originalIconPosition = iconRectTransform.anchoredPosition;
+        originalIconPosition =
+            iconRectTransform.anchoredPosition;
+
         canvasGroup.blocksRaycasts = false;
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        if (currentItem == null || itemIcon == null || parentCanvas == null)
+        if (currentItem == null ||
+            itemIcon == null ||
+            parentCanvas == null)
             return;
 
-        iconRectTransform.anchoredPosition += eventData.delta / parentCanvas.scaleFactor;
+        iconRectTransform.anchoredPosition +=
+            eventData.delta / parentCanvas.scaleFactor;
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        if (itemIcon == null)
-            return;
-
         canvasGroup.blocksRaycasts = true;
 
         if (iconRectTransform != null)
-            iconRectTransform.anchoredPosition = originalIconPosition;
+        {
+            iconRectTransform.anchoredPosition =
+                originalIconPosition;
+        }
     }
 }
