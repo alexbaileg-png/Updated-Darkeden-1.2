@@ -101,13 +101,16 @@ public class PlayerStats : MonoBehaviour, IDamageable
     }
 
     public void Heal(int amount)
-    {
-        if (isDead)
-            return;
+{
+    if (isDead)
+        return;
 
-        currentHealth += amount;
-        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
-    }
+    currentHealth += amount;
+    currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+
+    if (CombatTextSpawner.Instance != null)
+        CombatTextSpawner.Instance.SpawnText(transform.position + Vector3.up * 1.8f, "+" + amount);
+}
 
     public void GainXP(int amount)
     {
@@ -136,6 +139,12 @@ public class PlayerStats : MonoBehaviour, IDamageable
 
         currentHealth = maxHealth;
         currentMana = maxMana;
+        PlayerSkillManager skillManager = GetComponent<PlayerSkillManager>();
+
+if (skillManager != null)
+{
+    skillManager.GainSkillPoint();
+}
     }
 
     public bool SpendStatPoint(string statName)

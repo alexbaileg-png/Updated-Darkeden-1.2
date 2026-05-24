@@ -45,10 +45,27 @@ public class EnemyHealth : MonoBehaviour, IDamageable
         currentHealth -= finalDamage;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
 
+        SpawnDamageText(finalDamage);
+
         UpdateHealthBar();
 
         if (currentHealth <= 0)
             Die();
+    }
+
+    void SpawnDamageText(int damage)
+    {
+        if (CombatTextSpawner.Instance == null)
+            return;
+
+        Vector3 textPosition = transform.position + Vector3.up * 1.8f;
+
+        if (healthBar != null)
+            textPosition = healthBar.transform.position + Vector3.up * 0.4f;
+        else if (animator != null)
+            textPosition = animator.transform.position + Vector3.up * 1.8f;
+
+        CombatTextSpawner.Instance.SpawnText(textPosition, damage.ToString());
     }
 
     void UpdateHealthBar()
@@ -104,10 +121,7 @@ public class EnemyHealth : MonoBehaviour, IDamageable
         PlayerStats playerStats = playerObject.GetComponent<PlayerStats>();
 
         if (playerStats != null)
-        {
             playerStats.GainXP(xpReward);
-            Debug.Log("Player gained " + xpReward + " XP.");
-        }
     }
 
     IEnumerator DestroyAfterDeath()

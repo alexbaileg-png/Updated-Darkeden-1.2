@@ -2,23 +2,25 @@ using UnityEngine;
 
 public class HealingOrbitBuff : MonoBehaviour
 {
+    [Header("Target")]
     public Transform target;
 
+    [Header("Healing")]
     public int baseHealAmount = 10;
+
+    [Header("Orbit")]
     public float orbitRadius = 1.5f;
-    public float orbitSpeed = 180f;
+    public float orbitSpeed = 420f;
+
+    [Header("Duration")]
     public float duration = 10f;
 
     private float currentAngle;
-    private float lastAngle;
     private float endTime;
     private PlayerStats playerStats;
 
     void Start()
     {
-        if (target == null)
-            target = transform.parent;
-
         if (target != null)
             playerStats = target.GetComponent<PlayerStats>();
 
@@ -27,19 +29,12 @@ public class HealingOrbitBuff : MonoBehaviour
 
     void Update()
     {
-        if (target == null)
+        if (target == null || Time.time >= endTime)
         {
             Destroy(gameObject);
             return;
         }
 
-        if (Time.time >= endTime)
-        {
-            Destroy(gameObject);
-            return;
-        }
-
-        lastAngle = currentAngle;
         currentAngle += orbitSpeed * Time.deltaTime;
 
         if (currentAngle >= 360f)

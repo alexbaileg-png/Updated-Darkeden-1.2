@@ -12,43 +12,33 @@ public class WorldItemDropZone : MonoBehaviour, IDropHandler
 
     public void OnDrop(PointerEventData eventData)
     {
+        if (eventData == null || eventData.pointerDrag == null)
+            return;
+
         InventorySlot inventorySlot = eventData.pointerDrag.GetComponent<InventorySlot>();
 
         if (inventorySlot == null)
-        {
-            Debug.LogError("Drop failed: pointerDrag is not an InventorySlot.");
             return;
-        }
 
         if (inventorySlot.currentItem == null)
-        {
-            Debug.LogError("Drop failed: inventory slot has no item.");
             return;
-        }
 
-        DropItemOnGround(inventorySlot.currentItem);
-        inventorySlot.ClearSlot();
+        bool dropped = DropItemOnGround(inventorySlot.currentItem);
+
+        if (dropped)
+            inventorySlot.ClearSlot();
     }
 
-    void DropItemOnGround(ItemData item)
+    bool DropItemOnGround(ItemData item)
     {
         if (item == null)
-        {
-            Debug.LogError("Drop failed: item is null.");
-            return;
-        }
+            return false;
 
         if (item.worldLootPrefab == null)
-        {
-            Debug.LogError("Drop failed: " + item.itemName + " has no World Loot Prefab assigned.");
-            return;
-        }
+            return false;
 
         if (player == null)
-        {
-            Debug.LogError("Drop failed: Player is not assigned on WorldItemDropZone.");
-            return;
-        }
+            return false;
 
         Vector3 dropPosition = player.position + player.forward * dropDistanceFromPlayer;
         dropPosition.y = dropHeight;
@@ -65,8 +55,9 @@ public class WorldItemDropZone : MonoBehaviour, IDropHandler
         {
             groundLoot.SetItem(item);
             groundLoot.canAutoPickup = false;
+            groundLoot.canClickPickup = true;
         }
 
-        Debug.Log("Dropped item on ground: " + item.itemName);
+        return true;
     }
 }

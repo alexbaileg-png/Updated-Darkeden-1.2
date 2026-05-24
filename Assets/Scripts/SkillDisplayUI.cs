@@ -1,57 +1,47 @@
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.EventSystems;
 
-public class SkillDisplayUI : MonoBehaviour, IBeginDragHandler, IDragHandler
+public class SkillDisplayUI : MonoBehaviour
 {
+    [Header("Player Skills")]
     public PlayerProjectileAttack playerSkills;
 
-    [Header("Skill Images")]
-    public Image skillImage;
+    [Header("Skill Display")]
+    public Image skillIcon;
 
-    public Sprite holyBoltSprite;
-    public Sprite holyRainSprite;
-
-    private RectTransform rectTransform;
-    private Canvas parentCanvas;
-
-    void Start()
-    {
-        rectTransform = GetComponent<RectTransform>();
-        parentCanvas = GetComponentInParent<Canvas>();
-
-        UpdateSkillDisplay();
-    }
+    [Header("Icons")]
+    public Sprite holyBoltIcon;
+    public Sprite holyRainIcon;
+    public Sprite holyCircleHealIcon;
+    public Sprite healingOrbitIcon;
 
     void Update()
     {
-        UpdateSkillDisplay();
+        UpdateSkillIcon();
     }
 
-    void UpdateSkillDisplay()
+    void UpdateSkillIcon()
     {
-        if (playerSkills == null || skillImage == null)
+        if (playerSkills == null || skillIcon == null)
             return;
 
-        if (playerSkills.selectedSkill == PlayerProjectileAttack.SelectedSkill.HolyBolt)
-        {
-            skillImage.sprite = holyBoltSprite;
-        }
-        else if (playerSkills.selectedSkill == PlayerProjectileAttack.SelectedSkill.HolyRain)
-        {
-            skillImage.sprite = holyRainSprite;
-        }
+        skillIcon.sprite = GetIcon(playerSkills.currentSelectedSkill);
     }
 
-    public void OnBeginDrag(PointerEventData eventData)
+    Sprite GetIcon(SkillType skill)
     {
-    }
+        if (skill == SkillType.HolyBolt)
+            return holyBoltIcon;
 
-    public void OnDrag(PointerEventData eventData)
-    {
-        if (rectTransform == null || parentCanvas == null)
-            return;
+        if (skill == SkillType.HolyRain)
+            return holyRainIcon;
 
-        rectTransform.anchoredPosition += eventData.delta / parentCanvas.scaleFactor;
+        if (skill == SkillType.HolyCircleHeal)
+            return holyCircleHealIcon;
+
+        if (skill == SkillType.HealingOrbit)
+            return healingOrbitIcon;
+
+        return null;
     }
 }

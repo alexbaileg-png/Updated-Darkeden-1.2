@@ -132,7 +132,7 @@ MonoBehaviour:
   canCrit: 1
   speed: 8
   lifetime: 3
-  hitRadius: 1.5
+  hitRadius: 1
   turnSpeed: 25
   impactEffectPrefab: {fileID: 7143359627972612211, guid: 5cd0e5c973f43984d97d50547fc29efd, type: 3}
 --- !u!54 &4969014728076961176

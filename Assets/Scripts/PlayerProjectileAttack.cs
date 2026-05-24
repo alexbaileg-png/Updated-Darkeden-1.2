@@ -3,56 +3,55 @@ using UnityEngine;
 
 public class PlayerProjectileAttack : MonoBehaviour
 {
-    public enum SelectedSkill
-    {
-        HolyBolt,
-        HolyRain,
-        HolyCircleHeal,
-        HealingOrbit
-    }
-
     [Header("Selected Skill")]
-    public SelectedSkill selectedSkill = SelectedSkill.HolyBolt;
+    public SkillType currentSelectedSkill = SkillType.HolyBolt;
+
+    [Header("Keybinds")]
+    public SkillType f8Skill = SkillType.HolyBolt;
+    public SkillType f9Skill = SkillType.HolyCircleHeal;
+    public SkillType f10Skill = SkillType.HolyRain;
+    public SkillType f11Skill = SkillType.HealingOrbit;
 
     [Header("Cast Settings")]
     public float castDelay = 0.15f;
 
     [Header("Holy Bolt")]
     public GameObject projectilePrefab;
-    public float holyBoltCooldown = 0.35f;
 
     [Header("Holy Rain")]
     public GameObject holyRainEffectPrefab;
-    public float holyRainCooldown = 1.5f;
-    public float holyRainRadius = 3f;
-    public int holyRainDamage = 20;
+    public float holyRainBaseRadius = 3f;
 
     [Header("Holy Circle Heal")]
     public GameObject holyCircleHealEffectPrefab;
-    public float holyCircleHealCooldown = 2f;
-    public float holyCircleHealRadius = 4f;
-    public int holyCircleHealBaseAmount = 25;
+    public float holyCircleHealBaseRadius = 4f;
+    public float holyCircleHealBaseDuration = 4f;
+    public float holyCircleHealDurationPerLevel = 0.75f;
+    public float holyCircleHealInterval = 1f;
     public float holyCircleHealEffectHeight = 0.25f;
 
     [Header("Healing Orbit Buff")]
     public GameObject healingOrbitPrefab;
-    public float healingOrbitCooldown = 8f;
-    public int healingOrbitBaseHeal = 10;
-    public float healingOrbitDuration = 10f;
-    public float healingOrbitRadius = 1.5f;
-    public float healingOrbitSpeed = 180f;
+    public float healingOrbitBaseDuration = 10f;
+    public float healingOrbitDurationPerLevel = 1f;
+    public float healingOrbitBaseRadius = 1.5f;
+    public float healingOrbitRadiusPerLevel = 0.15f;
+    public float healingOrbitBaseSpeed = 420f;
+    public float healingOrbitSpeedPerLevel = 35f;
 
     private float nextCastTime = 0f;
     private bool isCasting = false;
 
     private PlayerMovement playerMovement;
     private PlayerStats playerStats;
+    private PlayerSkillManager skillManager;
     private Animator modelAnimator;
 
     void Start()
     {
         playerMovement = GetComponent<PlayerMovement>();
         playerStats = GetComponent<PlayerStats>();
+        skillManager = GetComponent<PlayerSkillManager>();
 
         if (playerMovement != null && playerMovement.modelAnimator != null)
             modelAnimator = playerMovement.modelAnimator;
@@ -67,16 +66,16 @@ public class PlayerProjectileAttack : MonoBehaviour
     void HandleSkillSelection()
     {
         if (Input.GetKeyDown(KeyCode.F8))
-            selectedSkill = SelectedSkill.HolyBolt;
-
-        if (Input.GetKeyDown(KeyCode.F10))
-            selectedSkill = SelectedSkill.HolyRain;
+            currentSelectedSkill = f8Skill;
 
         if (Input.GetKeyDown(KeyCode.F9))
-            selectedSkill = SelectedSkill.HolyCircleHeal;
+            currentSelectedSkill = f9Skill;
+
+        if (Input.GetKeyDown(KeyCode.F10))
+            currentSelectedSkill = f10Skill;
 
         if (Input.GetKeyDown(KeyCode.F11))
-            selectedSkill = SelectedSkill.HealingOrbit;
+            currentSelectedSkill = f11Skill;
     }
 
     void HandleCasting()
@@ -90,7 +89,23 @@ public class PlayerProjectileAttack : MonoBehaviour
         if (isCasting)
             return;
 
+        if (!CanUseSkill(currentSelectedSkill))
+            return;
+
         StartCoroutine(CastSelectedSkillRoutine());
+    }
+
+    bool CanUseSkill(SkillType skill)
+    {
+        if (skillManager != null && !skillManager.IsSkillUnlocked(skill))
+            return false;
+
+        int manaCost = GetManaCost(skill);
+
+        if (playerStats != null && !playerStats.SpendMana(manaCost))
+            return false;
+
+        return true;
     }
 
     IEnumerator CastSelectedSkillRoutine()
@@ -112,28 +127,82 @@ public class PlayerProjectileAttack : MonoBehaviour
 
         yield return new WaitForSeconds(castDelay);
 
-        if (selectedSkill == SelectedSkill.HolyBolt)
-        {
+        if (currentSelectedSkill == SkillType.HolyBolt)
             CastHolyBolt(aimDirection);
-            nextCastTime = Time.time + holyBoltCooldown;
-        }
-        else if (selectedSkill == SelectedSkill.HolyRain)
-        {
+        else if (currentSelectedSkill == SkillType.HolyRain)
             CastHolyRain();
-            nextCastTime = Time.time + holyRainCooldown;
-        }
-        else if (selectedSkill == SelectedSkill.HolyCircleHeal)
-        {
+        else if (currentSelectedSkill == SkillType.HolyCircleHeal)
             CastHolyCircleHeal();
-            nextCastTime = Time.time + holyCircleHealCooldown;
-        }
-        else if (selectedSkill == SelectedSkill.HealingOrbit)
-        {
+        else if (currentSelectedSkill == SkillType.HealingOrbit)
             CastHealingOrbit();
-            nextCastTime = Time.time + healingOrbitCooldown;
-        }
 
+        nextCastTime = Time.time + GetCooldown(currentSelectedSkill);
         isCasting = false;
+    }
+
+    int GetSkillLevel(SkillType skill)
+    {
+        if (skillManager == null)
+            return 1;
+
+        return Mathf.Max(1, skillManager.GetSkillLevel(skill));
+    }
+
+    int GetSkillPower(SkillType skill, int fallback)
+    {
+        if (skillManager == null)
+            return fallback;
+
+        int power = skillManager.GetSkillPower(skill);
+        return power > 0 ? power : fallback;
+    }
+
+    float GetCooldown(SkillType skill)
+    {
+        if (skillManager == null)
+            return 1f;
+
+        return skillManager.GetSkillCooldown(skill);
+    }
+
+    int GetManaCost(SkillType skill)
+    {
+        if (skillManager == null)
+            return 0;
+
+        return skillManager.GetSkillManaCost(skill);
+    }
+
+    public float GetCooldownRemaining()
+    {
+        return Mathf.Max(0f, nextCastTime - Time.time);
+    }
+
+    public float GetCurrentSkillCooldown()
+    {
+        return GetCooldown(currentSelectedSkill);
+    }
+
+    public void SetSelectedSkill(SkillType skill)
+    {
+        currentSelectedSkill = skill;
+    }
+
+    public void BindSkill(KeyCode key, SkillType skill)
+    {
+        if (key == KeyCode.F8)
+            f8Skill = skill;
+
+        if (key == KeyCode.F9)
+            f9Skill = skill;
+
+        if (key == KeyCode.F10)
+            f10Skill = skill;
+
+        if (key == KeyCode.F11)
+            f11Skill = skill;
+
+        Debug.Log("Bound " + skill + " to " + key);
     }
 
     Vector3 GetAimDirection()
@@ -166,6 +235,8 @@ public class PlayerProjectileAttack : MonoBehaviour
 
         direction.Normalize();
 
+        int damage = GetSkillPower(SkillType.HolyBolt, 20);
+
         GameObject projectileObject = Instantiate(
             projectilePrefab,
             transform.position + direction * 1f + Vector3.up * 0.5f,
@@ -177,6 +248,7 @@ public class PlayerProjectileAttack : MonoBehaviour
         if (projectile != null)
         {
             projectile.SetAttacker(gameObject);
+            projectile.damage = damage;
             projectile.damageType = DamageType.Magical;
             projectile.canCrit = true;
 
@@ -190,13 +262,20 @@ public class PlayerProjectileAttack : MonoBehaviour
         Vector3 castPosition = GetMouseWorldPosition();
         castPosition.y = 1.5f;
 
+        int skillLevel = GetSkillLevel(SkillType.HolyRain);
+        int damage = GetSkillPower(SkillType.HolyRain, 20);
+        float radius = holyRainBaseRadius + (skillLevel - 1) * 0.35f;
+
         if (holyRainEffectPrefab != null)
         {
-            Instantiate(
+            GameObject effect = Instantiate(
                 holyRainEffectPrefab,
                 castPosition,
                 holyRainEffectPrefab.transform.rotation
             );
+
+            if (holyRainBaseRadius > 0.01f)
+                effect.transform.localScale *= radius / holyRainBaseRadius;
         }
 
         EnemyHealth[] enemies = FindObjectsOfType<EnemyHealth>();
@@ -208,14 +287,14 @@ public class PlayerProjectileAttack : MonoBehaviour
 
             float distance = Vector3.Distance(castPosition, enemyPosition);
 
-            if (distance <= holyRainRadius)
+            if (distance <= radius)
             {
                 if (CombatManager.Instance != null)
                 {
                     DamageRequest request = new DamageRequest(
                         gameObject,
                         enemy.gameObject,
-                        holyRainDamage,
+                        damage,
                         DamageType.Magical,
                         true
                     );
@@ -224,7 +303,7 @@ public class PlayerProjectileAttack : MonoBehaviour
                 }
                 else
                 {
-                    enemy.ReceiveDamage(holyRainDamage, DamageType.Magical);
+                    enemy.ReceiveDamage(damage, DamageType.Magical);
                 }
             }
         }
@@ -235,34 +314,37 @@ public class PlayerProjectileAttack : MonoBehaviour
         Vector3 castPosition = GetMouseWorldPosition();
         castPosition.y = holyCircleHealEffectHeight;
 
-        if (holyCircleHealEffectPrefab == null)
+        int skillLevel = GetSkillLevel(SkillType.HolyCircleHeal);
+
+        int healAmount = GetSkillPower(SkillType.HolyCircleHeal, 25);
+        float radius = holyCircleHealBaseRadius + (skillLevel - 1) * 0.25f;
+        float duration = holyCircleHealBaseDuration + (skillLevel - 1) * holyCircleHealDurationPerLevel;
+
+        GameObject effectObject = null;
+
+        if (holyCircleHealEffectPrefab != null)
         {
-            Debug.LogError("Holy Circle Heal Effect Prefab is missing.");
-        }
-        else
-        {
-            GameObject effectObject = Instantiate(
+            effectObject = Instantiate(
                 holyCircleHealEffectPrefab,
                 castPosition,
                 holyCircleHealEffectPrefab.transform.rotation
             );
 
-            Debug.Log("Holy Circle Heal effect spawned: " + effectObject.name + " at " + castPosition);
+            if (holyCircleHealBaseRadius > 0.01f)
+                effectObject.transform.localScale *= radius / holyCircleHealBaseRadius;
         }
 
-        int healAmount = holyCircleHealBaseAmount;
-
-        if (playerStats != null)
-            healAmount = playerStats.GetMagicalHealing(holyCircleHealBaseAmount);
-
-        PlayerStats[] players = FindObjectsOfType<PlayerStats>();
-
-        foreach (PlayerStats targetStats in players)
+        if (effectObject != null)
         {
-            float distance = Vector3.Distance(castPosition, targetStats.transform.position);
+            HolyCircleHealArea healArea = effectObject.GetComponent<HolyCircleHealArea>();
 
-            if (distance <= holyCircleHealRadius)
-                targetStats.Heal(healAmount);
+            if (healArea == null)
+                healArea = effectObject.AddComponent<HolyCircleHealArea>();
+
+            healArea.healAmount = playerStats != null ? playerStats.GetMagicalHealing(healAmount) : healAmount;
+            healArea.radius = radius;
+            healArea.duration = duration;
+            healArea.healInterval = holyCircleHealInterval;
         }
     }
 
@@ -271,27 +353,30 @@ public class PlayerProjectileAttack : MonoBehaviour
         if (healingOrbitPrefab == null)
             return;
 
-        HealingOrbitBuff existingBuff = GetComponentInChildren<HealingOrbitBuff>();
+        int skillLevel = GetSkillLevel(SkillType.HealingOrbit);
 
-        if (existingBuff != null)
+        HealingOrbitBuff existingBuff = FindObjectOfType<HealingOrbitBuff>();
+
+        if (existingBuff != null && existingBuff.target == transform)
             Destroy(existingBuff.gameObject);
 
         GameObject orbitObject = Instantiate(
             healingOrbitPrefab,
             transform.position + Vector3.up * 1.1f,
-            Quaternion.identity,
-            transform
+            healingOrbitPrefab.transform.rotation
         );
+
+        orbitObject.transform.localScale = healingOrbitPrefab.transform.localScale;
 
         HealingOrbitBuff orbitBuff = orbitObject.GetComponent<HealingOrbitBuff>();
 
         if (orbitBuff != null)
         {
             orbitBuff.target = transform;
-            orbitBuff.baseHealAmount = healingOrbitBaseHeal;
-            orbitBuff.duration = healingOrbitDuration;
-            orbitBuff.orbitRadius = healingOrbitRadius;
-            orbitBuff.orbitSpeed = healingOrbitSpeed;
+            orbitBuff.baseHealAmount = GetSkillPower(SkillType.HealingOrbit, 10);
+            orbitBuff.duration = healingOrbitBaseDuration + (skillLevel - 1) * healingOrbitDurationPerLevel;
+            orbitBuff.orbitRadius = healingOrbitBaseRadius + (skillLevel - 1) * healingOrbitRadiusPerLevel;
+            orbitBuff.orbitSpeed = healingOrbitBaseSpeed + ((skillLevel - 1) * healingOrbitSpeedPerLevel);
         }
     }
 
