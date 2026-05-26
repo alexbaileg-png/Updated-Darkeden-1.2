@@ -41,8 +41,6 @@ public class EquipmentSlot : MonoBehaviour, IDropHandler, IBeginDragHandler, IDr
 
         if (equipmentManager != null)
             equipmentManager.RecalculateEquipmentStats();
-
-        Debug.Log("Equipped: " + item.itemName + " to " + allowedItemType);
     }
 
     public void ClearSlot()
@@ -85,19 +83,17 @@ public class EquipmentSlot : MonoBehaviour, IDropHandler, IBeginDragHandler, IDr
             return;
 
         if (!CanEquip(inventorySlot.currentItem))
-        {
-            Debug.Log("Cannot equip " + inventorySlot.currentItem.itemName + " to " + allowedItemType);
             return;
-        }
 
-        if (currentItem != null)
-        {
-            Debug.Log("Equipment slot already has item.");
-            return;
-        }
+        ItemData draggedItem = inventorySlot.currentItem;
+        ItemData oldEquippedItem = currentItem;
 
-        EquipItem(inventorySlot.currentItem);
-        inventorySlot.ClearSlot();
+        EquipItem(draggedItem);
+
+        if (oldEquippedItem != null)
+            inventorySlot.SetItem(oldEquippedItem, 1);
+        else
+            inventorySlot.ClearSlot();
     }
 
     public void OnPointerEnter(PointerEventData eventData)

@@ -29,7 +29,8 @@ public class Projectile : MonoBehaviour
 
     public void SetTarget(EnemyHealth target)
     {
-        targetEnemy = target;
+        if (target != null && !target.IsDead())
+            targetEnemy = target;
     }
 
     public void SetAttacker(GameObject newAttacker)
@@ -42,20 +43,22 @@ public class Projectile : MonoBehaviour
         if (hasHit)
             return;
 
+        if (targetEnemy != null && targetEnemy.IsDead())
+            targetEnemy = null;
+
         if (targetEnemy != null)
-        {
             MoveTowardTarget();
-        }
         else
-        {
             transform.position += transform.forward * speed * Time.deltaTime;
-        }
 
         CheckNearbyHits();
     }
 
     void MoveTowardTarget()
     {
+        if (targetEnemy == null || targetEnemy.IsDead())
+            return;
+
         Vector3 targetPosition = targetEnemy.transform.position + Vector3.up * 0.8f;
         Vector3 direction = targetPosition - transform.position;
 
@@ -87,7 +90,7 @@ public class Projectile : MonoBehaviour
 
         foreach (EnemyHealth enemy in enemies)
         {
-            if (enemy == null)
+            if (enemy == null || enemy.IsDead())
                 continue;
 
             Vector3 enemyPosition = enemy.transform.position + Vector3.up * 0.8f;
@@ -103,7 +106,7 @@ public class Projectile : MonoBehaviour
 
     void HitEnemy(EnemyHealth enemy)
     {
-        if (hasHit || enemy == null)
+        if (hasHit || enemy == null || enemy.IsDead())
             return;
 
         hasHit = true;

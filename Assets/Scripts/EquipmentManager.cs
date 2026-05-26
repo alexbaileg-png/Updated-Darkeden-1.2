@@ -19,13 +19,74 @@ public class EquipmentManager : MonoBehaviour
         RecalculateEquipmentStats();
     }
 
+    public bool TryEquipFromInventory(InventorySlot inventorySlot)
+    {
+        if (inventorySlot == null || inventorySlot.currentItem == null)
+            return false;
+
+        ItemData item = inventorySlot.currentItem;
+
+        EquipmentSlot targetSlot = GetSlotForItem(item);
+
+        if (targetSlot == null)
+            return false;
+
+        if (!targetSlot.CanEquip(item))
+            return false;
+
+        ItemData oldEquippedItem = targetSlot.currentItem;
+
+        targetSlot.EquipItem(item);
+
+        if (oldEquippedItem != null)
+            inventorySlot.SetItem(oldEquippedItem, 1);
+        else
+            inventorySlot.ClearSlot();
+
+        RecalculateEquipmentStats();
+
+        return true;
+    }
+
+    EquipmentSlot GetSlotForItem(ItemData item)
+    {
+        if (item == null)
+            return null;
+
+        switch (item.itemType)
+        {
+            case ItemType.Helmet:
+                return helmetSlot;
+
+            case ItemType.Necklace:
+                return necklaceSlot;
+
+            case ItemType.Top:
+                return topSlot;
+
+            case ItemType.Bottom:
+                return bottomSlot;
+
+            case ItemType.Boots:
+                return bootsSlot;
+
+            case ItemType.Weapon:
+                if (rightWeaponSlot != null && rightWeaponSlot.currentItem == null)
+                    return rightWeaponSlot;
+
+                if (leftWeaponSlot != null && leftWeaponSlot.currentItem == null)
+                    return leftWeaponSlot;
+
+                return rightWeaponSlot;
+        }
+
+        return null;
+    }
+
     public void RecalculateEquipmentStats()
     {
         if (playerStats == null)
-        {
-            Debug.LogError("EquipmentManager: PlayerStats is missing.");
             return;
-        }
 
         playerStats.ClearGearBonuses();
 
@@ -38,16 +99,11 @@ public class EquipmentManager : MonoBehaviour
         AddSlotBonuses(rightWeaponSlot);
 
         playerStats.RecalculateStats();
-
-        Debug.Log("Equipment stats recalculated.");
     }
 
     void AddSlotBonuses(EquipmentSlot slot)
     {
-        if (slot == null)
-            return;
-
-        if (slot.currentItem == null)
+        if (slot == null || slot.currentItem == null)
             return;
 
         playerStats.AddGearBonuses(slot.currentItem);

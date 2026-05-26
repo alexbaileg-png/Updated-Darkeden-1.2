@@ -36,16 +36,27 @@ public class MenuTabController : MonoBehaviour
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.I))
+        {
+            HideItemTooltip();
             ToggleInventory();
+        }
 
         if (Input.GetKeyDown(KeyCode.P))
+        {
+            HideItemTooltip();
             ToggleStats();
+        }
 
         if (Input.GetKeyDown(KeyCode.K))
+        {
+            HideItemTooltip();
             ToggleSkills();
+        }
 
         if (Input.GetKeyDown(KeyCode.Escape))
         {
+            HideItemTooltip();
+
             if (IsAnythingOpen())
                 CloseEverything();
             else
@@ -55,8 +66,16 @@ public class MenuTabController : MonoBehaviour
         IsMenuOpen = IsAnythingOpen();
     }
 
+    void HideItemTooltip()
+    {
+        if (ItemTooltip.Instance != null)
+            ItemTooltip.Instance.HideTooltip();
+    }
+
     public void OpenMainMenu()
     {
+        HideItemTooltip();
+
         if (menuRoot != null)
             menuRoot.SetActive(true);
 
@@ -68,21 +87,25 @@ public class MenuTabController : MonoBehaviour
 
     public void ToggleInventory()
     {
+        HideItemTooltip();
         TogglePanel(inventoryPanel);
     }
 
     public void ToggleStats()
     {
+        HideItemTooltip();
         TogglePanel(statsPanel);
     }
 
     public void ToggleSkills()
     {
+        HideItemTooltip();
         TogglePanel(skillsPanel);
     }
 
     public void ToggleOptions()
     {
+        HideItemTooltip();
         TogglePanel(optionsPanel);
     }
 
@@ -91,21 +114,25 @@ public class MenuTabController : MonoBehaviour
         if (menuRoot == null || panel == null)
             return;
 
+        bool newState = !panel.activeSelf;
+
         menuRoot.SetActive(true);
 
         if (topbar != null)
             topbar.SetActive(false);
 
-        panel.SetActive(!panel.activeSelf);
+        panel.SetActive(newState);
 
         IsMenuOpen = IsAnythingOpen();
 
-        if (!IsMenuOpen)
+        if (!IsMenuOpen && menuRoot != null)
             menuRoot.SetActive(false);
     }
 
     public void CloseEverything()
     {
+        HideItemTooltip();
+
         if (inventoryPanel != null) inventoryPanel.SetActive(false);
         if (statsPanel != null) statsPanel.SetActive(false);
         if (skillsPanel != null) skillsPanel.SetActive(false);

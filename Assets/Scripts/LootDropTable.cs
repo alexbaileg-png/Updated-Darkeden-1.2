@@ -41,7 +41,9 @@ public class LootDropTable : MonoBehaviour
 
             if (roll <= entry.dropChance)
             {
-                SpawnLoot(entry.item);
+                ItemData rolledItem = ItemRoller.RollItem(entry.item);
+                SpawnLoot(rolledItem);
+
                 dropsCreated++;
             }
         }
@@ -49,6 +51,9 @@ public class LootDropTable : MonoBehaviour
 
     void SpawnLoot(ItemData item)
     {
+        if (item == null)
+            return;
+
         GameObject prefabToSpawn = item.worldLootPrefab;
 
         if (prefabToSpawn == null)

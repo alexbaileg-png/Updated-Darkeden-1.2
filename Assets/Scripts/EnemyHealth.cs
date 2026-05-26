@@ -32,6 +32,11 @@ public class EnemyHealth : MonoBehaviour, IDamageable
         UpdateHealthBar();
     }
 
+    public bool IsDead()
+    {
+        return isDead;
+    }
+
     public void TakeDamage(int damage)
     {
         ReceiveDamage(damage, DamageType.Magical);
@@ -74,9 +79,7 @@ public class EnemyHealth : MonoBehaviour, IDamageable
         Bounds bounds = renderers[0].bounds;
 
         for (int i = 1; i < renderers.Length; i++)
-        {
             bounds.Encapsulate(renderers[i].bounds);
-        }
 
         return bounds.center;
     }
@@ -97,6 +100,8 @@ public class EnemyHealth : MonoBehaviour, IDamageable
 
         isDead = true;
 
+        DisableAllColliders();
+
         GiveXPToPlayer();
 
         if (lootDropTable != null)
@@ -116,12 +121,15 @@ public class EnemyHealth : MonoBehaviour, IDamageable
         if (healthBar != null)
             healthBar.gameObject.SetActive(false);
 
-        Collider col = GetComponent<Collider>();
-
-        if (col != null)
-            col.enabled = false;
-
         StartCoroutine(DestroyAfterDeath());
+    }
+
+    void DisableAllColliders()
+    {
+        Collider[] colliders = GetComponentsInChildren<Collider>();
+
+        foreach (Collider col in colliders)
+            col.enabled = false;
     }
 
     void GiveXPToPlayer()
