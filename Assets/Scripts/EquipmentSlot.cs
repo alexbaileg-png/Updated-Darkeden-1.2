@@ -2,7 +2,14 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public class EquipmentSlot : MonoBehaviour, IDropHandler, IBeginDragHandler, IDragHandler, IEndDragHandler, IPointerEnterHandler, IPointerExitHandler
+public class EquipmentSlot : MonoBehaviour,
+    IDropHandler,
+    IBeginDragHandler,
+    IDragHandler,
+    IEndDragHandler,
+    IPointerEnterHandler,
+    IPointerExitHandler,
+    IPointerClickHandler
 {
     public ItemType allowedItemType;
     public ItemData currentItem;
@@ -26,6 +33,9 @@ public class EquipmentSlot : MonoBehaviour, IDropHandler, IBeginDragHandler, IDr
         if (itemIcon != null)
             iconRectTransform = itemIcon.GetComponent<RectTransform>();
 
+        if (equipmentManager == null)
+            equipmentManager = FindObjectOfType<EquipmentManager>();
+
         RefreshSlot();
     }
 
@@ -41,6 +51,12 @@ public class EquipmentSlot : MonoBehaviour, IDropHandler, IBeginDragHandler, IDr
 
         if (equipmentManager != null)
             equipmentManager.RecalculateEquipmentStats();
+    }
+
+    public void SetItemWithoutRecalculate(ItemData item)
+    {
+        currentItem = item;
+        RefreshSlot();
     }
 
     public void ClearSlot()
@@ -75,8 +91,26 @@ public class EquipmentSlot : MonoBehaviour, IDropHandler, IBeginDragHandler, IDr
             iconRectTransform.anchoredPosition = Vector2.zero;
     }
 
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (currentItem == null)
+            return;
+
+        if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+        {
+            if (equipmentManager == null)
+                equipmentManager = FindObjectOfType<EquipmentManager>();
+
+            if (equipmentManager != null)
+                equipmentManager.TryUnequipToInventory(this);
+        }
+    }
+
     public void OnDrop(PointerEventData eventData)
     {
+        if (eventData == null || eventData.pointerDrag == null)
+            return;
+
         InventorySlot inventorySlot = eventData.pointerDrag.GetComponent<InventorySlot>();
 
         if (inventorySlot == null || inventorySlot.currentItem == null)
@@ -88,12 +122,15 @@ public class EquipmentSlot : MonoBehaviour, IDropHandler, IBeginDragHandler, IDr
         ItemData draggedItem = inventorySlot.currentItem;
         ItemData oldEquippedItem = currentItem;
 
-        EquipItem(draggedItem);
+        SetItemWithoutRecalculate(draggedItem);
 
         if (oldEquippedItem != null)
             inventorySlot.SetItem(oldEquippedItem, 1);
         else
             inventorySlot.ClearSlot();
+
+        if (equipmentManager != null)
+            equipmentManager.RecalculateEquipmentStats();
     }
 
     public void OnPointerEnter(PointerEventData eventData)

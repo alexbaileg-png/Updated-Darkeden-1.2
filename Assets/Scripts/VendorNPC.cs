@@ -2,8 +2,11 @@ using UnityEngine;
 
 public class VendorNPC : MonoBehaviour
 {
-    [Header("UI")]
-    public GameObject vendorPanel;
+    [Header("Merchant")]
+    public string merchantName = "Merchant";
+
+    [Header("Dialogue")]
+    public MerchantDialogueUI merchantDialogueUI;
 
     [Header("Player")]
     public Transform player;
@@ -14,9 +17,6 @@ public class VendorNPC : MonoBehaviour
 
     void Start()
     {
-        if (vendorPanel != null)
-            vendorPanel.SetActive(false);
-
         if (player == null)
         {
             GameObject playerObject = GameObject.Find("Player");
@@ -28,19 +28,19 @@ public class VendorNPC : MonoBehaviour
 
     void Update()
     {
-        if (player == null || vendorPanel == null)
+        if (player == null || merchantDialogueUI == null)
             return;
 
         float distance = Vector3.Distance(transform.position, player.position);
 
         if (distance <= interactDistance && Input.GetKeyDown(interactKey))
         {
-            vendorPanel.SetActive(!vendorPanel.activeSelf);
+            merchantDialogueUI.OpenDialogue(merchantName);
         }
 
-        if (distance > interactDistance && vendorPanel.activeSelf)
+        if (distance > interactDistance)
         {
-            vendorPanel.SetActive(false);
+            merchantDialogueUI.CloseAll();
         }
     }
 }

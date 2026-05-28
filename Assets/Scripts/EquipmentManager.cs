@@ -5,6 +5,9 @@ public class EquipmentManager : MonoBehaviour
     [Header("Player")]
     public PlayerStats playerStats;
 
+    [Header("Inventory")]
+    public InventoryGrid inventoryGrid;
+
     [Header("Equipment Slots")]
     public EquipmentSlot helmetSlot;
     public EquipmentSlot necklaceSlot;
@@ -24,24 +27,52 @@ public class EquipmentManager : MonoBehaviour
         if (inventorySlot == null || inventorySlot.currentItem == null)
             return false;
 
-        ItemData item = inventorySlot.currentItem;
+        ItemData itemToEquip = inventorySlot.currentItem;
 
-        EquipmentSlot targetSlot = GetSlotForItem(item);
+        if (itemToEquip.isStackable)
+            return false;
+
+        EquipmentSlot targetSlot = GetSlotForItem(itemToEquip);
 
         if (targetSlot == null)
             return false;
 
-        if (!targetSlot.CanEquip(item))
+        if (!targetSlot.CanEquip(itemToEquip))
             return false;
 
         ItemData oldEquippedItem = targetSlot.currentItem;
 
-        targetSlot.EquipItem(item);
+        targetSlot.SetItemWithoutRecalculate(itemToEquip);
 
         if (oldEquippedItem != null)
             inventorySlot.SetItem(oldEquippedItem, 1);
         else
             inventorySlot.ClearSlot();
+
+        RecalculateEquipmentStats();
+
+        return true;
+    }
+
+    public bool TryUnequipToInventory(EquipmentSlot equipmentSlot)
+    {
+        if (equipmentSlot == null || equipmentSlot.currentItem == null)
+            return false;
+
+        if (inventoryGrid == null)
+            inventoryGrid = FindObjectOfType<InventoryGrid>();
+
+        if (inventoryGrid == null)
+            return false;
+
+        ItemData itemToUnequip = equipmentSlot.currentItem;
+
+        bool added = inventoryGrid.AddItem(itemToUnequip, 1);
+
+        if (!added)
+            return false;
+
+        equipmentSlot.ClearSlot();
 
         RecalculateEquipmentStats();
 
