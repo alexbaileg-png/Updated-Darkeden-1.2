@@ -12,6 +12,10 @@ public class MerchantDialogueUI : MonoBehaviour
     public GameObject vendorBuyPanel;
     public GameObject questPanel;
 
+    [Header("Player Inventory UI")]
+    public GameObject menuRoot;
+    public GameObject inventoryPanel;
+
     [Header("Text")]
     public TMP_Text merchantNameText;
     public TMP_Text dialogueText;
@@ -78,17 +82,28 @@ public class MerchantDialogueUI : MonoBehaviour
 
     public void OpenBuy()
     {
+        OpenInventory();
         OpenPanel(vendorBuyPanel);
     }
 
     public void OpenSell()
     {
+        OpenInventory();
         OpenPanel(vendorSellPanel);
     }
 
     public void OpenQuests()
     {
         OpenPanel(questPanel);
+    }
+
+    void OpenInventory()
+    {
+        if (menuRoot != null)
+            menuRoot.SetActive(true);
+
+        if (inventoryPanel != null)
+            inventoryPanel.SetActive(true);
     }
 
     void OpenPanel(GameObject panel)

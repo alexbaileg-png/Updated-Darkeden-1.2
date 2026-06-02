@@ -14,6 +14,11 @@ public class InventoryGrid : MonoBehaviour
 
     private InventorySlot[] slots;
 
+    public InventorySlot[] Slots
+    {
+        get { return slots; }
+    }
+
     void Start()
     {
         BuildGrid();
@@ -54,6 +59,18 @@ public class InventoryGrid : MonoBehaviour
 
         foreach (ItemData item in startingItems)
             AddItem(item);
+    }
+
+    public void ClearInventory()
+    {
+        if (slots == null)
+            return;
+
+        foreach (InventorySlot slot in slots)
+        {
+            if (slot != null)
+                slot.ClearSlot();
+        }
     }
 
     public bool AddItem(ItemData item)

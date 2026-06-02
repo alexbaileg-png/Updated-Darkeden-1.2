@@ -1,0 +1,43 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e976ae5566286845b37c51031801d11, type: 3}
+  m_Name: Weapon Crystal
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  itemId: Weapon_Crystal
+  itemName: Weapon Crystal
+  description: 
+  itemIcon: {fileID: 21300000, guid: fa63baa6790309f4ba4f482a07bb7bbb, type: 3}
+  itemType: 10
+  rarity: 5
+  isStackable: 1
+  maxStackSize: 99
+  restoreAmount: 0
+  sellValue: 1000000
+  worldLootPrefab: {fileID: 6769121852389321879, guid: 36ae9ac79195efa49a556668fd9e83b9, type: 3}
+  strengthBonus: 0
+  dexterityBonus: 0
+  intelligenceBonus: 0
+  enduranceBonus: 0
+  healthBonus: 0
+  manaBonus: 0
+  meleeDamageBonus: 0
+  rangedDamageBonus: 0
+  magicalDamageBonus: 0
+  armorBonus: 0
+  resistanceBonus: 0
+  meleeResistanceBonus: 0
+  magicalResistanceBonus: 0
+  allResistanceBonus: 0
+  hasCrystalStat: 0
+  crystalStat: 0
+  crystalCurrentValue: 0
+  crystalMaxValue: 0

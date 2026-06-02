@@ -4,6 +4,7 @@ using UnityEngine.EventSystems;
 using TMPro;
 
 public class InventorySlot : MonoBehaviour,
+    IPointerDownHandler,
     IBeginDragHandler,
     IDragHandler,
     IEndDragHandler,
@@ -29,14 +30,13 @@ public class InventorySlot : MonoBehaviour,
     public Sprite rareBorder;
     public Sprite epicBorder;
     public Sprite legendaryBorder;
+    public Sprite mythicalBorder;
 
     private Canvas parentCanvas;
     private CanvasGroup canvasGroup;
     private RectTransform iconRectTransform;
     private Vector2 originalIconPosition;
-
     private bool isDraggingItem = false;
-    private bool mouseOverSlot = false;
 
     void Start()
     {
@@ -57,11 +57,7 @@ public class InventorySlot : MonoBehaviour,
         if (currentItem == null)
             return;
 
-        bool shiftHeld =
-            Input.GetKey(KeyCode.LeftShift) ||
-            Input.GetKey(KeyCode.RightShift);
-
-        if (!shiftHeld)
+        if (!Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.RightShift))
             return;
 
         if (!Input.GetMouseButtonDown(0))
@@ -71,6 +67,235 @@ public class InventorySlot : MonoBehaviour,
             return;
 
         TryShiftEquip();
+    }
+
+    public void OnPointerDown(PointerEventData eventData)
+    {
+        if (currentItem == null)
+            return;
+
+        if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
+            return;
+
+        if (eventData.button != PointerEventData.InputButton.Left)
+            return;
+
+        SelectedSlot = this;
+
+        foreach (InventorySlot slot in FindObjectsOfType<InventorySlot>())
+            slot.RefreshSlot();
+    }
+
+    public void OnDrop(PointerEventData eventData)
+    {
+        if (eventData == null || eventData.pointerDrag == null)
+            return;
+
+        InventorySlot draggedSlot = eventData.pointerDrag.GetComponent<InventorySlot>();
+
+        if (draggedSlot != null && draggedSlot != this && draggedSlot.currentItem != null)
+        {
+            HandleInventorySlotDrop(draggedSlot);
+            return;
+        }
+
+        VialHotbarSlot vialSlot = eventData.pointerDrag.GetComponent<VialHotbarSlot>();
+
+        if (vialSlot != null && vialSlot.currentItem != null)
+        {
+            HandleVialSlotDrop(vialSlot);
+            return;
+        }
+
+        EquipmentSlot equipmentSlot = eventData.pointerDrag.GetComponent<EquipmentSlot>();
+
+        if (equipmentSlot != null && equipmentSlot.currentItem != null)
+        {
+            HandleEquipmentSlotDrop(equipmentSlot);
+            return;
+        }
+    }
+
+    void HandleInventorySlotDrop(InventorySlot draggedSlot)
+    {
+        ItemData draggedItem = draggedSlot.currentItem;
+
+        bool isEnhancementItem =
+            draggedItem.itemType == ItemType.WeaponCrystal ||
+            draggedItem.itemType == ItemType.ArmorCrystal ||
+            draggedItem.itemType == ItemType.EnchantStone ||
+            draggedItem.itemType == ItemType.RefiningStone;
+
+        if (isEnhancementItem && currentItem != null)
+        {
+            TryApplyEnhancementFromSlot(draggedSlot);
+            return;
+        }
+
+        if (TryStackFromInventorySlot(draggedSlot))
+            return;
+
+        if (currentItem != null)
+        {
+            ItemData oldItem = currentItem;
+            int oldQuantity = quantity;
+
+            SetItem(draggedSlot.currentItem, draggedSlot.quantity);
+            draggedSlot.SetItem(oldItem, oldQuantity);
+        }
+        else
+        {
+            SetItem(draggedSlot.currentItem, draggedSlot.quantity);
+            draggedSlot.ClearSlot();
+        }
+
+        SaveInventoryChange();
+    }
+
+    void HandleVialSlotDrop(VialHotbarSlot vialSlot)
+    {
+        if (vialSlot == null || vialSlot.currentItem == null)
+            return;
+
+        if (TryStackFromVialSlot(vialSlot))
+            return;
+
+        if (currentItem != null)
+            return;
+
+        SetItem(vialSlot.currentItem, vialSlot.quantity);
+        vialSlot.ClearSlot();
+
+        VialHotbar hotbar = vialSlot.GetComponentInParent<VialHotbar>();
+        if (hotbar != null)
+            hotbar.SaveSlotsToBelt();
+
+        SaveInventoryChange();
+    }
+
+    void HandleEquipmentSlotDrop(EquipmentSlot equipmentSlot)
+    {
+        if (equipmentSlot == null || equipmentSlot.currentItem == null)
+            return;
+
+        if (currentItem != null)
+            return;
+
+        SetItem(equipmentSlot.currentItem, 1);
+        equipmentSlot.ClearSlot();
+
+        SaveInventoryChange();
+    }
+
+    bool TryStackFromInventorySlot(InventorySlot draggedSlot)
+    {
+        if (draggedSlot == null || draggedSlot.currentItem == null)
+            return false;
+
+        if (currentItem == null)
+            return false;
+
+        if (!SameItem(currentItem, draggedSlot.currentItem))
+            return false;
+
+        if (!currentItem.isStackable)
+            return false;
+
+        int remaining = AddToStack(draggedSlot.quantity);
+
+        if (remaining <= 0)
+            draggedSlot.ClearSlot();
+        else
+        {
+            draggedSlot.quantity = remaining;
+            draggedSlot.RefreshSlot();
+        }
+
+        SaveInventoryChange();
+        return true;
+    }
+
+    bool TryStackFromVialSlot(VialHotbarSlot vialSlot)
+    {
+        if (vialSlot == null || vialSlot.currentItem == null)
+            return false;
+
+        if (currentItem == null)
+            return false;
+
+        if (!SameItem(currentItem, vialSlot.currentItem))
+            return false;
+
+        if (!currentItem.isStackable)
+            return false;
+
+        int remaining = AddToStack(vialSlot.quantity);
+
+        if (remaining <= 0)
+            vialSlot.ClearSlot();
+        else
+        {
+            vialSlot.quantity = remaining;
+            vialSlot.RefreshSlot();
+        }
+
+        VialHotbar hotbar = vialSlot.GetComponentInParent<VialHotbar>();
+        if (hotbar != null)
+            hotbar.SaveSlotsToBelt();
+
+        SaveInventoryChange();
+        return true;
+    }
+
+    void TryApplyEnhancementFromSlot(InventorySlot enhancementSlot)
+    {
+        if (enhancementSlot == null || enhancementSlot.currentItem == null)
+            return;
+
+        if (currentItem == null)
+            return;
+
+        ItemEnhancementManager manager = FindObjectOfType<ItemEnhancementManager>();
+
+        if (manager == null)
+        {
+            Debug.LogWarning("No ItemEnhancementManager found.");
+            return;
+        }
+
+        bool success = manager.UseEnhancementItem(currentItem, enhancementSlot.currentItem);
+
+        if (!success)
+            return;
+
+        ItemData usedItem = enhancementSlot.currentItem;
+
+        enhancementSlot.RemoveQuantity(1);
+        RefreshSlot();
+
+        SaveInventoryChange();
+
+        Debug.Log("Applied " + usedItem.itemName + " to " + currentItem.itemName);
+    }
+
+    bool SameItem(ItemData a, ItemData b)
+    {
+        if (a == null || b == null)
+            return false;
+
+        return !string.IsNullOrEmpty(a.itemId) &&
+               !string.IsNullOrEmpty(b.itemId) &&
+               a.itemId == b.itemId;
+    }
+
+    void TryShiftEquip()
+    {
+        EquipmentManager equipmentManager = FindObjectOfType<EquipmentManager>();
+
+        if (equipmentManager == null)
+            return;
+
+        equipmentManager.TryEquipFromInventory(this);
     }
 
     bool IsMouseOverIcon()
@@ -90,32 +315,6 @@ public class InventorySlot : MonoBehaviour,
         );
     }
 
-    void TryShiftEquip()
-    {
-        if (currentItem == null)
-            return;
-
-        EquipmentManager equipmentManager = FindObjectOfType<EquipmentManager>();
-
-        if (equipmentManager == null)
-        {
-            Debug.LogWarning("Shift equip failed: No active EquipmentManager found.");
-            return;
-        }
-
-        bool equipped = equipmentManager.TryEquipFromInventory(this);
-
-        if (!equipped)
-        {
-            Debug.LogWarning(
-                "Shift equip failed for: " +
-                currentItem.itemName +
-                " | ItemType: " +
-                currentItem.itemType
-            );
-        }
-    }
-
     public void SetItem(ItemData newItem, int amount = 1)
     {
         currentItem = newItem;
@@ -130,7 +329,6 @@ public class InventorySlot : MonoBehaviour,
 
         currentItem = null;
         quantity = 0;
-
         RefreshSlot();
         HideTooltip();
     }
@@ -142,8 +340,9 @@ public class InventorySlot : MonoBehaviour,
 
     public bool CanStack(ItemData item)
     {
-        return currentItem == item &&
-               currentItem != null &&
+        return currentItem != null &&
+               item != null &&
+               SameItem(currentItem, item) &&
                currentItem.isStackable &&
                quantity < currentItem.maxStackSize;
     }
@@ -185,7 +384,7 @@ public class InventorySlot : MonoBehaviour,
         {
             itemIcon.enabled = hasItem && currentItem.itemIcon != null;
             itemIcon.sprite = hasItem ? currentItem.itemIcon : null;
-            itemIcon.raycastTarget = hasItem;
+            itemIcon.raycastTarget = false;
         }
 
         if (rarityBorder != null)
@@ -208,11 +407,7 @@ public class InventorySlot : MonoBehaviour,
 
         if (quantityText != null)
         {
-            bool showQuantity =
-                hasItem &&
-                currentItem.isStackable &&
-                quantity > 1;
-
+            bool showQuantity = hasItem && currentItem.isStackable && quantity > 1;
             quantityText.gameObject.SetActive(showQuantity);
             quantityText.text = showQuantity ? quantity.ToString() : "";
             quantityText.raycastTarget = false;
@@ -226,54 +421,25 @@ public class InventorySlot : MonoBehaviour,
     {
         switch (rarity)
         {
-            case ItemRarity.Common:
-                return commonBorder;
-
-            case ItemRarity.Uncommon:
-                return uncommonBorder;
-
-            case ItemRarity.Rare:
-                return rareBorder;
-
-            case ItemRarity.Epic:
-                return epicBorder;
-
-            case ItemRarity.Legendary:
-                return legendaryBorder;
+            case ItemRarity.Common: return commonBorder;
+            case ItemRarity.Uncommon: return uncommonBorder;
+            case ItemRarity.Rare: return rareBorder;
+            case ItemRarity.Epic: return epicBorder;
+            case ItemRarity.Legendary: return legendaryBorder;
+            case ItemRarity.Mythical: return mythicalBorder;
         }
 
         return commonBorder;
     }
 
-    public void OnDrop(PointerEventData eventData)
-    {
-        if (eventData == null || eventData.pointerDrag == null)
-            return;
-
-        EquipmentSlot equipmentSlot =
-            eventData.pointerDrag.GetComponent<EquipmentSlot>();
-
-        if (equipmentSlot == null || equipmentSlot.currentItem == null)
-            return;
-
-        if (currentItem != null)
-            return;
-
-        SetItem(equipmentSlot.currentItem, 1);
-        equipmentSlot.ClearSlot();
-    }
-
     public void OnPointerEnter(PointerEventData eventData)
     {
-        mouseOverSlot = true;
-
         if (currentItem != null && ItemTooltip.Instance != null)
             ItemTooltip.Instance.ShowTooltip(currentItem);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        mouseOverSlot = false;
         HideTooltip();
     }
 
@@ -293,26 +459,11 @@ public class InventorySlot : MonoBehaviour,
         if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift))
             return;
 
-        if (!IsPointerOverIcon(eventData))
-            return;
-
-        HideTooltip();
-
         originalIconPosition = iconRectTransform.anchoredPosition;
         canvasGroup.blocksRaycasts = false;
+        HideTooltip();
+
         isDraggingItem = true;
-    }
-
-    bool IsPointerOverIcon(PointerEventData eventData)
-    {
-        if (iconRectTransform == null)
-            return false;
-
-        return RectTransformUtility.RectangleContainsScreenPoint(
-            iconRectTransform,
-            eventData.position,
-            eventData.pressEventCamera
-        );
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -323,8 +474,7 @@ public class InventorySlot : MonoBehaviour,
         if (currentItem == null || itemIcon == null || parentCanvas == null)
             return;
 
-        iconRectTransform.anchoredPosition +=
-            eventData.delta / parentCanvas.scaleFactor;
+        iconRectTransform.anchoredPosition += eventData.delta / parentCanvas.scaleFactor;
     }
 
     public void OnEndDrag(PointerEventData eventData)
@@ -337,5 +487,11 @@ public class InventorySlot : MonoBehaviour,
 
         if (iconRectTransform != null)
             iconRectTransform.anchoredPosition = originalIconPosition;
+    }
+
+    void SaveInventoryChange()
+    {
+        if (InventoryPersistenceManager.Instance != null)
+            InventoryPersistenceManager.Instance.SaveAfterChange();
     }
 }

@@ -14,12 +14,69 @@ public class EquipmentManager : MonoBehaviour
     public EquipmentSlot topSlot;
     public EquipmentSlot bottomSlot;
     public EquipmentSlot bootsSlot;
+    public EquipmentSlot glovesSlot;
+    public EquipmentSlot beltSlot;
     public EquipmentSlot leftWeaponSlot;
     public EquipmentSlot rightWeaponSlot;
+
+    public EquipmentSlot[] EquipmentSlots
+    {
+        get
+        {
+            return new EquipmentSlot[]
+            {
+                helmetSlot,
+                necklaceSlot,
+                topSlot,
+                bottomSlot,
+                bootsSlot,
+                glovesSlot,
+                beltSlot,
+                leftWeaponSlot,
+                rightWeaponSlot
+            };
+        }
+    }
 
     void Start()
     {
         RecalculateEquipmentStats();
+    }
+
+    public void ClearEquipment()
+    {
+        foreach (EquipmentSlot slot in EquipmentSlots)
+        {
+            if (slot != null)
+                slot.ClearSlot();
+        }
+
+        RecalculateEquipmentStats();
+    }
+
+    public ItemData GetEquippedItemForType(ItemType itemType)
+    {
+        switch (itemType)
+        {
+            case ItemType.Helmet: return helmetSlot != null ? helmetSlot.currentItem : null;
+            case ItemType.Necklace: return necklaceSlot != null ? necklaceSlot.currentItem : null;
+            case ItemType.Top: return topSlot != null ? topSlot.currentItem : null;
+            case ItemType.Bottom: return bottomSlot != null ? bottomSlot.currentItem : null;
+            case ItemType.Boots: return bootsSlot != null ? bootsSlot.currentItem : null;
+            case ItemType.Gloves: return glovesSlot != null ? glovesSlot.currentItem : null;
+            case ItemType.Belt: return beltSlot != null ? beltSlot.currentItem : null;
+
+            case ItemType.Weapon:
+                if (rightWeaponSlot != null && rightWeaponSlot.currentItem != null)
+                    return rightWeaponSlot.currentItem;
+
+                if (leftWeaponSlot != null && leftWeaponSlot.currentItem != null)
+                    return leftWeaponSlot.currentItem;
+
+                return null;
+        }
+
+        return null;
     }
 
     public bool TryEquipFromInventory(InventorySlot inventorySlot)
@@ -34,10 +91,7 @@ public class EquipmentManager : MonoBehaviour
 
         EquipmentSlot targetSlot = GetSlotForItem(itemToEquip);
 
-        if (targetSlot == null)
-            return false;
-
-        if (!targetSlot.CanEquip(itemToEquip))
+        if (targetSlot == null || !targetSlot.CanEquip(itemToEquip))
             return false;
 
         ItemData oldEquippedItem = targetSlot.currentItem;
@@ -50,6 +104,9 @@ public class EquipmentManager : MonoBehaviour
             inventorySlot.ClearSlot();
 
         RecalculateEquipmentStats();
+
+        if (InventoryPersistenceManager.Instance != null)
+            InventoryPersistenceManager.Instance.SaveAfterChange();
 
         return true;
     }
@@ -76,6 +133,9 @@ public class EquipmentManager : MonoBehaviour
 
         RecalculateEquipmentStats();
 
+        if (InventoryPersistenceManager.Instance != null)
+            InventoryPersistenceManager.Instance.SaveAfterChange();
+
         return true;
     }
 
@@ -86,20 +146,13 @@ public class EquipmentManager : MonoBehaviour
 
         switch (item.itemType)
         {
-            case ItemType.Helmet:
-                return helmetSlot;
-
-            case ItemType.Necklace:
-                return necklaceSlot;
-
-            case ItemType.Top:
-                return topSlot;
-
-            case ItemType.Bottom:
-                return bottomSlot;
-
-            case ItemType.Boots:
-                return bootsSlot;
+            case ItemType.Helmet: return helmetSlot;
+            case ItemType.Necklace: return necklaceSlot;
+            case ItemType.Top: return topSlot;
+            case ItemType.Bottom: return bottomSlot;
+            case ItemType.Boots: return bootsSlot;
+            case ItemType.Gloves: return glovesSlot;
+            case ItemType.Belt: return beltSlot;
 
             case ItemType.Weapon:
                 if (rightWeaponSlot != null && rightWeaponSlot.currentItem == null)
@@ -121,13 +174,8 @@ public class EquipmentManager : MonoBehaviour
 
         playerStats.ClearGearBonuses();
 
-        AddSlotBonuses(helmetSlot);
-        AddSlotBonuses(necklaceSlot);
-        AddSlotBonuses(topSlot);
-        AddSlotBonuses(bottomSlot);
-        AddSlotBonuses(bootsSlot);
-        AddSlotBonuses(leftWeaponSlot);
-        AddSlotBonuses(rightWeaponSlot);
+        foreach (EquipmentSlot slot in EquipmentSlots)
+            AddSlotBonuses(slot);
 
         playerStats.RecalculateStats();
     }

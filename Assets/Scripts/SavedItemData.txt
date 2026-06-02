@@ -1,0 +1,42 @@
+using System;
+
+[Serializable]
+public class SavedItemData
+{
+    // UNIQUE INSTANCE ID
+    public string uniqueItemId;
+
+    // TEMPLATE ITEM ID
+    public string baseItemId;
+
+    // STACKING
+    public int quantity;
+
+    // RARITY
+    public ItemRarity rarity;
+
+    // BASE STATS
+    public int strengthBonus;
+    public int dexterityBonus;
+    public int intelligenceBonus;
+    public int enduranceBonus;
+
+    public int healthBonus;
+    public int manaBonus;
+
+    public int meleeDamageBonus;
+    public int rangedDamageBonus;
+    public int magicalDamageBonus;
+
+    public int armorBonus;
+    public int resistanceBonus;
+    public int meleeResistanceBonus;
+    public int magicalResistanceBonus;
+    public int allResistanceBonus;
+
+    // CRYSTAL DATA
+    public bool hasCrystalStat;
+    public ItemBonusStat crystalStat;
+    public int crystalCurrentValue;
+    public int crystalMaxValue;
+}

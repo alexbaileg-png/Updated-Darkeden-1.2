@@ -12,15 +12,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e976ae5566286845b37c51031801d11, type: 3}
   m_Name: CargoPants
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  itemId: Cargo_Pants
   itemName: Cargo Pants
+  description: 
   itemIcon: {fileID: 21300000, guid: 03f588f64c685e74fa85e47ebf2e844f, type: 3}
   itemType: 3
+  rarity: 0
+  isStackable: 0
+  maxStackSize: 99
+  sellValue: 0
   worldLootPrefab: {fileID: 5648383419603476059, guid: 4fb95bb1e56028f44b170e0178958b02, type: 3}
   strengthBonus: 0
   dexterityBonus: 0
   intelligenceBonus: 0
   enduranceBonus: 5
-  armorBonus: 5
-  resistanceBonus: 2
   healthBonus: 0
   manaBonus: 0
+  meleeDamageBonus: 0
+  rangedDamageBonus: 0
+  magicalDamageBonus: 0
+  armorBonus: 5
+  resistanceBonus: 2
+  meleeResistanceBonus: 0
+  magicalResistanceBonus: 0
+  allResistanceBonus: 0
+  hasCrystalStat: 0
+  crystalStat: 0
+  crystalCurrentValue: 0
+  crystalMaxValue: 0

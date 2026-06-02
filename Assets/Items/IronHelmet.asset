@@ -12,15 +12,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e976ae5566286845b37c51031801d11, type: 3}
   m_Name: IronHelmet
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  itemId: Iron_Helmet
   itemName: Iron Helmet
+  description: 
   itemIcon: {fileID: 21300000, guid: dbf56748f25e2904ebe65773d668b282, type: 3}
   itemType: 0
+  rarity: 0
+  isStackable: 0
+  maxStackSize: 99
+  sellValue: 0
   worldLootPrefab: {fileID: 655367368841965685, guid: b4a9d5b1fe2ab684d981be88024b5e0a, type: 3}
   strengthBonus: 2
   dexterityBonus: 0
   intelligenceBonus: 0
   enduranceBonus: 4
-  armorBonus: 8
-  resistanceBonus: 0
   healthBonus: 0
   manaBonus: 0
+  meleeDamageBonus: 0
+  rangedDamageBonus: 0
+  magicalDamageBonus: 0
+  armorBonus: 8
+  resistanceBonus: 0
+  meleeResistanceBonus: 0
+  magicalResistanceBonus: 0
+  allResistanceBonus: 0
+  hasCrystalStat: 0
+  crystalStat: 0
+  crystalCurrentValue: 0
+  crystalMaxValue: 0

@@ -1,0 +1,144 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e976ae5566286845b37c51031801d11, type: 3}
+  m_Name: ModernGloves
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  itemId: Kevlar_Gloves
+  itemName: Kevlar Gloves
+  description: 
+  itemIcon: {fileID: 21300000, guid: 8027e5b264d073a49ab32d9431bfaff6, type: 3}
+  itemType: 5
+  rarity: 0
+  isStackable: 0
+  maxStackSize: 99
+  restoreAmount: 0
+  sellValue: 500
+  worldLootPrefab: {fileID: 7200500799613138921, guid: 5564f77ea158eb249bb3e61dbcc35692, type: 3}
+  strengthBonus: 10
+  dexterityBonus: 10
+  intelligenceBonus: 10
+  enduranceBonus: 10
+  healthBonus: 100
+  manaBonus: 100
+  meleeDamageBonus: 10
+  rangedDamageBonus: 10
+  magicalDamageBonus: 10
+  armorBonus: 10
+  resistanceBonus: 10
+  meleeResistanceBonus: 10
+  magicalResistanceBonus: 10
+  allResistanceBonus: 10
+  hasCrystalStat: 0
+  crystalStat: 0
+  crystalCurrentValue: 0
+  crystalMaxValue: 0
+  beltSlots:
+  - uniqueItemId: 
+    baseItemId: 
+    slotIndex: -1
+    equipmentSlotId: 
+    quantity: 0
+    rarity: 0
+    strengthBonus: 0
+    dexterityBonus: 0
+    intelligenceBonus: 0
+    enduranceBonus: 0
+    healthBonus: 0
+    manaBonus: 0
+    meleeDamageBonus: 0
+    rangedDamageBonus: 0
+    magicalDamageBonus: 0
+    armorBonus: 0
+    resistanceBonus: 0
+    meleeResistanceBonus: 0
+    magicalResistanceBonus: 0
+    allResistanceBonus: 0
+    hasCrystalStat: 0
+    crystalStat: 0
+    crystalCurrentValue: 0
+    crystalMaxValue: 0
+    beltItems: []
+  - uniqueItemId: 
+    baseItemId: 
+    slotIndex: -1
+    equipmentSlotId: 
+    quantity: 0
+    rarity: 0
+    strengthBonus: 0
+    dexterityBonus: 0
+    intelligenceBonus: 0
+    enduranceBonus: 0
+    healthBonus: 0
+    manaBonus: 0
+    meleeDamageBonus: 0
+    rangedDamageBonus: 0
+    magicalDamageBonus: 0
+    armorBonus: 0
+    resistanceBonus: 0
+    meleeResistanceBonus: 0
+    magicalResistanceBonus: 0
+    allResistanceBonus: 0
+    hasCrystalStat: 0
+    crystalStat: 0
+    crystalCurrentValue: 0
+    crystalMaxValue: 0
+    beltItems: []
+  - uniqueItemId: 
+    baseItemId: 
+    slotIndex: -1
+    equipmentSlotId: 
+    quantity: 0
+    rarity: 0
+    strengthBonus: 0
+    dexterityBonus: 0
+    intelligenceBonus: 0
+    enduranceBonus: 0
+    healthBonus: 0
+    manaBonus: 0
+    meleeDamageBonus: 0
+    rangedDamageBonus: 0
+    magicalDamageBonus: 0
+    armorBonus: 0
+    resistanceBonus: 0
+    meleeResistanceBonus: 0
+    magicalResistanceBonus: 0
+    allResistanceBonus: 0
+    hasCrystalStat: 0
+    crystalStat: 0
+    crystalCurrentValue: 0
+    crystalMaxValue: 0
+    beltItems: []
+  - uniqueItemId: 
+    baseItemId: 
+    slotIndex: -1
+    equipmentSlotId: 
+    quantity: 0
+    rarity: 0
+    strengthBonus: 0
+    dexterityBonus: 0
+    intelligenceBonus: 0
+    enduranceBonus: 0
+    healthBonus: 0
+    manaBonus: 0
+    meleeDamageBonus: 0
+    rangedDamageBonus: 0
+    magicalDamageBonus: 0
+    armorBonus: 0
+    resistanceBonus: 0
+    meleeResistanceBonus: 0
+    magicalResistanceBonus: 0
+    allResistanceBonus: 0
+    hasCrystalStat: 0
+    crystalStat: 0
+    crystalCurrentValue: 0
+    crystalMaxValue: 0
+    beltItems: []

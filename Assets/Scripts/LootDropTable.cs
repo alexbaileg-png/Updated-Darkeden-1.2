@@ -42,24 +42,15 @@ public class LootDropTable : MonoBehaviour
             if (roll <= entry.dropChance)
             {
                 ItemData rolledItem = ItemRoller.RollItem(entry.item);
-                SpawnLoot(rolledItem);
-
+                DropItem(rolledItem);
                 dropsCreated++;
             }
         }
     }
 
-    void SpawnLoot(ItemData item)
+    void DropItem(ItemData item)
     {
         if (item == null)
-            return;
-
-        GameObject prefabToSpawn = item.worldLootPrefab;
-
-        if (prefabToSpawn == null)
-            prefabToSpawn = defaultGroundLootPrefab;
-
-        if (prefabToSpawn == null)
             return;
 
         Vector2 randomCircle = Random.insideUnitCircle * dropScatterRadius;
@@ -69,6 +60,25 @@ public class LootDropTable : MonoBehaviour
             dropHeight,
             randomCircle.y
         );
+
+        if (LootBagManager.Instance != null)
+        {
+            LootBagManager.Instance.AddLoot(item, dropPosition);
+            return;
+        }
+
+        SpawnFallbackGroundLoot(item, dropPosition);
+    }
+
+    void SpawnFallbackGroundLoot(ItemData item, Vector3 dropPosition)
+    {
+        GameObject prefabToSpawn = item.worldLootPrefab;
+
+        if (prefabToSpawn == null)
+            prefabToSpawn = defaultGroundLootPrefab;
+
+        if (prefabToSpawn == null)
+            return;
 
         GameObject lootObject = Instantiate(
             prefabToSpawn,

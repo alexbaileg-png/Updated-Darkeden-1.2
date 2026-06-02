@@ -20,6 +20,9 @@ public static class ItemRarityColors
 
             case ItemRarity.Legendary:
                 return new Color(1f, 0.55f, 0f);
+
+            case ItemRarity.Mythical:
+                return new Color(1f, 0.05f, 0.05f);
         }
 
         return Color.white;

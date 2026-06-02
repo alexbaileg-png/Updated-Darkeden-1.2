@@ -448,8 +448,24 @@ MonoBehaviour:
   - item: {fileID: 11400000, guid: 43d318145df03cd4fb63876179fbbc8f, type: 2}
     dropChance: 5
   - item: {fileID: 11400000, guid: dbe6450ff3be25147b8b53151ddb8693, type: 2}
+    dropChance: 100
+  - item: {fileID: 11400000, guid: bf6c0cc6ee4dfe1499b6c0d9e365e940, type: 2}
+    dropChance: 50
+  - item: {fileID: 11400000, guid: 9797f287f1c8296499cf897fddb57dfa, type: 2}
+    dropChance: 25
+  - item: {fileID: 11400000, guid: f13e4ae8aa5c2a446a3bd5dcbc0c8d4c, type: 2}
+    dropChance: 25
+  - item: {fileID: 11400000, guid: 2fa716cd5bb43a64f8a30f0cb6dc5a22, type: 2}
+    dropChance: 25
+  - item: {fileID: 11400000, guid: 71c711f625630bc4abc3254e6e5a3862, type: 2}
+    dropChance: 90
+  - item: {fileID: 11400000, guid: e49f3eb7042dafb439bfe20ae47d26a1, type: 2}
     dropChance: 80.2
-  maxDrops: 2
+  - item: {fileID: 11400000, guid: 2523f8b7bcd4c354daa5cda8dbd2afd9, type: 2}
+    dropChance: 90
+  - item: {fileID: 11400000, guid: 3f71a1f2a341c4849935e764994d4ab0, type: 2}
+    dropChance: 80.2
+  maxDrops: 5
   dropScatterRadius: 1.2
   dropHeight: -0.4
 --- !u!1 &1840938806691661711

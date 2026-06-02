@@ -35,11 +35,16 @@ public class VendorHoverInfoUI : MonoBehaviour
         if (rootPanel != null)
             rootPanel.SetActive(true);
 
+        Color rarityColor = ItemRarityColors.GetColor(item.rarity);
+
         if (itemNameText != null)
+        {
             itemNameText.text = item.itemName;
+            itemNameText.color = rarityColor;
+        }
 
         if (itemTypeText != null)
-            itemTypeText.text = item.itemType.ToString();
+            itemTypeText.text = item.rarity + " " + item.itemType;
 
         if (descriptionText != null)
             descriptionText.text = item.description;
@@ -57,12 +62,6 @@ public class VendorHoverInfoUI : MonoBehaviour
             itemStatsText.text = BuildStats(item);
     }
 
-    public void Hide()
-    {
-        if (rootPanel != null)
-            rootPanel.SetActive(false);
-    }
-
     string BuildStats(ItemData item)
     {
         string stats = "";
@@ -72,11 +71,18 @@ public class VendorHoverInfoUI : MonoBehaviour
         AddStat(ref stats, "Intelligence", item.intelligenceBonus);
         AddStat(ref stats, "Endurance", item.enduranceBonus);
 
-        AddStat(ref stats, "Armor", item.armorBonus);
-        AddStat(ref stats, "Resistance", item.resistanceBonus);
-
         AddStat(ref stats, "Health", item.healthBonus);
         AddStat(ref stats, "Mana", item.manaBonus);
+
+        AddStat(ref stats, "Melee Damage", item.meleeDamageBonus);
+        AddStat(ref stats, "Ranged Damage", item.rangedDamageBonus);
+        AddStat(ref stats, "Magic Damage", item.magicalDamageBonus);
+
+        AddStat(ref stats, "Armor", item.armorBonus);
+        AddStat(ref stats, "Resistance", item.resistanceBonus);
+        AddStat(ref stats, "Melee Resistance", item.meleeResistanceBonus);
+        AddStat(ref stats, "Magic Resistance", item.magicalResistanceBonus);
+        AddStat(ref stats, "All Resistance", item.allResistanceBonus);
 
         if (string.IsNullOrEmpty(stats))
             stats = "No bonuses";
@@ -89,6 +95,12 @@ public class VendorHoverInfoUI : MonoBehaviour
         if (value == 0)
             return;
 
-        text += statName + ": +" + value + "\n";
+        text += statName + " +" + value + "\n";
+    }
+
+    public void Hide()
+    {
+        if (rootPanel != null)
+            rootPanel.SetActive(false);
     }
 }

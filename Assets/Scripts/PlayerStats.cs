@@ -23,15 +23,27 @@ public class PlayerStats : MonoBehaviour, IDamageable
     public int intelligence;
     public int endurance;
 
-    [Header("Gear Bonuses")]
+    [Header("Gear Core Bonuses")]
     public int gearStrength;
     public int gearDexterity;
     public int gearIntelligence;
     public int gearEndurance;
-    public int gearArmor;
-    public int gearResistance;
+
+    [Header("Gear Resource Bonuses")]
     public int gearHealth;
     public int gearMana;
+
+    [Header("Gear Offensive Bonuses")]
+    public int gearMeleeDamage;
+    public int gearRangedDamage;
+    public int gearMagicDamage;
+
+    [Header("Gear Defensive Bonuses")]
+    public int gearArmor;
+    public int gearResistance;
+    public int gearMeleeResistance;
+    public int gearMagicResistance;
+    public int gearAllResistance;
 
     [Header("Resources")]
     public int maxHealth;
@@ -48,6 +60,8 @@ public class PlayerStats : MonoBehaviour, IDamageable
     public float buffDurationBonus;
     public float armor;
     public float resistance;
+    public float meleeResistance;
+    public float magicResistance;
     public float criticalChance;
 
     private bool isDead = false;
@@ -66,10 +80,10 @@ public class PlayerStats : MonoBehaviour, IDamageable
         intelligence = baseIntelligence + gearIntelligence;
         endurance = baseEndurance + gearEndurance;
 
-        meleeDamageBonus = strength * 2.0f;
-        rangedDamageBonus = dexterity * 1.75f;
+        meleeDamageBonus = (strength * 2.0f) + gearMeleeDamage;
+        rangedDamageBonus = (dexterity * 1.75f) + gearRangedDamage;
 
-        magicalSkillPower = intelligence * 2.25f;
+        magicalSkillPower = (intelligence * 2.25f) + gearMagicDamage;
         magicalArmorPenetration = intelligence * 0.5f;
 
         buffEffectivenessBonus = intelligence * 0.01f;
@@ -91,8 +105,143 @@ public class PlayerStats : MonoBehaviour, IDamageable
         resistance += endurance * 0.35f;
         resistance += gearResistance;
 
+        meleeResistance = armor + gearMeleeResistance + gearAllResistance;
+        magicResistance = resistance + gearMagicResistance + gearAllResistance;
+
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
         currentMana = Mathf.Clamp(currentMana, 0, maxMana);
+    }
+
+    public void ClearGearBonuses()
+    {
+        gearStrength = 0;
+        gearDexterity = 0;
+        gearIntelligence = 0;
+        gearEndurance = 0;
+
+        gearHealth = 0;
+        gearMana = 0;
+
+        gearMeleeDamage = 0;
+        gearRangedDamage = 0;
+        gearMagicDamage = 0;
+
+        gearArmor = 0;
+        gearResistance = 0;
+        gearMeleeResistance = 0;
+        gearMagicResistance = 0;
+        gearAllResistance = 0;
+    }
+
+    public void AddGearBonuses(ItemData item)
+    {
+        if (item == null)
+            return;
+
+        gearStrength += item.strengthBonus;
+        gearDexterity += item.dexterityBonus;
+        gearIntelligence += item.intelligenceBonus;
+        gearEndurance += item.enduranceBonus;
+
+        gearHealth += item.healthBonus;
+        gearMana += item.manaBonus;
+
+        gearMeleeDamage += item.meleeDamageBonus;
+        gearRangedDamage += item.rangedDamageBonus;
+        gearMagicDamage += item.magicalDamageBonus;
+
+        gearArmor += item.armorBonus;
+        gearResistance += item.resistanceBonus;
+        gearMeleeResistance += item.meleeResistanceBonus;
+        gearMagicResistance += item.magicalResistanceBonus;
+        gearAllResistance += item.allResistanceBonus;
+
+        ApplyCrystalBonus(item);
+    }
+
+    void ApplyCrystalBonus(ItemData item)
+    {
+        if (item == null)
+            return;
+
+        if (!item.hasCrystalStat)
+            return;
+
+        int value = item.crystalCurrentValue;
+
+        switch (item.crystalStat)
+        {
+            case ItemBonusStat.Strength:
+                gearStrength += value;
+                break;
+
+            case ItemBonusStat.Dexterity:
+                gearDexterity += value;
+                break;
+
+            case ItemBonusStat.Intelligence:
+                gearIntelligence += value;
+                break;
+
+            case ItemBonusStat.Endurance:
+                gearEndurance += value;
+                break;
+
+            case ItemBonusStat.Health:
+                gearHealth += value;
+                break;
+
+            case ItemBonusStat.Mana:
+                gearMana += value;
+                break;
+
+            case ItemBonusStat.MeleeDamage:
+                gearMeleeDamage += value;
+                break;
+
+            case ItemBonusStat.RangedDamage:
+                gearRangedDamage += value;
+                break;
+
+            case ItemBonusStat.MagicDamage:
+                gearMagicDamage += value;
+                break;
+
+            case ItemBonusStat.Armor:
+                gearArmor += value;
+                break;
+
+            case ItemBonusStat.Resistance:
+                gearResistance += value;
+                break;
+
+            case ItemBonusStat.MeleeResistance:
+                gearMeleeResistance += value;
+                break;
+
+            case ItemBonusStat.MagicResistance:
+                gearMagicResistance += value;
+                break;
+
+            case ItemBonusStat.AllResistance:
+                gearAllResistance += value;
+                break;
+        }
+    }
+
+    public int GetMeleeDamage(int baseDamage)
+    {
+        return Mathf.RoundToInt(baseDamage + meleeDamageBonus);
+    }
+
+    public int GetRangedDamage(int baseDamage)
+    {
+        return Mathf.RoundToInt(baseDamage + rangedDamageBonus);
+    }
+
+    public int GetMagicalSkillDamage(int baseDamage)
+    {
+        return Mathf.RoundToInt(baseDamage + magicalSkillPower);
     }
 
     public int GetMagicalHealing(int baseHealing)
@@ -101,16 +250,16 @@ public class PlayerStats : MonoBehaviour, IDamageable
     }
 
     public void Heal(int amount)
-{
-    if (isDead)
-        return;
+    {
+        if (isDead)
+            return;
 
-    currentHealth += amount;
-    currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
+        currentHealth += amount;
+        currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
 
-    if (CombatTextSpawner.Instance != null)
-        CombatTextSpawner.Instance.SpawnText(transform.position + Vector3.up * 1.8f, "+" + amount);
-}
+        if (CombatTextSpawner.Instance != null)
+            CombatTextSpawner.Instance.SpawnText(transform.position + Vector3.up * 1.8f, "+" + amount);
+    }
 
     public void GainXP(int amount)
     {
@@ -139,12 +288,11 @@ public class PlayerStats : MonoBehaviour, IDamageable
 
         currentHealth = maxHealth;
         currentMana = maxMana;
+
         PlayerSkillManager skillManager = GetComponent<PlayerSkillManager>();
 
-if (skillManager != null)
-{
-    skillManager.GainSkillPoint();
-}
+        if (skillManager != null)
+            skillManager.GainSkillPoint();
     }
 
     public bool SpendStatPoint(string statName)
@@ -169,52 +317,10 @@ if (skillManager != null)
         return true;
     }
 
-    public void ClearGearBonuses()
-    {
-        gearStrength = 0;
-        gearDexterity = 0;
-        gearIntelligence = 0;
-        gearEndurance = 0;
-        gearArmor = 0;
-        gearResistance = 0;
-        gearHealth = 0;
-        gearMana = 0;
-    }
-
-    public void AddGearBonuses(ItemData item)
-    {
-        if (item == null)
-            return;
-
-        gearStrength += item.strengthBonus;
-        gearDexterity += item.dexterityBonus;
-        gearIntelligence += item.intelligenceBonus;
-        gearEndurance += item.enduranceBonus;
-        gearArmor += item.armorBonus;
-        gearResistance += item.resistanceBonus;
-        gearHealth += item.healthBonus;
-        gearMana += item.manaBonus;
-    }
-
     float CalculateCriticalChance(int dex)
     {
         float crit = (dex * 0.35f) / (1f + dex * 0.01f);
         return Mathf.Clamp(crit, 0f, 60f);
-    }
-
-    public int GetMeleeDamage(int baseDamage)
-    {
-        return Mathf.RoundToInt(baseDamage + meleeDamageBonus);
-    }
-
-    public int GetRangedDamage(int baseDamage)
-    {
-        return Mathf.RoundToInt(baseDamage + rangedDamageBonus);
-    }
-
-    public int GetMagicalSkillDamage(int baseDamage)
-    {
-        return Mathf.RoundToInt(baseDamage + magicalSkillPower);
     }
 
     public bool RollCritical()
@@ -258,7 +364,7 @@ if (skillManager != null)
 
     public int CalculatePhysicalDamageTaken(int incomingDamage)
     {
-        float damageReduction = armor / (armor + 100f);
+        float damageReduction = meleeResistance / (meleeResistance + 100f);
         float reducedDamage = incomingDamage * (1f - damageReduction);
 
         return Mathf.Max(1, Mathf.RoundToInt(reducedDamage));
@@ -266,7 +372,7 @@ if (skillManager != null)
 
     public int CalculateMagicDamageTaken(int incomingDamage, float enemyMagicPenetration)
     {
-        float effectiveResistance = Mathf.Max(0f, resistance - enemyMagicPenetration);
+        float effectiveResistance = Mathf.Max(0f, magicResistance - enemyMagicPenetration);
         float damageReduction = effectiveResistance / (effectiveResistance + 100f);
         float reducedDamage = incomingDamage * (1f - damageReduction);
 

@@ -95,12 +95,14 @@ MonoBehaviour:
   quantity: 1
   itemIcon: {fileID: 4751314422560062426}
   rarityBorder: {fileID: 3354348701540508154}
+  selectedHighlight: {fileID: 0}
   quantityText: {fileID: 1098934039408484265}
   commonBorder: {fileID: 21300000, guid: 4a17c5033cf96ed4494052cb298ee4ea, type: 3}
   uncommonBorder: {fileID: 21300000, guid: 1c59abc967c3d57468021f013e67ccd5, type: 3}
   rareBorder: {fileID: 21300000, guid: 508c41cbbce1bff4b8789bfeaeb592e0, type: 3}
   epicBorder: {fileID: 21300000, guid: 398e1a18cd7e86b408564940f1a6c6ed, type: 3}
   legendaryBorder: {fileID: 21300000, guid: a8816edda37f7194cb8feb979a22b6e1, type: 3}
+  mythicalBorder: {fileID: 21300000, guid: 095fdfb3f1869054481576349770cf68, type: 3}
 --- !u!1 &6624285830316704481
 GameObject:
   m_ObjectHideFlags: 0
