@@ -13,7 +13,21 @@ public class EquipmentSlot : MonoBehaviour,
 {
     public ItemType allowedItemType;
     public ItemData currentItem;
+
+    [Header("UI")]
     public Image itemIcon;
+    public Image rarityBorder;
+
+    [Header("Rarity Borders")]
+    public Sprite commonBorder;
+    public Sprite uncommonBorder;
+    public Sprite rareBorder;
+    public Sprite epicBorder;
+    public Sprite legendaryBorder;
+    public Sprite mythicalBorder;
+
+    [Header("Tooltip Override")]
+    public ItemTooltip tooltipOverride;
 
     public EquipmentManager equipmentManager;
 
@@ -71,24 +85,44 @@ public class EquipmentSlot : MonoBehaviour,
 
     public void RefreshSlot()
     {
-        if (itemIcon == null)
-            return;
+        bool hasItem = currentItem != null;
 
-        if (currentItem != null && currentItem.itemIcon != null)
+        if (itemIcon != null)
         {
-            itemIcon.enabled = true;
-            itemIcon.sprite = currentItem.itemIcon;
+            itemIcon.enabled = hasItem && currentItem.itemIcon != null;
+            itemIcon.sprite = hasItem ? currentItem.itemIcon : null;
             itemIcon.raycastTarget = true;
         }
-        else
+
+        if (rarityBorder != null)
         {
-            itemIcon.enabled = false;
-            itemIcon.sprite = null;
-            itemIcon.raycastTarget = false;
+            rarityBorder.enabled = hasItem;
+            rarityBorder.raycastTarget = false;
+
+            if (hasItem)
+            {
+                rarityBorder.sprite = GetBorderSprite(currentItem.rarity);
+                rarityBorder.color = Color.white;
+            }
         }
 
         if (iconRectTransform != null)
             iconRectTransform.anchoredPosition = Vector2.zero;
+    }
+
+    Sprite GetBorderSprite(ItemRarity rarity)
+    {
+        switch (rarity)
+        {
+            case ItemRarity.Common: return commonBorder;
+            case ItemRarity.Uncommon: return uncommonBorder;
+            case ItemRarity.Rare: return rareBorder;
+            case ItemRarity.Epic: return epicBorder;
+            case ItemRarity.Legendary: return legendaryBorder;
+            case ItemRarity.Mythical: return mythicalBorder;
+        }
+
+        return commonBorder;
     }
 
     public void OnPointerClick(PointerEventData eventData)
@@ -131,12 +165,23 @@ public class EquipmentSlot : MonoBehaviour,
 
         if (equipmentManager != null)
             equipmentManager.RecalculateEquipmentStats();
+
+        if (InventoryPersistenceManager.Instance != null)
+            InventoryPersistenceManager.Instance.SaveAfterChange();
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (currentItem != null && ItemTooltip.Instance != null)
-            ItemTooltip.Instance.ShowTooltip(currentItem);
+        if (currentItem == null)
+            return;
+
+        ItemTooltip tooltip =
+            tooltipOverride != null
+                ? tooltipOverride
+                : ItemTooltip.Instance;
+
+        if (tooltip != null)
+            tooltip.ShowTooltip(currentItem);
     }
 
     public void OnPointerExit(PointerEventData eventData)
@@ -146,13 +191,18 @@ public class EquipmentSlot : MonoBehaviour,
 
     void HideTooltip()
     {
-        if (ItemTooltip.Instance != null)
-            ItemTooltip.Instance.HideTooltip();
+        ItemTooltip tooltip =
+            tooltipOverride != null
+                ? tooltipOverride
+                : ItemTooltip.Instance;
+
+        if (tooltip != null)
+            tooltip.HideTooltip();
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        if (currentItem == null || itemIcon == null)
+        if (currentItem == null || itemIcon == null || iconRectTransform == null)
             return;
 
         HideTooltip();

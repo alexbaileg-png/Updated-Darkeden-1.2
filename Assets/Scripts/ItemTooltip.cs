@@ -5,6 +5,9 @@ public class ItemTooltip : MonoBehaviour
 {
     public static ItemTooltip Instance;
 
+    [Header("Behavior")]
+    public bool registerAsGlobalTooltip = true;
+
     [Header("UI")]
     public GameObject tooltipRoot;
 
@@ -18,7 +21,8 @@ public class ItemTooltip : MonoBehaviour
 
     void Awake()
     {
-        Instance = this;
+        if (registerAsGlobalTooltip)
+            Instance = this;
 
         if (tooltipRoot == null)
             tooltipRoot = gameObject;
