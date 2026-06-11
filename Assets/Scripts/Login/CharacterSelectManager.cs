@@ -72,7 +72,7 @@ public class CharacterSelectManager : MonoBehaviour
         if (character == null) return;
 
         GameSession.Instance.SelectCharacter(character);
-        SceneManager.LoadScene("Game");
+        SceneManager.LoadScene("GameScene");
     }
 
     public void OnCreateCharacterClicked()
