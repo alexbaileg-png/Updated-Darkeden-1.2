@@ -68,6 +68,10 @@ public class NetworkPlayerController : NetworkBehaviour
 
         if (IsServerStarted)
             MoveOnServer();
+
+        // Drive animation on clients from the synced value every frame
+        if (IsClientStarted && !IsServerStarted)
+            SetMoveAnimation(_syncMoving.Value);
     }
 
     // ── Input (owner only) ────────────────────────────────────────────────────
