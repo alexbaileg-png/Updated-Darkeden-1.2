@@ -83,7 +83,7 @@ public class CharacterSelectManager : MonoBehaviour
             return;
         }
 
-        SceneManager.LoadScene("CharacterCreation");
+        SceneManager.LoadScene("CharacterCreate");
     }
 
     public async void OnDeleteCharacterClicked()

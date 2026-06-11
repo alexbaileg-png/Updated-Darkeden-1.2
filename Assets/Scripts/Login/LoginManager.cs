@@ -122,7 +122,7 @@ public class LoginManager : MonoBehaviour
         AccountData account = await CloudDataService.LoadAccountAsync();
         GameSession.Instance.SetAccountData(account);
 
-        SceneManager.LoadScene("CharacterSelect");
+        SceneManager.LoadScene("Character Selection");
     }
 
     void SetStatus(string message) { if (statusText != null) statusText.text = message; }
