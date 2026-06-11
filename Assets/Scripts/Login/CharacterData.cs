@@ -1,6 +1,7 @@
 using System;
 
 public enum PlayerFaction { Vampire, Slayer }
+public enum PlayerGender { Male, Female }
 public enum VampireBloodline { BloodKnight, Shadow, Sorcerer, Dominator }
 public enum SlayerClass { Swordmaster, Soldier, Enchanter, Healer }
 
@@ -10,6 +11,7 @@ public class CharacterData
     public string characterId;
     public string characterName;
     public PlayerFaction faction;
+    public PlayerGender gender;
 
     // Only one of these is used depending on faction
     public VampireBloodline vampireBloodline;
