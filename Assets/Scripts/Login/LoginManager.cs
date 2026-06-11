@@ -119,7 +119,7 @@ public class LoginManager : MonoBehaviour
         if (GameSession.Instance == null)
             new GameObject("GameSession").AddComponent<GameSession>();
 
-        AccountData account = await CloudSaveService.LoadAccountAsync();
+        AccountData account = await CloudDataService.LoadAccountAsync();
         GameSession.Instance.SetAccountData(account);
 
         SceneManager.LoadScene("CharacterSelect");

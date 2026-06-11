@@ -94,7 +94,7 @@ public class CharacterSelectManager : MonoBehaviour
         if (character == null) return;
 
         GameSession.Instance.AccountData.characters[_selectedSlot] = null;
-        await CloudSaveService.SaveAccountAsync(GameSession.Instance.AccountData);
+        await CloudDataService.SaveAccountAsync(GameSession.Instance.AccountData);
 
         RefreshSlots();
         SetSelected(-1);
