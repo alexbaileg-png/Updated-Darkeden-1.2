@@ -360,11 +360,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20984d183cbc2494ea5311b2ab5b39cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 0}
+  _networkObjectCache: {fileID: 0}
   maxHealth: 200
-  currentHealth: 200
-  healthBar: {fileID: 717267395925834411}
   xpReward: 20000
   destroyDelay: 5
+  healthBar: {fileID: 717267395925834411}
 --- !u!114 &2122587727983555116
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -377,7 +379,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59e64615f2d75b24597ecb4187b1096d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
-  player: {fileID: 5741883079678456472}
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 0}
+  _networkObjectCache: {fileID: 0}
   moveSpeed: 1
   chaseRange: 30
   stopDistance: 0.5
@@ -595,11 +599,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20984d183cbc2494ea5311b2ab5b39cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 0}
+  _networkObjectCache: {fileID: 0}
   maxHealth: 50
-  currentHealth: 0
-  healthBar: {fileID: 0}
   xpReward: 25
   destroyDelay: 10
+  healthBar: {fileID: 0}
 --- !u!1 &6289278516138488872
 GameObject:
   m_ObjectHideFlags: 0

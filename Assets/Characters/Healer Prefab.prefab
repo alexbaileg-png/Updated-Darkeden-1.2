@@ -1,0 +1,389 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &942416509634964565
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 515305705555684825}
+  - component: {fileID: 3913169535726895021}
+  - component: {fileID: 624755688521382164}
+  - component: {fileID: 5856355862371513842}
+  - component: {fileID: 3642962026272004597}
+  - component: {fileID: 2067154310066005541}
+  - component: {fileID: 5340251896549424073}
+  - component: {fileID: 4957528679881584483}
+  - component: {fileID: 5873882193844265009}
+  - component: {fileID: 5875477963710170481}
+  - component: {fileID: 6927985626757416933}
+  - component: {fileID: 3266443201650563871}
+  m_Layer: 0
+  m_Name: Healer Prefab
+  m_TagString: Player
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &515305705555684825
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 942416509634964565}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.47, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 5777686743211399449}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3913169535726895021
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 942416509634964565}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9cab5d62c99b4a4b968d00a70f229c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
+  moveSpeed: 6
+  stopDistance: 0.35
+  modelTransform: {fileID: 5777686743211399449}
+  modelAnimator: {fileID: 8259120237934932691}
+--- !u!114 &624755688521382164
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 942416509634964565}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99aabeff98224804a930220a91216129, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerProjectileAttack
+  _componentIndexCache: 0
+  _addedNetworkObject: {fileID: 0}
+  _networkObjectCache: {fileID: 0}
+  currentSelectedSkill: 0
+  f8Skill: 0
+  f9Skill: 2
+  f10Skill: 1
+  f11Skill: 3
+  castDelay: 0.15
+  projectilePrefab: {fileID: 7028737442947763435, guid: a6a875c89fab1444386c12f77b719db7, type: 3}
+  holyRainEffectPrefab: {fileID: 9091421485519787305, guid: 95b81a83a6542fb4f91d2e664ad0784d, type: 3}
+  holyRainBaseRadius: 3
+  holyCircleHealEffectPrefab: {fileID: 5195297573039092532, guid: 040bff8c5bfcff94ba70fe12fdba0ecc, type: 3}
+  holyCircleHealBaseRadius: 4
+  holyCircleHealBaseDuration: 4
+  holyCircleHealDurationPerLevel: 0.75
+  holyCircleHealInterval: 1
+  holyCircleHealEffectHeight: 0.25
+  healingOrbitPrefab: {fileID: 4368203913174783380, guid: a0951559de10ff84c9c8e0dd76756ca6, type: 3}
+  healingOrbitBaseDuration: 10
+  healingOrbitDurationPerLevel: 1
+  healingOrbitBaseRadius: 1.5
+  healingOrbitRadiusPerLevel: 0.15
+  healingOrbitBaseSpeed: 180
+  healingOrbitSpeedPerLevel: 35
+--- !u!95 &5856355862371513842
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 942416509634964565}
+  m_Enabled: 1
+  m_Avatar: {fileID: 9000000, guid: 4feedbbed7feebd4cb0ea7227e33422f, type: 3}
+  m_Controller: {fileID: 9100000, guid: 6a384b0faa11c6b4bb1c2fa54c0780d9, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &3642962026272004597
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 942416509634964565}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5dd1c024a01ac346886f3dd693e18e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerStats
+  _componentIndexCache: 1
+  _addedNetworkObject: {fileID: 0}
+  _networkObjectCache: {fileID: 0}
+  faction: 1
+  hasReceivedStartingItems: 0
+  level: 1
+  xpToNextLevel: 50
+  statPointsPerLevel: 3
+  baseStrength: 10
+  baseDexterity: 10
+  baseIntelligence: 10
+  baseEndurance: 10
+  strength: 10
+  dexterity: 10
+  intelligence: 10
+  endurance: 10
+  gearStrength: 0
+  gearDexterity: 0
+  gearIntelligence: 0
+  gearEndurance: 0
+  gearHealth: 0
+  gearMana: 0
+  gearMeleeDamage: 0
+  gearRangedDamage: 0
+  gearMagicDamage: 0
+  gearArmor: 0
+  gearResistance: 0
+  gearMeleeResistance: 0
+  gearMagicResistance: 0
+  gearAllResistance: 0
+  maxHealth: 0
+  maxMana: 0
+  meleeDamageBonus: 0
+  rangedDamageBonus: 0
+  magicalSkillPower: 0
+  magicalArmorPenetration: 0
+  buffEffectivenessBonus: 0
+  buffDurationBonus: 0
+  armor: 0
+  resistance: 0
+  meleeResistance: 0
+  magicResistance: 0
+  criticalChance: 0
+--- !u!114 &2067154310066005541
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 942416509634964565}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 084b089eb3b0c57468883d971e9776db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerLootPickup
+  inventoryGrid: {fileID: 0}
+  bagOpenRange: 3
+  openBagKey: 101
+--- !u!114 &5340251896549424073
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 942416509634964565}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 17523aa14f79b4a4aacf51ff5f692f3c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EquipmentSlot
+  allowedItemType: 0
+  currentItem: {fileID: 0}
+  itemIcon: {fileID: 0}
+  rarityBorder: {fileID: 0}
+  commonBorder: {fileID: 0}
+  uncommonBorder: {fileID: 0}
+  rareBorder: {fileID: 0}
+  epicBorder: {fileID: 0}
+  legendaryBorder: {fileID: 0}
+  mythicalBorder: {fileID: 0}
+  tooltipOverride: {fileID: 0}
+  equipmentManager: {fileID: 3266443201650563871}
+--- !u!114 &4957528679881584483
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 942416509634964565}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa4760274c8f77c4d99bd9888d12b665, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerSkillManager
+  _componentIndexCache: 2
+  _addedNetworkObject: {fileID: 0}
+  _networkObjectCache: {fileID: 0}
+  skillPointsPerLevel: 1
+  allSkills:
+  - {fileID: 11400000, guid: f91031aadbbd0584cb55f360acb63d77, type: 2}
+  - {fileID: 11400000, guid: 0452001bba6a27f488532ef0911c56f5, type: 2}
+  - {fileID: 11400000, guid: 1c9d9f63e88fc3d49975a2dfe8c0419c, type: 2}
+  - {fileID: 11400000, guid: ad5db62747b5fd048a1559ee871a51fa, type: 2}
+  skillProgress: []
+--- !u!54 &5873882193844265009
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 942416509634964565}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 1
+  m_Constraints: 112
+  m_CollisionDetection: 1
+--- !u!136 &5875477963710170481
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 942416509634964565}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.4
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 1, z: 0}
+--- !u!114 &6927985626757416933
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 942416509634964565}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 06b50351626256946a88e6207233187c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerGold
+  gold: 0
+--- !u!114 &3266443201650563871
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 942416509634964565}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eaa0b7afc3c2b59409d3bdaae85677bf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EquipmentManager
+  playerStats: {fileID: 3642962026272004597}
+  inventoryGrid: {fileID: 0}
+  helmetSlot: {fileID: 0}
+  necklaceSlot: {fileID: 0}
+  topSlot: {fileID: 0}
+  bottomSlot: {fileID: 0}
+  bootsSlot: {fileID: 0}
+  glovesSlot: {fileID: 0}
+  beltSlot: {fileID: 0}
+  leftWeaponSlot: {fileID: 0}
+  rightWeaponSlot: {fileID: 0}
+--- !u!1001 &2842200453272349254
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 515305705555684825}
+    m_Modifications:
+    - target: {fileID: 8601859051914654559, guid: 68bdcf34b7b889343892c9b6850a0677, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8601859051914654559, guid: 68bdcf34b7b889343892c9b6850a0677, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8601859051914654559, guid: 68bdcf34b7b889343892c9b6850a0677, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8601859051914654559, guid: 68bdcf34b7b889343892c9b6850a0677, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8601859051914654559, guid: 68bdcf34b7b889343892c9b6850a0677, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8601859051914654559, guid: 68bdcf34b7b889343892c9b6850a0677, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8601859051914654559, guid: 68bdcf34b7b889343892c9b6850a0677, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8601859051914654559, guid: 68bdcf34b7b889343892c9b6850a0677, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8601859051914654559, guid: 68bdcf34b7b889343892c9b6850a0677, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8601859051914654559, guid: 68bdcf34b7b889343892c9b6850a0677, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8940808093599115749, guid: 68bdcf34b7b889343892c9b6850a0677, type: 3}
+      propertyPath: m_Name
+      value: woman_base
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 68bdcf34b7b889343892c9b6850a0677, type: 3}
+--- !u!4 &5777686743211399449 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8601859051914654559, guid: 68bdcf34b7b889343892c9b6850a0677, type: 3}
+  m_PrefabInstance: {fileID: 2842200453272349254}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &8259120237934932691 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 6192392699284904085, guid: 68bdcf34b7b889343892c9b6850a0677, type: 3}
+  m_PrefabInstance: {fileID: 2842200453272349254}
+  m_PrefabAsset: {fileID: 0}

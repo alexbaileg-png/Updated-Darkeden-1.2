@@ -1,39 +1,9 @@
 using System.Collections;
-using System.Collections.Generic;
+using FishNet.Object;
 using UnityEngine;
 
-public class EnemyAI : MonoBehaviour
+public class EnemyAI : NetworkBehaviour
 {
-    // ── Static player registry — populated by PlayerStats.OnStartServer ───────
-    private static readonly List<PlayerStats> _registeredPlayers = new List<PlayerStats>();
-
-    public static void RegisterPlayer(PlayerStats ps)
-    {
-        if (!_registeredPlayers.Contains(ps)) _registeredPlayers.Add(ps);
-    }
-
-    public static void UnregisterPlayer(PlayerStats ps)
-    {
-        _registeredPlayers.Remove(ps);
-    }
-
-    public static PlayerStats GetNearestPlayer(Vector3 position)
-    {
-        PlayerStats nearest = null;
-        float bestDist = float.MaxValue;
-        foreach (PlayerStats ps in _registeredPlayers)
-        {
-            if (ps == null || ps.isDead) continue;
-            float dist = Vector3.Distance(position, ps.transform.position);
-            if (dist < bestDist) { bestDist = dist; nearest = ps; }
-        }
-        return nearest;
-    }
-
-    // ─────────────────────────────────────────────────────────────────────────
-
-    public Transform player;
-
     [Header("Movement")]
     public float moveSpeed = 3f;
     public float chaseRange = 30f;
@@ -50,34 +20,36 @@ public class EnemyAI : MonoBehaviour
     public Animator modelAnimator;
 
     private float nextAttackTime = 0f;
-    private PlayerStats playerStats;
     private bool isAttacking = false;
+    private Transform _target;
+    private PlayerStats _targetStats;
 
-    void Start()
+    public override void OnStartServer()
     {
+        base.OnStartServer();
+
         if (modelAnimator == null && modelTransform != null)
             modelAnimator = modelTransform.GetComponent<Animator>();
+
+        if (modelAnimator == null)
+            modelAnimator = GetComponentInChildren<Animator>();
     }
 
     void Update()
     {
-        // Use the registry to always target the nearest living player
-        PlayerStats nearest = GetNearestPlayer(transform.position);
-        if (nearest != null)
-        {
-            player      = nearest.transform;
-            playerStats = nearest;
-        }
+        // AI only runs on the server
+        if (!IsServerStarted) return;
 
-        if (player == null)
+        RefreshTarget();
+
+        if (_target == null)
         {
             SetMoving(false);
             return;
         }
 
-        Vector3 direction = player.position - transform.position;
+        Vector3 direction = _target.position - transform.position;
         direction.y = 0f;
-
         float distance = direction.magnitude;
 
         if (distance > chaseRange)
@@ -86,7 +58,7 @@ public class EnemyAI : MonoBehaviour
             return;
         }
 
-        FacePlayer(direction);
+        FaceTarget(direction);
 
         if (distance <= attackRange)
         {
@@ -95,14 +67,30 @@ public class EnemyAI : MonoBehaviour
             return;
         }
 
-        if (distance > stopDistance && !isAttacking)
-        {
+        if (!isAttacking)
             Move(direction.normalized);
-        }
         else
-        {
             SetMoving(false);
+    }
+
+    // Finds the closest living player each frame
+    void RefreshTarget()
+    {
+        float closestDist = chaseRange;
+        Transform closest = null;
+
+        foreach (PlayerStats ps in FindObjectsOfType<PlayerStats>())
+        {
+            float dist = Vector3.Distance(transform.position, ps.transform.position);
+            if (dist < closestDist)
+            {
+                closestDist = dist;
+                closest = ps.transform;
+                _targetStats = ps;
+            }
         }
+
+        _target = closest;
     }
 
     void Move(Vector3 direction)
@@ -113,11 +101,8 @@ public class EnemyAI : MonoBehaviour
 
     void TryAttack()
     {
-        if (isAttacking)
-            return;
-
-        if (Time.time < nextAttackTime)
-            return;
+        if (isAttacking) return;
+        if (Time.time < nextAttackTime) return;
 
         nextAttackTime = Time.time + attackCooldown;
         StartCoroutine(AttackRoutine());
@@ -128,38 +113,34 @@ public class EnemyAI : MonoBehaviour
         isAttacking = true;
         SetMoving(false);
 
-        if (modelAnimator != null)
-        {
-            modelAnimator.ResetTrigger("Attack");
-            modelAnimator.SetTrigger("Attack");
-        }
+        TriggerAttackAnimOnClients();
 
         yield return new WaitForSeconds(attackHitDelay);
 
-        if (player != null)
+        if (_target != null)
         {
-            Vector3 direction = player.position - transform.position;
-            direction.y = 0f;
-
-            float distance = direction.magnitude;
+            float distance = Vector3.Distance(transform.position, _target.position);
 
             if (distance <= attackRange)
             {
-                if (CombatManager.Instance != null)
+                // Try NetworkPlayerController first (networked player), fall back to PlayerStats
+                NetworkPlayerController netPlayer = _target.GetComponent<NetworkPlayerController>();
+                if (netPlayer != null)
                 {
-                    DamageRequest request = new DamageRequest(
-                        gameObject,
-                        player.gameObject,
-                        attackDamage,
-                        DamageType.Melee,
-                        false
-                    );
-
-                    CombatManager.Instance.ApplyDamage(request);
+                    netPlayer.ServerTakeDamage(attackDamage, DamageType.Melee);
                 }
-                else if (playerStats != null)
+                else if (_targetStats != null)
                 {
-                    playerStats.ReceiveDamage(attackDamage, DamageType.Melee);
+                    if (CombatManager.Instance != null)
+                    {
+                        DamageRequest request = new DamageRequest(
+                            gameObject, _target.gameObject, attackDamage, DamageType.Melee, false);
+                        CombatManager.Instance.ApplyDamage(request);
+                    }
+                    else
+                    {
+                        _targetStats.ReceiveDamage(attackDamage, DamageType.Melee);
+                    }
                 }
             }
         }
@@ -167,12 +148,18 @@ public class EnemyAI : MonoBehaviour
         isAttacking = false;
     }
 
-    void FacePlayer(Vector3 direction)
+    [ObserversRpc]
+    void TriggerAttackAnimOnClients()
+    {
+        if (modelAnimator == null) return;
+        modelAnimator.ResetTrigger("Attack");
+        modelAnimator.SetTrigger("Attack");
+    }
+
+    void FaceTarget(Vector3 direction)
     {
         direction.y = 0f;
-
-        if (direction.sqrMagnitude <= 0.01f)
-            return;
+        if (direction.sqrMagnitude <= 0.01f) return;
 
         Quaternion lookRotation = Quaternion.LookRotation(direction.normalized);
 
@@ -184,27 +171,8 @@ public class EnemyAI : MonoBehaviour
 
     void SetMoving(bool isMoving)
     {
-        if (modelAnimator == null)
-            return;
-
+        if (modelAnimator == null) return;
         modelAnimator.SetBool("IsMoving", isMoving);
         modelAnimator.SetFloat("MoveSpeed", isMoving ? moveSpeed : 0f);
-    }
-
-    private float _baseChaseRange = -1f;
-
-    public void ApplyFogDebuff(float detectionMultiplier)
-    {
-        if (_baseChaseRange < 0f) _baseChaseRange = chaseRange;
-        chaseRange = _baseChaseRange * detectionMultiplier;
-    }
-
-    public void RemoveFogDebuff()
-    {
-        if (_baseChaseRange >= 0f)
-        {
-            chaseRange = _baseChaseRange;
-            _baseChaseRange = -1f;
-        }
     }
 }

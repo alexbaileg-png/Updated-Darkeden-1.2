@@ -10,7 +10,11 @@ public class InventoryGrid : MonoBehaviour
     public GameObject inventorySlotPrefab;
 
     [Header("Starting Items")]
-    public ItemData[] startingItems;
+    [Tooltip("Given to Slayer faction players on first login.")]
+    public ItemData[] slayerStartingItems;
+
+    [Tooltip("Given to Vampire faction players on first login.")]
+    public ItemData[] vampireStartingItems;
 
     private InventorySlot[] slots;
 
@@ -22,7 +26,7 @@ public class InventoryGrid : MonoBehaviour
     void Start()
     {
         BuildGrid();
-        AddStartingItems();
+        // Starting items are now given by PlayerStats after faction is known
     }
 
     void BuildGrid()
@@ -52,13 +56,14 @@ public class InventoryGrid : MonoBehaviour
         }
     }
 
-    void AddStartingItems()
+    public void AddStartingItems(PlayerFaction faction = PlayerFaction.Slayer)
     {
-        if (startingItems == null)
-            return;
+        ItemData[] items = faction == PlayerFaction.Vampire ? vampireStartingItems : slayerStartingItems;
 
-        foreach (ItemData item in startingItems)
-            AddItem(item);
+        if (items == null) return;
+
+        foreach (ItemData item in items)
+            if (item != null) AddItem(item);
     }
 
     public void ClearInventory()

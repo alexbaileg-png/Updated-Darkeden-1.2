@@ -13,49 +13,21 @@ public class GameSessionBridge : MonoBehaviour
     [Header("Save & Exit UI")]
     public GameObject saveExitMenuPanel;
 
-    [Header("Auto Save")]
-    public float autoSaveInterval = 60f; // seconds between auto-saves
-    private float _nextAutoSave;
-
     void Awake()
     {
         Instance = this;
-
-        // Register faction BEFORE network starts (Awake runs before Start)
-        CharacterData character = GameSession.Instance?.SelectedCharacter;
-        if (character != null)
-            FactionPlayerSpawner.SetPendingFaction(character.faction, character.GetClassName(), character.gender);
     }
 
     void Start()
     {
         if (saveExitMenuPanel != null)
             saveExitMenuPanel.SetActive(false);
-
-        _nextAutoSave = Time.time + autoSaveInterval;
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.Escape))
             ToggleSaveExitMenu();
-
-        if (Time.time >= _nextAutoSave)
-        {
-            _nextAutoSave = Time.time + autoSaveInterval;
-            AutoSave();
-        }
-    }
-
-    async void AutoSave()
-    {
-        SaveGameToSession();
-        CharacterPersistenceManager.Instance?.SaveCharacter();
-
-        if (GameSession.Instance != null)
-            await CloudDataService.SaveAccountAsync(GameSession.Instance.AccountData);
-
-        Debug.Log("[AutoSave] Character progress saved.");
     }
 
     // ── Menu ─────────────────────────────────────────────────────────────────

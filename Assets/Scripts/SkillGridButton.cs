@@ -4,76 +4,63 @@ using UnityEngine.UI;
 
 public class SkillGridButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
-    [Header("References")]
+    [Header("References — set by SkillSelectorUI at runtime")]
     public SkillSelectorUI skillSelectorUI;
     public PlayerSkillManager skillManager;
     public PlayerStats playerStats;
 
-    [Header("Skill")]
+    [Header("Skill — set by SkillSelectorUI at runtime")]
     public SkillType skillType;
 
     [Header("Icon")]
     public Image iconImage;
-    public Sprite iconSprite;
 
     void Start()
     {
         if (iconImage == null)
             iconImage = GetComponent<Image>();
 
-        if (iconImage != null)
-        {
-            iconImage.sprite = iconSprite;
-            iconImage.raycastTarget = true;
-        }
-
+        ApplyIcon();
         RefreshVisibility();
     }
 
-    void OnEnable()
+    void OnEnable() => RefreshVisibility();
+
+    void ApplyIcon()
     {
-        RefreshVisibility();
+        if (iconImage == null || skillManager == null) return;
+        SkillData data = skillManager.GetSkillData(skillType);
+        if (data?.skillIcon != null)
+            iconImage.sprite = data.skillIcon;
     }
 
     public void RefreshVisibility()
     {
-        if (skillManager == null)
-            return;
-
-        bool unlocked = skillManager.IsSkillUnlocked(skillType);
-        gameObject.SetActive(unlocked);
+        if (skillManager == null) return;
+        gameObject.SetActive(skillManager.IsSkillUnlocked(skillType));
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (skillSelectorUI != null)
-            skillSelectorUI.SetHoveredSkill(skillType);
-
+        skillSelectorUI?.SetHoveredSkill(skillType);
         ShowTooltip();
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        if (skillSelectorUI != null)
-            skillSelectorUI.ClearHoveredSkill();
-
-        if (SkillTooltipUI.Instance != null)
-            SkillTooltipUI.Instance.HideTooltip();
+        skillSelectorUI?.ClearHoveredSkill();
+        SkillTooltipUI.Instance?.HideTooltip();
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (skillSelectorUI != null)
-            skillSelectorUI.SelectSkill(skillType);
+        skillSelectorUI?.SelectSkill(skillType);
     }
 
     void ShowTooltip()
     {
-        if (SkillTooltipUI.Instance == null || skillManager == null)
-            return;
-
+        if (SkillTooltipUI.Instance == null || skillManager == null) return;
         SkillData data = skillManager.GetSkillData(skillType);
-
         SkillTooltipUI.Instance.ShowTooltip(data, skillManager, playerStats);
     }
 }

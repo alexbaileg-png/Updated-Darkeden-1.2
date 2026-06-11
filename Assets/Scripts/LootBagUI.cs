@@ -83,54 +83,24 @@ public class LootBagUI : MonoBehaviour
             hoverInfoUI.Hide();
     }
 
+    public bool IsShowingBag(LootBag bag) => currentBag == bag && rootPanel != null && rootPanel.activeSelf;
+
     public void TakeSlot(int index)
     {
-        if (currentBag == null || currentInventory == null)
-            return;
-
-        currentBag.TakeEntry(index, currentInventory);
-        Refresh();
+        if (currentBag == null) return;
+        currentBag.ServerTakeEntry(index);
     }
 
     public void TakeEntireStack(int index)
     {
-        if (currentBag == null || currentInventory == null)
-            return;
-
-        if (index < 0 || index >= currentBag.items.Count)
-            return;
-
-        LootBagEntry entry = currentBag.items[index];
-
-        if (entry == null || entry.item == null)
-            return;
-
-        int amount = entry.quantity;
-
-        for (int i = 0; i < amount; i++)
-        {
-            bool added = currentInventory.AddItem(entry.item, 1);
-
-            if (!added)
-                break;
-
-            entry.quantity--;
-        }
-
-        if (entry.quantity <= 0)
-            currentBag.items.RemoveAt(index);
-
-        currentBag.CheckIfEmpty();
-        Refresh();
+        if (currentBag == null || index < 0 || index >= currentBag.items.Count) return;
+        currentBag.ServerTakeEntireStack(index);
     }
 
     public void TakeAll()
     {
-        if (currentBag == null || currentInventory == null)
-            return;
-
-        currentBag.TakeAll(currentInventory);
-        Refresh();
+        if (currentBag == null) return;
+        currentBag.ServerTakeAll();
     }
 
     public void CloseBag()

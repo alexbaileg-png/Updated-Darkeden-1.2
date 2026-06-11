@@ -1,6 +1,7 @@
+using FishNet.Object;
 using UnityEngine;
 
-public class HoverDetector : MonoBehaviour
+public class HoverDetector : NetworkBehaviour
 {
     public static HoverHighlight CurrentHover;
     public static EnemyHealth CurrentEnemyTarget;
@@ -11,6 +12,10 @@ public class HoverDetector : MonoBehaviour
 
     void Update()
     {
+        // Only the local owner should detect hovers
+        if (!IsOwner) return;
+
+        if (Camera.main == null) return;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
 
@@ -50,7 +55,7 @@ public class HoverDetector : MonoBehaviour
 
             if (currentHighlight != null)
             {
-                Debug.LogError("Highlighting: " + currentHighlight.gameObject.name);
+                Debug.Log("Highlighting: " + currentHighlight.gameObject.name);
                 currentHighlight.SetHighlighted(true);
                 CurrentEnemyTarget = currentHighlight.GetComponent<EnemyHealth>();
             }

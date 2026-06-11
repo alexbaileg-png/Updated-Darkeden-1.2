@@ -1,19 +1,22 @@
+using FishNet;
+using FishNet.Object;
 using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-    public GameObject enemyPrefab;
+    public NetworkObject enemyPrefab;
 
     public int maxEnemies = 10;
-
     public float spawnRadius = 15f;
-
     public float spawnInterval = 2f;
 
     private float nextSpawnTime = 0f;
 
     void Update()
     {
+        // Only the server spawns enemies
+        if (!InstanceFinder.IsServerStarted) return;
+
         if (Time.time >= nextSpawnTime)
         {
             TrySpawnEnemy();
@@ -23,30 +26,15 @@ public class EnemySpawner : MonoBehaviour
 
     void TrySpawnEnemy()
     {
-        EnemyHealth[] enemies = FindObjectsOfType<EnemyHealth>();
-
-        if (enemies.Length >= maxEnemies)
+        if (FindObjectsOfType<EnemyHealth>().Length >= maxEnemies)
             return;
 
         Vector2 randomCircle = Random.insideUnitCircle * spawnRadius;
+        Vector3 spawnPosition = new Vector3(randomCircle.x, 1f, randomCircle.y);
 
-        Vector3 spawnPosition = new Vector3(
-            randomCircle.x,
-            1f,
-            randomCircle.y
-        );
+        NetworkObject enemy = InstanceFinder.NetworkManager.GetPooledInstantiated(
+            enemyPrefab, spawnPosition, Quaternion.identity, true);
 
-        GameObject enemy = Instantiate(
-            enemyPrefab,
-            spawnPosition,
-            Quaternion.identity
-        );
-
-        EnemyAI ai = enemy.GetComponent<EnemyAI>();
-
-        if (ai != null)
-        {
-            ai.player = GameObject.Find("Player").transform;
-        }
+        InstanceFinder.ServerManager.Spawn(enemy);
     }
 }

@@ -46,6 +46,8 @@ public class ItemEnhancementManager : MonoBehaviour
             gearItem.itemType == ItemType.Top ||
             gearItem.itemType == ItemType.Bottom ||
             gearItem.itemType == ItemType.Boots ||
+            gearItem.itemType == ItemType.Gloves ||
+            gearItem.itemType == ItemType.Belt ||
             gearItem.itemType == ItemType.Necklace;
 
         if (isWeaponCrystal && !validWeapon)
@@ -141,6 +143,8 @@ public class ItemEnhancementManager : MonoBehaviour
             item.itemType == ItemType.Top ||
             item.itemType == ItemType.Bottom ||
             item.itemType == ItemType.Boots ||
+            item.itemType == ItemType.Gloves ||
+            item.itemType == ItemType.Belt ||
             item.itemType == ItemType.Weapon;
     }
 

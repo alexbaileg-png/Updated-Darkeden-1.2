@@ -17,6 +17,9 @@ public class PlayerHUD : MonoBehaviour
 
     void Update()
     {
+        if (playerStats == null)
+            playerStats = PlayerStats.LocalInstance;
+
         UpdateHUD();
     }
 
@@ -32,19 +35,27 @@ public class PlayerHUD : MonoBehaviour
         }
 
         if (healthText != null)
-        {
             healthText.text = playerStats.currentHealth + " / " + playerStats.maxHealth;
-        }
+
+        // Vampires don't use mana — hide the mana bar entirely
+        bool isVampire = playerStats.faction == PlayerFaction.Vampire;
 
         if (manaSlider != null)
         {
-            manaSlider.maxValue = playerStats.maxMana;
-            manaSlider.value = playerStats.currentMana;
+            manaSlider.gameObject.SetActive(!isVampire);
+            if (!isVampire)
+            {
+                manaSlider.maxValue = playerStats.maxMana;
+                manaSlider.value = playerStats.currentMana;
+            }
         }
 
         if (manaText != null)
         {
-            manaText.text = playerStats.currentMana + " / " + playerStats.maxMana;
+            manaText.gameObject.SetActive(!isVampire);
+            if (!isVampire)
+                manaText.text = playerStats.currentMana + " / " + playerStats.maxMana;
         }
     }
+
 }

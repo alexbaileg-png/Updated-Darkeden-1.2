@@ -1,0 +1,145 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e976ae5566286845b37c51031801d11, type: 3}
+  m_Name: SashData
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  itemId: Vamp_Sash
+  factionRestriction: 2
+  itemName: Sash
+  description: 
+  itemIcon: {fileID: 21300000, guid: a4171ca4c7bfe0044b82c1bec40d979d, type: 3}
+  itemType: 15
+  rarity: 0
+  isStackable: 0
+  maxStackSize: 99
+  restoreAmount: 0
+  sellValue: 0
+  worldLootPrefab: {fileID: 3667215711335300240, guid: d7b678190bff68d479adc1de18346dee, type: 3}
+  strengthBonus: 0
+  dexterityBonus: 0
+  intelligenceBonus: 0
+  enduranceBonus: 0
+  healthBonus: 0
+  manaBonus: 0
+  meleeDamageBonus: 0
+  rangedDamageBonus: 0
+  magicalDamageBonus: 0
+  armorBonus: 0
+  resistanceBonus: 0
+  meleeResistanceBonus: 0
+  magicalResistanceBonus: 0
+  allResistanceBonus: 0
+  hasCrystalStat: 0
+  crystalStat: 0
+  crystalCurrentValue: 0
+  crystalMaxValue: 0
+  beltSlots:
+  - uniqueItemId: 
+    baseItemId: 
+    slotIndex: -1
+    equipmentSlotId: 
+    quantity: 0
+    rarity: 0
+    strengthBonus: 0
+    dexterityBonus: 0
+    intelligenceBonus: 0
+    enduranceBonus: 0
+    healthBonus: 0
+    manaBonus: 0
+    meleeDamageBonus: 0
+    rangedDamageBonus: 0
+    magicalDamageBonus: 0
+    armorBonus: 0
+    resistanceBonus: 0
+    meleeResistanceBonus: 0
+    magicalResistanceBonus: 0
+    allResistanceBonus: 0
+    hasCrystalStat: 0
+    crystalStat: 0
+    crystalCurrentValue: 0
+    crystalMaxValue: 0
+    beltItems: []
+  - uniqueItemId: 
+    baseItemId: 
+    slotIndex: -1
+    equipmentSlotId: 
+    quantity: 0
+    rarity: 0
+    strengthBonus: 0
+    dexterityBonus: 0
+    intelligenceBonus: 0
+    enduranceBonus: 0
+    healthBonus: 0
+    manaBonus: 0
+    meleeDamageBonus: 0
+    rangedDamageBonus: 0
+    magicalDamageBonus: 0
+    armorBonus: 0
+    resistanceBonus: 0
+    meleeResistanceBonus: 0
+    magicalResistanceBonus: 0
+    allResistanceBonus: 0
+    hasCrystalStat: 0
+    crystalStat: 0
+    crystalCurrentValue: 0
+    crystalMaxValue: 0
+    beltItems: []
+  - uniqueItemId: 
+    baseItemId: 
+    slotIndex: -1
+    equipmentSlotId: 
+    quantity: 0
+    rarity: 0
+    strengthBonus: 0
+    dexterityBonus: 0
+    intelligenceBonus: 0
+    enduranceBonus: 0
+    healthBonus: 0
+    manaBonus: 0
+    meleeDamageBonus: 0
+    rangedDamageBonus: 0
+    magicalDamageBonus: 0
+    armorBonus: 0
+    resistanceBonus: 0
+    meleeResistanceBonus: 0
+    magicalResistanceBonus: 0
+    allResistanceBonus: 0
+    hasCrystalStat: 0
+    crystalStat: 0
+    crystalCurrentValue: 0
+    crystalMaxValue: 0
+    beltItems: []
+  - uniqueItemId: 
+    baseItemId: 
+    slotIndex: -1
+    equipmentSlotId: 
+    quantity: 0
+    rarity: 0
+    strengthBonus: 0
+    dexterityBonus: 0
+    intelligenceBonus: 0
+    enduranceBonus: 0
+    healthBonus: 0
+    manaBonus: 0
+    meleeDamageBonus: 0
+    rangedDamageBonus: 0
+    magicalDamageBonus: 0
+    armorBonus: 0
+    resistanceBonus: 0
+    meleeResistanceBonus: 0
+    magicalResistanceBonus: 0
+    allResistanceBonus: 0
+    hasCrystalStat: 0
+    crystalStat: 0
+    crystalCurrentValue: 0
+    crystalMaxValue: 0
+    beltItems: []

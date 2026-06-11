@@ -3,19 +3,19 @@ using UnityEngine.UI;
 
 public class SkillCooldownUI : MonoBehaviour
 {
-    [Header("Player Skills")]
-    public PlayerProjectileAttack playerSkills;
-
     [Header("Cooldown Overlay")]
     public Image cooldownFill;
 
+    private ISkillCaster _caster;
+
+    public void SetSkillCaster(ISkillCaster caster) => _caster = caster;
+
     void Update()
     {
-        if (playerSkills == null || cooldownFill == null)
-            return;
+        if (_caster == null || cooldownFill == null) return;
 
-        float remaining = playerSkills.GetCooldownRemaining();
-        float total = playerSkills.GetCurrentSkillCooldown();
+        float remaining = _caster.GetCooldownRemaining();
+        float total     = _caster.GetCurrentSkillCooldown();
 
         if (remaining <= 0f || total <= 0f)
         {

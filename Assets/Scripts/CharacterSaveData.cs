@@ -22,6 +22,8 @@ public class CharacterSaveData
 
     public int gold;
 
+    public bool hasReceivedStartingItems;
+
     public float positionX;
     public float positionY;
     public float positionZ;

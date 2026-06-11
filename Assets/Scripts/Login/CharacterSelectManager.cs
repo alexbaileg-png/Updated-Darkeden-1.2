@@ -39,7 +39,6 @@ public class CharacterSelectManager : MonoBehaviour
         for (int i = 0; i < slots.Length; i++)
         {
             CharacterData character = i < account.characters.Length ? account.characters[i] : null;
-            if (GameSession.IsEmptySlot(character)) character = null;
             slots[i].Setup(character, i, OnSlotClicked);
         }
     }
@@ -67,36 +66,24 @@ public class CharacterSelectManager : MonoBehaviour
             selectedLevelText.text = hasCharacter ? $"Level {character.level}" : "";
     }
 
-    public void OnBackClicked()
-    {
-        if (GameSession.Instance != null)
-            AuthBackHelper.SignOutAndReturn();
-        SceneManager.LoadScene("Login");
-    }
-
     public void OnEnterWorldClicked()
     {
         CharacterData character = GetCharacterAt(_selectedSlot);
         if (character == null) return;
 
         GameSession.Instance.SelectCharacter(character);
-        SceneManager.LoadScene("GameScene");
+        SceneManager.LoadScene("Game");
     }
 
     public void OnCreateCharacterClicked()
     {
-        int emptySlot = GameSession.Instance.GetEmptySlot();
-        Debug.Log($"[CharacterSelect] Create clicked. Empty slot: {emptySlot}. Characters: " +
-            string.Join(", ", System.Array.ConvertAll(GameSession.Instance.AccountData.characters,
-                c => c == null ? "null" : c.characterName)));
-
-        if (emptySlot < 0)
+        if (GameSession.Instance.GetEmptySlot() < 0)
         {
             Debug.Log("All character slots are full.");
             return;
         }
 
-        SceneManager.LoadScene("CharacterCreate");
+        SceneManager.LoadScene("CharacterCreation");
     }
 
     public async void OnDeleteCharacterClicked()
@@ -107,7 +94,7 @@ public class CharacterSelectManager : MonoBehaviour
         if (character == null) return;
 
         GameSession.Instance.AccountData.characters[_selectedSlot] = null;
-        await CloudDataService.SaveAccountAsync(GameSession.Instance.AccountData);
+        await CloudSaveService.SaveAccountAsync(GameSession.Instance.AccountData);
 
         RefreshSlots();
         SetSelected(-1);
@@ -118,7 +105,6 @@ public class CharacterSelectManager : MonoBehaviour
         if (slot < 0 || GameSession.Instance == null) return null;
         CharacterData[] chars = GameSession.Instance.AccountData.characters;
         if (slot >= chars.Length) return null;
-        CharacterData c = chars[slot];
-        return GameSession.IsEmptySlot(c) ? null : c;
+        return chars[slot];
     }
 }

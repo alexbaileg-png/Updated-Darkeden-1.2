@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.IO;
-using System.Collections;
 
 public class CharacterPersistenceManager : MonoBehaviour
 {
@@ -17,18 +16,17 @@ public class CharacterPersistenceManager : MonoBehaviour
 
     private string SavePath
     {
-        get { return Path.Combine(Application.persistentDataPath, saveFileName); }
+        get
+        {
+            string prefix = GameSession.Instance?.SelectedCharacter?.characterId ?? "";
+            string file = string.IsNullOrEmpty(prefix) ? saveFileName : prefix + "_" + saveFileName;
+            return Path.Combine(Application.persistentDataPath, file);
+        }
     }
 
     void Awake()
     {
         Instance = this;
-    }
-
-    IEnumerator Start()
-    {
-        yield return null;
-        LoadCharacter();
     }
 
     void OnApplicationQuit()
@@ -85,6 +83,8 @@ public class CharacterPersistenceManager : MonoBehaviour
         if (playerGold != null)
             data.gold = playerGold.gold;
 
+        data.hasReceivedStartingItems = playerStats.hasReceivedStartingItems;
+
         if (playerTransform != null)
         {
             data.positionX = playerTransform.position.x;
@@ -102,7 +102,9 @@ public class CharacterPersistenceManager : MonoBehaviour
     {
         if (!File.Exists(SavePath))
         {
-            Debug.Log("No character save found yet.");
+            Debug.Log("No character save found — applying class base stats for new character.");
+            if (playerStats != null)
+                playerStats.ApplyClassBaseStats();
             return;
         }
 
@@ -115,6 +117,7 @@ public class CharacterPersistenceManager : MonoBehaviour
                 data.level, data.currentXP, data.xpToNextLevel, data.availableStatPoints,
                 data.baseStrength, data.baseDexterity, data.baseIntelligence, data.baseEndurance
             );
+            playerStats.hasReceivedStartingItems = data.hasReceivedStartingItems;
         }
 
         if (playerSkillManager != null)

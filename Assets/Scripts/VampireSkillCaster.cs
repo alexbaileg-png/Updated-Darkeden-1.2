@@ -6,7 +6,7 @@ using UnityEngine;
 /// Handles all vampire bloodline skills.
 /// Attach this to the PlayerNetworkPrefabVampire prefab.
 /// </summary>
-public class VampireSkillCaster : NetworkBehaviour, ISkillCaster
+public class VampireSkillCaster : NetworkBehaviour
 {
     [Header("Keybinds")]
     public SkillType f8Skill  = SkillType.DarkBolt;
@@ -84,7 +84,6 @@ public class VampireSkillCaster : NetworkBehaviour, ISkillCaster
     void HandleCasting()
     {
         if (!Input.GetMouseButtonDown(1)) return;
-        if (_playerStats != null && _playerStats.isDead) return;
         if (Time.time < _nextCastTime) return;
         if (_isCasting || _isChanneling) return;
         if (!CanCast(_selectedSkill)) return;
@@ -97,9 +96,8 @@ public class VampireSkillCaster : NetworkBehaviour, ISkillCaster
         CharacterData character = GameSession.Instance?.SelectedCharacter;
         if (character != null && !ClassSkillConfig.CanUseSkill(character, skill)) return false;
         if (_skillManager != null && !_skillManager.IsSkillUnlocked(skill)) return false;
-        // Vampires spend Health to cast — must have more than the cost (can't cast if it would kill them)
         int cost = GetManaCost(skill);
-        if (_playerStats != null && _playerStats.currentHealth <= cost) return false;
+        if (_playerStats != null && _playerStats.currentMana < cost) return false;
         return true;
     }
 
@@ -119,12 +117,12 @@ public class VampireSkillCaster : NetworkBehaviour, ISkillCaster
         PlayCastAnimation();
         yield return new WaitForSeconds(castDelay);
 
-        int skillLevel  = GetSkillLevel(skill);
-        int skillPower  = GetSkillPower(skill, 25);
-        int healthCost  = GetManaCost(skill);   // vampires pay health, not mana
+        int skillLevel = GetSkillLevel(skill);
+        int skillPower = GetSkillPower(skill, 25);
+        int manaCost   = GetManaCost(skill);
         Vector3 castPos = GetMouseWorldPosition();
 
-        ServerCastSkill(skill, transform.position, aimDir, castPos, skillLevel, skillPower, healthCost);
+        ServerCastSkill(skill, transform.position, aimDir, castPos, skillLevel, skillPower, manaCost);
 
         // Blood Drain blocks casting for the channel duration
         if (skill == SkillType.BloodDrain)
@@ -142,15 +140,10 @@ public class VampireSkillCaster : NetworkBehaviour, ISkillCaster
 
     [ServerRpc]
     void ServerCastSkill(SkillType skill, Vector3 casterPos, Vector3 aimDir,
-                         Vector3 castPos, int skillLevel, int skillPower, int healthCost)
+                         Vector3 castPos, int skillLevel, int skillPower, int manaCost)
     {
         PlayerStats stats = GetComponent<PlayerStats>();
-        // Vampires burn their own blood to cast — deduct health directly
-        if (stats != null)
-        {
-            if (stats.currentHealth <= healthCost) return;  // prevent self-kill via casting
-            stats.ReceiveDamage(healthCost, DamageType.Melee);
-        }
+        if (stats != null && !stats.SpendMana(manaCost)) return;
 
         switch (skill)
         {
@@ -345,18 +338,9 @@ public class VampireSkillCaster : NetworkBehaviour, ISkillCaster
     float GetCooldown(SkillType skill)  => _skillManager != null ? _skillManager.GetSkillCooldown(skill) : 1f;
     int GetManaCost(SkillType skill)    => _skillManager != null ? _skillManager.GetSkillManaCost(skill) : 0;
 
-    public SkillType CurrentSelectedSkill      => _selectedSkill;
-    public float GetCooldownRemaining()        => Mathf.Max(0f, _nextCastTime - Time.time);
-    public float GetCurrentSkillCooldown()     => GetCooldown(_selectedSkill);
+    public float GetCooldownRemaining()       => Mathf.Max(0f, _nextCastTime - Time.time);
+    public float GetCurrentSkillCooldown()    => GetCooldown(_selectedSkill);
     public void  SetSelectedSkill(SkillType s) => _selectedSkill = s;
-
-    public void BindSkill(KeyCode key, SkillType skill)
-    {
-        if (key == KeyCode.F8)  f8Skill  = skill;
-        if (key == KeyCode.F9)  f9Skill  = skill;
-        if (key == KeyCode.F10) f10Skill = skill;
-        if (key == KeyCode.F11) f11Skill = skill;
-    }
 
     Vector3 GetAimDirection()
     {

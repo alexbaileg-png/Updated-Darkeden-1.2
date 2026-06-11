@@ -1,7 +1,8 @@
 using System.Collections;
+using FishNet.Object;
 using UnityEngine;
 
-public class PlayerProjectileAttack : MonoBehaviour
+public class PlayerProjectileAttack : NetworkBehaviour
 {
     [Header("Selected Skill")]
     public SkillType currentSelectedSkill = SkillType.HolyBolt;
@@ -42,208 +43,158 @@ public class PlayerProjectileAttack : MonoBehaviour
     private float nextCastTime = 0f;
     private bool isCasting = false;
 
-    private PlayerMovement playerMovement;
     private PlayerStats playerStats;
     private PlayerSkillManager skillManager;
     private Animator modelAnimator;
+    private NetworkPlayerController netController;
 
-    void Start()
+    public override void OnStartClient()
     {
-        playerMovement = GetComponent<PlayerMovement>();
+        base.OnStartClient();
+
+        if (!IsOwner) return;
+
         playerStats = GetComponent<PlayerStats>();
         skillManager = GetComponent<PlayerSkillManager>();
+        netController = GetComponent<NetworkPlayerController>();
 
-        if (playerMovement != null && playerMovement.modelAnimator != null)
-            modelAnimator = playerMovement.modelAnimator;
+        // Get animator from NetworkPlayerController's modelTransform
+        if (netController != null && netController.modelTransform != null)
+            modelAnimator = netController.modelTransform.GetComponent<Animator>();
+
+        if (modelAnimator == null)
+            modelAnimator = GetComponentInChildren<Animator>();
     }
 
     void Update()
     {
+        if (!IsOwner) return;
+
         HandleSkillSelection();
         HandleCasting();
     }
 
     void HandleSkillSelection()
     {
-        if (Input.GetKeyDown(KeyCode.F8))
-            currentSelectedSkill = f8Skill;
-
-        if (Input.GetKeyDown(KeyCode.F9))
-            currentSelectedSkill = f9Skill;
-
-        if (Input.GetKeyDown(KeyCode.F10))
-            currentSelectedSkill = f10Skill;
-
-        if (Input.GetKeyDown(KeyCode.F11))
-            currentSelectedSkill = f11Skill;
+        if (Input.GetKeyDown(KeyCode.F8)) currentSelectedSkill = f8Skill;
+        if (Input.GetKeyDown(KeyCode.F9)) currentSelectedSkill = f9Skill;
+        if (Input.GetKeyDown(KeyCode.F10)) currentSelectedSkill = f10Skill;
+        if (Input.GetKeyDown(KeyCode.F11)) currentSelectedSkill = f11Skill;
     }
 
     void HandleCasting()
     {
-        if (!Input.GetMouseButtonDown(1))
-            return;
+        if (!Input.GetMouseButtonDown(1)) return;
+        if (Time.time < nextCastTime) return;
+        if (isCasting) return;
+        if (!CanCastSkill(currentSelectedSkill)) return;
 
-        if (Time.time < nextCastTime)
-            return;
-
-        if (isCasting)
-            return;
-
-        if (!CanUseSkill(currentSelectedSkill))
-            return;
-
-        StartCoroutine(CastSelectedSkillRoutine());
+        StartCoroutine(CastRoutine());
     }
 
-    bool CanUseSkill(SkillType skill)
+    bool CanCastSkill(SkillType skill)
     {
         if (skillManager != null && !skillManager.IsSkillUnlocked(skill))
             return false;
 
-        int manaCost = GetManaCost(skill);
-
-        if (playerStats != null && !playerStats.SpendMana(manaCost))
+        // Mana check (preview only on client — server enforces it)
+        int cost = GetManaCost(skill);
+        if (playerStats != null && playerStats.currentMana < cost)
             return false;
 
         return true;
     }
 
-    IEnumerator CastSelectedSkillRoutine()
+    IEnumerator CastRoutine()
     {
         isCasting = true;
 
-        if (playerMovement != null)
-            playerMovement.StopMovement();
-
-        Vector3 aimDirection = GetAimDirection();
-
-        if (aimDirection.sqrMagnitude > 0.01f)
+        Vector3 aimDir = GetAimDirection();
+        if (aimDir.sqrMagnitude > 0.01f)
         {
-            aimDirection.Normalize();
-            RotatePlayerVisual(aimDirection);
+            aimDir.Normalize();
+            RotatePlayerVisual(aimDir);
         }
 
         PlayCastAnimation();
 
         yield return new WaitForSeconds(castDelay);
 
-        if (currentSelectedSkill == SkillType.HolyBolt)
-            CastHolyBolt(aimDirection);
-        else if (currentSelectedSkill == SkillType.HolyRain)
-            CastHolyRain();
-        else if (currentSelectedSkill == SkillType.HolyCircleHeal)
-            CastHolyCircleHeal();
-        else if (currentSelectedSkill == SkillType.HealingOrbit)
-            CastHealingOrbit();
+        Vector3 castPosition = GetMouseWorldPosition();
+        int skillLevel = GetSkillLevel(currentSelectedSkill);
+        int skillPower = GetSkillPower(currentSelectedSkill, 20);
+        int manaCost = GetManaCost(currentSelectedSkill);
+
+        // Send to server — server validates mana, applies damage/heals
+        ServerCastSkill(currentSelectedSkill, transform.position, aimDir, castPosition, skillLevel, skillPower, manaCost);
 
         nextCastTime = Time.time + GetCooldown(currentSelectedSkill);
         isCasting = false;
     }
 
-    int GetSkillLevel(SkillType skill)
+    [ServerRpc]
+    void ServerCastSkill(SkillType skill, Vector3 casterPos, Vector3 aimDir, Vector3 castPos, int skillLevel, int skillPower, int manaCost)
     {
-        if (skillManager == null)
-            return 1;
-
-        return Mathf.Max(1, skillManager.GetSkillLevel(skill));
-    }
-
-    int GetSkillPower(SkillType skill, int fallback)
-    {
-        if (skillManager == null)
-            return fallback;
-
-        int power = skillManager.GetSkillPower(skill);
-        return power > 0 ? power : fallback;
-    }
-
-    float GetCooldown(SkillType skill)
-    {
-        if (skillManager == null)
-            return 1f;
-
-        return skillManager.GetSkillCooldown(skill);
-    }
-
-    int GetManaCost(SkillType skill)
-    {
-        if (skillManager == null)
-            return 0;
-
-        return skillManager.GetSkillManaCost(skill);
-    }
-
-    public float GetCooldownRemaining()
-    {
-        return Mathf.Max(0f, nextCastTime - Time.time);
-    }
-
-    public float GetCurrentSkillCooldown()
-    {
-        return GetCooldown(currentSelectedSkill);
-    }
-
-    public void SetSelectedSkill(SkillType skill)
-    {
-        currentSelectedSkill = skill;
-    }
-
-    public void BindSkill(KeyCode key, SkillType skill)
-    {
-        if (key == KeyCode.F8)
-            f8Skill = skill;
-
-        if (key == KeyCode.F9)
-            f9Skill = skill;
-
-        if (key == KeyCode.F10)
-            f10Skill = skill;
-
-        if (key == KeyCode.F11)
-            f11Skill = skill;
-
-        Debug.Log("Bound " + skill + " to " + key);
-    }
-
-    Vector3 GetAimDirection()
-    {
-        EnemyHealth target = HoverDetector.CurrentEnemyTarget;
-
-        if (target != null)
-        {
-            Vector3 directionToTarget = target.transform.position - transform.position;
-            directionToTarget.y = 0f;
-            return directionToTarget;
-        }
-
-        Vector3 mouseWorldPosition = GetMouseWorldPosition();
-        Vector3 directionToMouse = mouseWorldPosition - transform.position;
-        directionToMouse.y = 0f;
-
-        return directionToMouse;
-    }
-
-    void CastHolyBolt(Vector3 direction)
-    {
-        if (projectilePrefab == null)
+        // Server validates and spends mana
+        PlayerStats stats = GetComponent<PlayerStats>();
+        if (stats != null && !stats.SpendMana(manaCost))
             return;
 
-        EnemyHealth target = HoverDetector.CurrentEnemyTarget;
+        switch (skill)
+        {
+            case SkillType.HolyBolt:
+                ServerHolyBolt(casterPos, aimDir, skillPower);
+                break;
+            case SkillType.HolyRain:
+                ServerHolyRain(castPos, skillLevel, skillPower);
+                break;
+            case SkillType.HolyCircleHeal:
+                ServerHolyCircleHeal(castPos, skillLevel, skillPower);
+                break;
+            case SkillType.HealingOrbit:
+                ServerHealingOrbit(skillLevel, skillPower);
+                break;
+        }
+    }
 
-        if (direction.sqrMagnitude <= 0.01f)
-            direction = transform.forward;
+    // ── Holy Bolt ─────────────────────────────────────────────────────────────
 
+    void ServerHolyBolt(Vector3 casterPos, Vector3 direction, int damage)
+    {
+        if (direction.sqrMagnitude <= 0.01f) direction = transform.forward;
         direction.Normalize();
 
-        int damage = GetSkillPower(SkillType.HolyBolt, 20);
+        Vector3 spawnPos = casterPos + direction * 1f + Vector3.up * 0.5f;
 
-        GameObject projectileObject = Instantiate(
-            projectilePrefab,
-            transform.position + direction * 1f + Vector3.up * 0.5f,
-            Quaternion.LookRotation(direction)
-        );
+        // Find nearest enemy in direction as hitscan target
+        EnemyHealth bestTarget = null;
+        float bestAngle = 25f;
 
-        Projectile projectile = projectileObject.GetComponent<Projectile>();
+        foreach (EnemyHealth enemy in FindObjectsOfType<EnemyHealth>())
+        {
+            if (enemy.IsDead()) continue;
+            Vector3 toEnemy = (enemy.transform.position - casterPos).normalized;
+            toEnemy.y = 0f;
+            float angle = Vector3.Angle(direction, toEnemy);
+            float dist = Vector3.Distance(casterPos, enemy.transform.position);
+            if (angle < bestAngle && dist < 30f)
+            {
+                bestAngle = angle;
+                bestTarget = enemy;
+            }
+        }
+
+        // Spawn visual projectile on all clients, damage applied on hit server-side
+        SpawnHolyBoltVisual(spawnPos, direction, bestTarget != null ? bestTarget.gameObject : null, damage);
+    }
+
+    [ObserversRpc]
+    void SpawnHolyBoltVisual(Vector3 spawnPos, Vector3 direction, GameObject target, int damage)
+    {
+        if (projectilePrefab == null) return;
+
+        GameObject proj = Instantiate(projectilePrefab, spawnPos, Quaternion.LookRotation(direction));
+        Projectile projectile = proj.GetComponent<Projectile>();
 
         if (projectile != null)
         {
@@ -253,158 +204,164 @@ public class PlayerProjectileAttack : MonoBehaviour
             projectile.canCrit = true;
 
             if (target != null)
-                projectile.SetTarget(target);
-        }
-    }
-
-    void CastHolyRain()
-    {
-        Vector3 castPosition = GetMouseWorldPosition();
-        castPosition.y = 1.5f;
-
-        int skillLevel = GetSkillLevel(SkillType.HolyRain);
-        int damage = GetSkillPower(SkillType.HolyRain, 20);
-        float radius = holyRainBaseRadius + (skillLevel - 1) * 0.35f;
-
-        if (holyRainEffectPrefab != null)
-        {
-            GameObject effect = Instantiate(
-                holyRainEffectPrefab,
-                castPosition,
-                holyRainEffectPrefab.transform.rotation
-            );
-
-            if (holyRainBaseRadius > 0.01f)
-                effect.transform.localScale *= radius / holyRainBaseRadius;
-        }
-
-        EnemyHealth[] enemies = FindObjectsOfType<EnemyHealth>();
-
-        foreach (EnemyHealth enemy in enemies)
-        {
-            Vector3 enemyPosition = enemy.transform.position;
-            enemyPosition.y = castPosition.y;
-
-            float distance = Vector3.Distance(castPosition, enemyPosition);
-
-            if (distance <= radius)
             {
-                if (CombatManager.Instance != null)
-                {
-                    DamageRequest request = new DamageRequest(
-                        gameObject,
-                        enemy.gameObject,
-                        damage,
-                        DamageType.Magical,
-                        true
-                    );
-
-                    CombatManager.Instance.ApplyDamage(request);
-                }
-                else
-                {
-                    enemy.ReceiveDamage(damage, DamageType.Magical);
-                }
+                EnemyHealth eh = target.GetComponent<EnemyHealth>();
+                if (eh != null) projectile.SetTarget(eh);
             }
         }
     }
 
-    void CastHolyCircleHeal()
+    // ── Holy Rain ─────────────────────────────────────────────────────────────
+
+    void ServerHolyRain(Vector3 castPos, int skillLevel, int damage)
     {
-        Vector3 castPosition = GetMouseWorldPosition();
-        castPosition.y = holyCircleHealEffectHeight;
+        castPos.y = 1.5f;
+        float radius = holyRainBaseRadius + (skillLevel - 1) * 0.35f;
 
-        int skillLevel = GetSkillLevel(SkillType.HolyCircleHeal);
+        foreach (EnemyHealth enemy in FindObjectsOfType<EnemyHealth>())
+        {
+            if (enemy.IsDead()) continue;
+            Vector3 enemyPos = enemy.transform.position;
+            enemyPos.y = castPos.y;
+            if (Vector3.Distance(castPos, enemyPos) <= radius)
+                enemy.ReceiveDamage(damage, DamageType.Magical);
+        }
 
-        int healAmount = GetSkillPower(SkillType.HolyCircleHeal, 25);
+        SpawnHolyRainVisual(castPos, radius);
+    }
+
+    [ObserversRpc]
+    void SpawnHolyRainVisual(Vector3 castPos, float radius)
+    {
+        if (holyRainEffectPrefab == null) return;
+        GameObject effect = Instantiate(holyRainEffectPrefab, castPos, holyRainEffectPrefab.transform.rotation);
+        if (holyRainBaseRadius > 0.01f)
+            effect.transform.localScale *= radius / holyRainBaseRadius;
+    }
+
+    // ── Holy Circle Heal ──────────────────────────────────────────────────────
+
+    void ServerHolyCircleHeal(Vector3 castPos, int skillLevel, int healAmount)
+    {
+        castPos.y = holyCircleHealEffectHeight;
         float radius = holyCircleHealBaseRadius + (skillLevel - 1) * 0.25f;
         float duration = holyCircleHealBaseDuration + (skillLevel - 1) * holyCircleHealDurationPerLevel;
 
-        GameObject effectObject = null;
+        PlayerStats stats = GetComponent<PlayerStats>();
+        int finalHeal = stats != null ? stats.GetMagicalHealing(healAmount) : healAmount;
 
-        if (holyCircleHealEffectPrefab != null)
-        {
-            effectObject = Instantiate(
-                holyCircleHealEffectPrefab,
-                castPosition,
-                holyCircleHealEffectPrefab.transform.rotation
-            );
-
-            if (holyCircleHealBaseRadius > 0.01f)
-                effectObject.transform.localScale *= radius / holyCircleHealBaseRadius;
-        }
-
-        if (effectObject != null)
-        {
-            HolyCircleHealArea healArea = effectObject.GetComponent<HolyCircleHealArea>();
-
-            if (healArea == null)
-                healArea = effectObject.AddComponent<HolyCircleHealArea>();
-
-            healArea.healAmount = playerStats != null ? playerStats.GetMagicalHealing(healAmount) : healAmount;
-            healArea.radius = radius;
-            healArea.duration = duration;
-            healArea.healInterval = holyCircleHealInterval;
-        }
+        SpawnHolyCircleHealVisual(castPos, radius, duration, finalHeal);
     }
 
-    void CastHealingOrbit()
+    [ObserversRpc]
+    void SpawnHolyCircleHealVisual(Vector3 castPos, float radius, float duration, int healAmount)
     {
-        if (healingOrbitPrefab == null)
-            return;
+        if (holyCircleHealEffectPrefab == null) return;
 
-        int skillLevel = GetSkillLevel(SkillType.HealingOrbit);
+        GameObject effectObject = Instantiate(holyCircleHealEffectPrefab, castPos, holyCircleHealEffectPrefab.transform.rotation);
+        if (holyCircleHealBaseRadius > 0.01f)
+            effectObject.transform.localScale *= radius / holyCircleHealBaseRadius;
 
-        HealingOrbitBuff existingBuff = FindObjectOfType<HealingOrbitBuff>();
+        HolyCircleHealArea healArea = effectObject.GetComponent<HolyCircleHealArea>();
+        if (healArea == null) healArea = effectObject.AddComponent<HolyCircleHealArea>();
 
-        if (existingBuff != null && existingBuff.target == transform)
-            Destroy(existingBuff.gameObject);
+        healArea.healAmount = healAmount;
+        healArea.radius = radius;
+        healArea.duration = duration;
+        healArea.healInterval = holyCircleHealInterval;
+    }
 
-        GameObject orbitObject = Instantiate(
-            healingOrbitPrefab,
-            transform.position + Vector3.up * 1.1f,
-            healingOrbitPrefab.transform.rotation
-        );
+    // ── Healing Orbit ─────────────────────────────────────────────────────────
 
+    void ServerHealingOrbit(int skillLevel, int healAmount)
+    {
+        float duration = healingOrbitBaseDuration + (skillLevel - 1) * healingOrbitDurationPerLevel;
+        float radius = healingOrbitBaseRadius + (skillLevel - 1) * healingOrbitRadiusPerLevel;
+        float speed = healingOrbitBaseSpeed + (skillLevel - 1) * healingOrbitSpeedPerLevel;
+
+        SpawnHealingOrbitVisual(duration, radius, speed, healAmount);
+    }
+
+    [ObserversRpc]
+    void SpawnHealingOrbitVisual(float duration, float radius, float speed, int healAmount)
+    {
+        if (healingOrbitPrefab == null) return;
+
+        HealingOrbitBuff existing = FindObjectOfType<HealingOrbitBuff>();
+        if (existing != null && existing.target == transform)
+            Destroy(existing.gameObject);
+
+        GameObject orbitObject = Instantiate(healingOrbitPrefab, transform.position + Vector3.up * 1.1f, healingOrbitPrefab.transform.rotation);
         orbitObject.transform.localScale = healingOrbitPrefab.transform.localScale;
 
         HealingOrbitBuff orbitBuff = orbitObject.GetComponent<HealingOrbitBuff>();
-
         if (orbitBuff != null)
         {
             orbitBuff.target = transform;
-            orbitBuff.baseHealAmount = GetSkillPower(SkillType.HealingOrbit, 10);
-            orbitBuff.duration = healingOrbitBaseDuration + (skillLevel - 1) * healingOrbitDurationPerLevel;
-            orbitBuff.orbitRadius = healingOrbitBaseRadius + (skillLevel - 1) * healingOrbitRadiusPerLevel;
-            orbitBuff.orbitSpeed = healingOrbitBaseSpeed + ((skillLevel - 1) * healingOrbitSpeedPerLevel);
+            orbitBuff.baseHealAmount = healAmount;
+            orbitBuff.duration = duration;
+            orbitBuff.orbitRadius = radius;
+            orbitBuff.orbitSpeed = speed;
         }
     }
 
-    void PlayCastAnimation()
+    // ── Helpers ───────────────────────────────────────────────────────────────
+
+    int GetSkillLevel(SkillType skill) => skillManager != null ? Mathf.Max(1, skillManager.GetSkillLevel(skill)) : 1;
+    int GetSkillPower(SkillType skill, int fallback) => skillManager != null && skillManager.GetSkillPower(skill) > 0 ? skillManager.GetSkillPower(skill) : fallback;
+    float GetCooldown(SkillType skill) => skillManager != null ? skillManager.GetSkillCooldown(skill) : 1f;
+    int GetManaCost(SkillType skill) => skillManager != null ? skillManager.GetSkillManaCost(skill) : 0;
+
+    public float GetCooldownRemaining() => Mathf.Max(0f, nextCastTime - Time.time);
+    public float GetCurrentSkillCooldown() => GetCooldown(currentSelectedSkill);
+    public void SetSelectedSkill(SkillType skill) => currentSelectedSkill = skill;
+
+    public void BindSkill(KeyCode key, SkillType skill)
     {
-        if (modelAnimator != null)
+        if (key == KeyCode.F8) f8Skill = skill;
+        if (key == KeyCode.F9) f9Skill = skill;
+        if (key == KeyCode.F10) f10Skill = skill;
+        if (key == KeyCode.F11) f11Skill = skill;
+    }
+
+    Vector3 GetAimDirection()
+    {
+        EnemyHealth target = HoverDetector.CurrentEnemyTarget;
+        if (target != null)
         {
-            modelAnimator.ResetTrigger("Cast");
-            modelAnimator.SetTrigger("Cast");
+            Vector3 dir = target.transform.position - transform.position;
+            dir.y = 0f;
+            return dir;
         }
-    }
 
-    void RotatePlayerVisual(Vector3 direction)
-    {
-        if (playerMovement != null)
-            playerMovement.RotateVisual(direction);
-        else
-            transform.rotation = Quaternion.LookRotation(direction);
+        Vector3 mousePos = GetMouseWorldPosition();
+        Vector3 toMouse = mousePos - transform.position;
+        toMouse.y = 0f;
+        return toMouse;
     }
 
     Vector3 GetMouseWorldPosition()
     {
+        if (Camera.main == null) return transform.position + transform.forward * 3f;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
-
         if (groundPlane.Raycast(ray, out float distance))
             return ray.GetPoint(distance);
-
         return transform.position + transform.forward * 3f;
+    }
+
+    void PlayCastAnimation()
+    {
+        if (modelAnimator == null) return;
+        modelAnimator.ResetTrigger("Cast");
+        modelAnimator.SetTrigger("Cast");
+    }
+
+    void RotatePlayerVisual(Vector3 direction)
+    {
+        if (netController != null)
+            netController.RotateVisualPublic(direction);
+        else
+            transform.rotation = Quaternion.LookRotation(direction);
     }
 }

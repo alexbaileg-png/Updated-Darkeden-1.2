@@ -1,0 +1,4 @@
+*
+!Assets/FishNet/Plugins/FishyUnityTransport/**
+!.gitignore
+!FishyUnityTransport.unitypackage

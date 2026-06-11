@@ -3,45 +3,33 @@ using UnityEngine.UI;
 
 public class SkillDisplayUI : MonoBehaviour
 {
-    [Header("Player Skills")]
-    public PlayerProjectileAttack playerSkills;
-
     [Header("Skill Display")]
     public Image skillIcon;
 
-    [Header("Icons")]
-    public Sprite holyBoltIcon;
-    public Sprite holyRainIcon;
-    public Sprite holyCircleHealIcon;
-    public Sprite healingOrbitIcon;
+    private ISkillCaster _caster;
+    private PlayerSkillManager _skillManager;
+
+    public void SetSkillCaster(ISkillCaster caster)
+    {
+        _caster = caster;
+        // Grab the skill manager from the same GameObject
+        if (caster is UnityEngine.MonoBehaviour mb)
+            _skillManager = mb.GetComponent<PlayerSkillManager>();
+    }
 
     void Update()
     {
-        UpdateSkillIcon();
+        if (_caster == null || skillIcon == null) return;
+
+        Sprite icon = GetIconForSkill(_caster.CurrentSelectedSkill);
+        skillIcon.sprite = icon;
+        skillIcon.enabled = icon != null;
     }
 
-    void UpdateSkillIcon()
+    Sprite GetIconForSkill(SkillType skill)
     {
-        if (playerSkills == null || skillIcon == null)
-            return;
-
-        skillIcon.sprite = GetIcon(playerSkills.currentSelectedSkill);
-    }
-
-    Sprite GetIcon(SkillType skill)
-    {
-        if (skill == SkillType.HolyBolt)
-            return holyBoltIcon;
-
-        if (skill == SkillType.HolyRain)
-            return holyRainIcon;
-
-        if (skill == SkillType.HolyCircleHeal)
-            return holyCircleHealIcon;
-
-        if (skill == SkillType.HealingOrbit)
-            return healingOrbitIcon;
-
-        return null;
+        if (_skillManager == null) return null;
+        SkillData data = _skillManager.GetSkillData(skill);
+        return data?.skillIcon;
     }
 }

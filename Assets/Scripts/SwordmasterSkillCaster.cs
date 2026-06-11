@@ -19,9 +19,9 @@ public class SwordmasterSkillCaster : NetworkBehaviour, ISkillCaster
     [Header("Judgment Rush")]
     public GameObject judgmentRushEffectPrefab;   // VFX spawned along dash path
     public float rushDistance      = 10f;
-    public float rushDuration      = 0.25f;        // seconds the dash takes (matches animation)
+    public float rushSpeed         = 30f;          // how fast the player moves
     public float rushKnockback     = 3f;
-    public float rushWidth         = 2f;           // half-width of the line hitbox
+    public float rushWidth         = 1.2f;         // half-width of the line hitbox
 
     // ── Consecration ─────────────────────────────────────────────────────────
     [Header("Consecration")]
@@ -44,15 +44,7 @@ public class SwordmasterSkillCaster : NetworkBehaviour, ISkillCaster
 
     // ── Shared ────────────────────────────────────────────────────────────────
     [Header("Cast Settings")]
-    public float effectHeightOffset = 1.2f;
-    [Tooltip("Delay before JudgmentRush fires (matches wind-up)")]
-    public float judgmentRushDelay  = 0.15f;
-    [Tooltip("Delay before Consecration fires — set to when the character lands")]
-    public float consecrationDelay  = 0.5f;
-    [Tooltip("Delay before RadiantFlurry fires")]
-    public float radiantFlurryDelay = 0.15f;
-    [Tooltip("Delay before AegisOfFaith fires")]
-    public float aegisDelay         = 0.2f;
+    public float castDelay = 0.1f;
 
     // ── ISkillCaster ──────────────────────────────────────────────────────────
     public SkillType CurrentSelectedSkill => _selectedSkill;
@@ -77,8 +69,6 @@ public class SwordmasterSkillCaster : NetworkBehaviour, ISkillCaster
     private float _lastCooldown  = 0f;
     private bool  _isCasting     = false;
 
-    public bool IsCasting => _isCasting;
-
     private PlayerStats            _playerStats;
     private PlayerSkillManager     _skillManager;
     private NetworkPlayerController _netController;
@@ -96,10 +86,8 @@ public class SwordmasterSkillCaster : NetworkBehaviour, ISkillCaster
         _skillManager  = GetComponent<PlayerSkillManager>();
         _netController = GetComponent<NetworkPlayerController>();
 
-        // Use the exact same Animator reference as NetworkPlayerController
-        if (_netController != null)
-            _modelAnimator = _netController.modelAnimator;
-
+        if (_netController != null && _netController.modelTransform != null)
+            _modelAnimator = _netController.modelTransform.GetComponent<Animator>();
         if (_modelAnimator == null)
             _modelAnimator = GetComponentInChildren<Animator>();
     }
@@ -133,25 +121,13 @@ public class SwordmasterSkillCaster : NetworkBehaviour, ISkillCaster
     bool CanCast(SkillType skill)
     {
         CharacterData character = GameSession.Instance?.SelectedCharacter;
-        if (character != null && !ClassSkillConfig.CanUseSkill(character, skill))
-        {
-            Debug.Log($"[Skill] CanCast BLOCKED — class can't use {skill}");
-            return false;
-        }
+        if (character != null && !ClassSkillConfig.CanUseSkill(character, skill)) return false;
 
         int level = GetSkillLevel(skill);
-        if (level <= 0)
-        {
-            Debug.Log($"[Skill] CanCast BLOCKED — {skill} not unlocked (level={level})");
-            return false;
-        }
+        if (level <= 0) return false;
 
         int manaCost = GetManaCost(skill);
-        if (_playerStats != null && _playerStats.currentMana < manaCost)
-        {
-            Debug.Log($"[Skill] CanCast BLOCKED — not enough mana ({_playerStats.currentMana} < {manaCost})");
-            return false;
-        }
+        if (_playerStats != null && _playerStats.currentMana < manaCost) return false;
 
         return true;
     }
@@ -162,6 +138,9 @@ public class SwordmasterSkillCaster : NetworkBehaviour, ISkillCaster
     {
         _isCasting = true;
 
+        PlayCastAnimation();
+        yield return new WaitForSeconds(castDelay);
+
         int   skillLevel = GetSkillLevel(skill);
         int   skillPower = GetSkillPower(skill, 30);
         int   manaCost   = GetManaCost(skill);
@@ -169,26 +148,8 @@ public class SwordmasterSkillCaster : NetworkBehaviour, ISkillCaster
 
         // Aim direction toward mouse
         Vector3 aimDir = GetAimDirection();
-
-        // Play animation FIRST
-        PlayCastAnimation();
-
-        // Rotate toward aim direction via server
-        if (aimDir.sqrMagnitude > 0.01f)
-            ServerRotateToward(aimDir.normalized);
-
-        // Wait for the hit frame of this skill's animation before firing
-        float delay = skill switch
-        {
-            SkillType.JudgmentRush  => judgmentRushDelay,
-            SkillType.Consecration  => consecrationDelay,
-            SkillType.AegisOfFaith  => aegisDelay,
-            SkillType.RadiantFlurry => radiantFlurryDelay,
-            _                       => 0.15f,
-        };
-
-        if (delay > 0f)
-            yield return new WaitForSeconds(delay);
+        if (aimDir.sqrMagnitude > 0.01f && _netController != null)
+            _netController.RotateVisualPublic(aimDir.normalized);
 
         ServerCastSkill(skill, transform.position, aimDir.normalized, skillLevel, skillPower, manaCost);
 
@@ -200,20 +161,12 @@ public class SwordmasterSkillCaster : NetworkBehaviour, ISkillCaster
     // ── Server-side skill execution ───────────────────────────────────────────
 
     [ServerRpc]
-    void ServerRotateToward(Vector3 direction)
-    {
-        if (direction.sqrMagnitude > 0.01f)
-            transform.rotation = Quaternion.LookRotation(direction);
-    }
-
-    [ServerRpc]
     void ServerCastSkill(SkillType skill, Vector3 casterPos, Vector3 aimDir,
                          int skillLevel, int skillPower, int manaCost)
     {
-        Debug.Log($"[Skill] ServerCastSkill received — skill={skill}, power={skillPower}, mana={manaCost}");
         PlayerStats stats = GetComponent<PlayerStats>();
-        if (stats == null) { Debug.Log("[Skill] BLOCKED — PlayerStats null on server"); return; }
-        if (stats.currentMana < manaCost) { Debug.Log($"[Skill] BLOCKED — server mana {stats.currentMana} < {manaCost}"); return; }
+        if (stats == null) return;
+        if (stats.currentMana < manaCost) return;
         stats.SpendMana(manaCost);
 
         switch (skill)
@@ -234,47 +187,27 @@ public class SwordmasterSkillCaster : NetworkBehaviour, ISkillCaster
         float distance = rushDistance + (skillLevel - 1) * 1f;
         Vector3 endPos = casterPos + aimDir * distance;
 
-        // Face the dash direction on the server
-        if (aimDir.sqrMagnitude > 0.01f)
-            transform.rotation = Quaternion.LookRotation(aimDir);
+        // Teleport player to end of rush
+        transform.position = endPos;
 
-        // Spawn effect at player center height along the midpoint of the dash
-        Vector3 midpoint = casterPos + aimDir * (distance * 0.5f);
-        midpoint.y = casterPos.y + effectHeightOffset;
-        SpawnJudgmentRushEffect(midpoint, Quaternion.LookRotation(aimDir), distance);
+        // Spawn VFX at midpoint of the dash
+        SpawnEffectOnClients(judgmentRushEffectPrefab, casterPos + aimDir * (distance * 0.5f),
+                             Quaternion.LookRotation(aimDir));
 
-        StartCoroutine(SmoothDash(endPos, rushDuration));
-
-        // Physics.Overlap won't work across FishNet physics scenes —
-        // do a manual distance check against all enemies instead
-        PlayerStats stats = GetComponent<PlayerStats>();
-        EnemyHealth[] allEnemies = FindObjectsByType<EnemyHealth>(FindObjectsSortMode.None);
-
-        foreach (EnemyHealth enemy in allEnemies)
+        // Damage + knockback every enemy in the line
+        Collider[] hits = Physics.OverlapCapsule(casterPos, endPos, rushWidth);
+        foreach (Collider col in hits)
         {
+            EnemyHealth enemy = col.GetComponent<EnemyHealth>();
             if (enemy == null || enemy.IsDead()) continue;
 
-            // Project enemy position onto the dash line
-            Vector3 toEnemy = enemy.transform.position - casterPos;
-            float dot = Vector3.Dot(toEnemy, aimDir);
-
-            // Must be within the line segment (not behind or past the end)
-            if (dot < -1f || dot > distance + 1f) continue;
-
-            // Perpendicular distance from the dash line
-            Vector3 projected = casterPos + aimDir * Mathf.Clamp(dot, 0f, distance);
-            float distFromLine = Vector3.Distance(
-                new Vector3(enemy.transform.position.x, 0f, enemy.transform.position.z),
-                new Vector3(projected.x, 0f, projected.z));
-
-            if (distFromLine > rushWidth) continue;
-
+            PlayerStats stats = GetComponent<PlayerStats>();
             int damage = stats != null ? stats.GetMeleeDamage(skillPower) : skillPower;
             damage = stats != null ? stats.ApplyCriticalDamage(damage) : damage;
             enemy.ReceiveDamage(damage, DamageType.Melee, stats);
 
-            // Knockback
-            Rigidbody rb = enemy.GetComponent<Rigidbody>();
+            // Knockback — push enemy away from the rush direction
+            Rigidbody rb = col.GetComponent<Rigidbody>();
             if (rb != null)
                 rb.AddForce(aimDir * rushKnockback, ForceMode.Impulse);
         }
@@ -282,41 +215,19 @@ public class SwordmasterSkillCaster : NetworkBehaviour, ISkillCaster
 
     // ── Consecration ─────────────────────────────────────────────────────────
 
-    IEnumerator SmoothDash(Vector3 endPos, float duration)
-    {
-        NetworkPlayerController controller = GetComponent<NetworkPlayerController>();
-        if (controller != null) controller.ResetMovementTarget(transform.position);
-
-        Vector3 startPos = transform.position;
-        float elapsed = 0f;
-
-        while (elapsed < duration)
-        {
-            elapsed += Time.deltaTime;
-            transform.position = Vector3.Lerp(startPos, endPos, elapsed / duration);
-            yield return null;
-        }
-
-        transform.position = endPos;
-        if (controller != null) controller.ResetMovementTarget(endPos);
-    }
-
     void ServerConsecration(Vector3 casterPos, int skillLevel, int skillPower)
     {
         float radius = consecrationRadius + (skillLevel - 1) * 0.5f;
 
-        // Spawn slightly above ground so the ring sits on the surface
-        Vector3 effectPos = new Vector3(casterPos.x, casterPos.y + 0.05f, casterPos.z);
-        SpawnConsecrationEffect(effectPos);
+        SpawnEffectOnClients(consecrationEffectPrefab, casterPos, Quaternion.identity);
 
+        Collider[] hits = Physics.OverlapSphere(casterPos, radius);
         PlayerStats stats = GetComponent<PlayerStats>();
-        EnemyHealth[] allEnemies = FindObjectsByType<EnemyHealth>(FindObjectsSortMode.None);
 
-        foreach (EnemyHealth enemy in allEnemies)
+        foreach (Collider col in hits)
         {
+            EnemyHealth enemy = col.GetComponent<EnemyHealth>();
             if (enemy == null || enemy.IsDead()) continue;
-            float dist = Vector3.Distance(casterPos, enemy.transform.position);
-            if (dist > radius) continue;
 
             int damage = stats != null ? stats.GetMagicalSkillDamage(skillPower) : skillPower;
             damage = stats != null ? stats.ApplyCriticalDamage(damage) : damage;
@@ -330,28 +241,31 @@ public class SwordmasterSkillCaster : NetworkBehaviour, ISkillCaster
     {
         float duration = aegisBaseDuration + (skillLevel - 1) * 2f;
 
-        PlayerStats stats = GetComponent<PlayerStats>();
-
-        // Remove old aegis if already active before reapplying
-        if (_aegisActive && stats != null)
+        // Remove old aegis if already active
+        if (_aegisActive)
         {
-            stats.gearArmor      -= (int)_aegisArmor;
-            stats.gearResistance -= (int)_aegisResistance;
-            stats.RecalculateStats();
+            PlayerStats ps = GetComponent<PlayerStats>();
+            if (ps != null)
+            {
+                ps.armorBonus     -= _aegisArmor;
+                ps.resistanceBonus -= _aegisResistance;
+                ps.RecalculateStats();
+            }
         }
 
-        _aegisArmor      = aegisArmorBonus  + (skillLevel - 1) * 5f;
-        _aegisResistance = aegisResistBonus + (skillLevel - 1) * 3f;
+        _aegisArmor      = aegisArmorBonus     + (skillLevel - 1) * 5f;
+        _aegisResistance = aegisResistBonus    + (skillLevel - 1) * 3f;
         _aegisActive     = true;
 
+        PlayerStats stats = GetComponent<PlayerStats>();
         if (stats != null)
         {
-            stats.gearArmor      += (int)_aegisArmor;
-            stats.gearResistance += (int)_aegisResistance;
+            stats.armorBonus     += _aegisArmor;
+            stats.resistanceBonus += _aegisResistance;
             stats.RecalculateStats();
         }
 
-        SpawnAegisEffect(transform.position);
+        SpawnEffectOnClients(aegisShieldEffectPrefab, transform.position, Quaternion.identity);
 
         StartCoroutine(AegisExpiry(duration));
     }
@@ -366,8 +280,8 @@ public class SwordmasterSkillCaster : NetworkBehaviour, ISkillCaster
         PlayerStats stats = GetComponent<PlayerStats>();
         if (stats != null)
         {
-            stats.gearArmor      -= (int)_aegisArmor;
-            stats.gearResistance -= (int)_aegisResistance;
+            stats.armorBonus     -= _aegisArmor;
+            stats.resistanceBonus -= _aegisResistance;
             stats.RecalculateStats();
         }
     }
@@ -384,15 +298,15 @@ public class SwordmasterSkillCaster : NetworkBehaviour, ISkillCaster
         int maxTargets = flurryMaxTargets + (skillLevel - 1);
         float radius   = flurryRadius + (skillLevel - 1) * 0.5f;
 
+        Collider[] hits = Physics.OverlapSphere(casterPos, radius);
         PlayerStats stats = GetComponent<PlayerStats>();
-        EnemyHealth[] allEnemies = FindObjectsByType<EnemyHealth>(FindObjectsSortMode.None);
 
-        // Build list of enemies within radius, sorted by distance
+        // Build a sorted list of valid enemies by distance
         List<EnemyHealth> targets = new List<EnemyHealth>();
-        foreach (EnemyHealth enemy in allEnemies)
+        foreach (Collider col in hits)
         {
-            if (enemy == null || enemy.IsDead()) continue;
-            if (Vector3.Distance(casterPos, enemy.transform.position) <= radius)
+            EnemyHealth enemy = col.GetComponent<EnemyHealth>();
+            if (enemy != null && !enemy.IsDead())
                 targets.Add(enemy);
             if (targets.Count >= maxTargets) break;
         }
@@ -405,74 +319,27 @@ public class SwordmasterSkillCaster : NetworkBehaviour, ISkillCaster
             damage = stats != null ? stats.ApplyCriticalDamage(damage) : damage;
             enemy.ReceiveDamage(damage, DamageType.Melee, stats);
 
-            SpawnRadiantHitEffect(enemy.transform.position + Vector3.up * 1f);
+            SpawnEffectOnClients(radiantHitEffectPrefab,
+                                 enemy.transform.position + Vector3.up * 1f,
+                                 Quaternion.identity);
 
             yield return new WaitForSeconds(flurryHitInterval);
         }
     }
 
-    bool HasAnimatorState(string stateName)
-    {
-        if (_modelAnimator == null) return false;
-        foreach (AnimatorControllerParameter p in _modelAnimator.parameters)
-            if (p.name == stateName) return true;
-        return false;
-    }
-
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     [ObserversRpc]
-    void SpawnJudgmentRushEffect(Vector3 pos, Quaternion rot, float distance)
+    void SpawnEffectOnClients(GameObject prefab, Vector3 pos, Quaternion rot)
     {
-        if (judgmentRushEffectPrefab == null) return;
-        GameObject go = Instantiate(judgmentRushEffectPrefab, pos, rot);
-        JudgmentRushEffect fx = go.GetComponent<JudgmentRushEffect>();
-        if (fx != null) fx.rushDistance = distance;
-    }
-
-    [ObserversRpc]
-    void SpawnConsecrationEffect(Vector3 pos)
-    {
-        if (consecrationEffectPrefab == null) return;
-        Instantiate(consecrationEffectPrefab, pos, Quaternion.identity);
-    }
-
-    [ObserversRpc]
-    void SpawnAegisEffect(Vector3 pos)
-    {
-        if (aegisShieldEffectPrefab == null) return;
-        GameObject go = Instantiate(aegisShieldEffectPrefab, pos, Quaternion.identity);
-        go.transform.SetParent(transform); // parent to player so it follows them
-    }
-
-    [ObserversRpc]
-    void SpawnRadiantHitEffect(Vector3 pos)
-    {
-        if (radiantHitEffectPrefab == null) return;
-        Instantiate(radiantHitEffectPrefab, pos, Quaternion.identity);
+        if (prefab == null) return;
+        Instantiate(prefab, pos, rot);
     }
 
     void PlayCastAnimation()
     {
-        PlayCastAnimation(_selectedSkill);
-    }
-
-    void PlayCastAnimation(SkillType skill)
-    {
-        if (_modelAnimator == null) return;
-
-        string trigger = skill switch
-        {
-            SkillType.AegisOfFaith  => HasAnimatorState("Spell")         ? "Spell"         : "Cast",
-            SkillType.Consecration  => HasAnimatorState("Consecration")   ? "Consecration"  : "Cast",
-            _                       => HasAnimatorState("Attack")         ? "Attack"        : "Cast",
-        };
-
-        // Reset all cast triggers first to avoid stacking
-        foreach (string t in new[] { "Cast", "Attack", "Spell", "Consecration" })
-            _modelAnimator.ResetTrigger(t);
-
-        _modelAnimator.SetTrigger(trigger);
+        if (_modelAnimator != null)
+            _modelAnimator.SetTrigger("Attack");
     }
 
     Vector3 GetAimDirection()
@@ -510,7 +377,7 @@ public class SwordmasterSkillCaster : NetworkBehaviour, ISkillCaster
         if (_skillManager == null) return 10;
         foreach (var p in _skillManager.skillProgress)
             if (p.skill != null && p.skill.skillType == skill)
-                return p.skill.baseManaCost;
+                return p.skill.manaCost;
         return 10;
     }
 
@@ -519,7 +386,7 @@ public class SwordmasterSkillCaster : NetworkBehaviour, ISkillCaster
         if (_skillManager == null) return 3f;
         foreach (var p in _skillManager.skillProgress)
             if (p.skill != null && p.skill.skillType == skill)
-                return p.skill.baseCooldown;
+                return p.skill.cooldown;
         return 3f;
     }
 }

@@ -1,143 +1,136 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
 public class SkillSelectorUI : MonoBehaviour, IPointerClickHandler
 {
-    [Header("Player Skills")]
-    public PlayerProjectileAttack playerSkills;
-
     [Header("Main Selector")]
     public Image selectedSkillIcon;
 
     [Header("Skill Grid")]
     public GameObject skillGridPanel;
+    [Tooltip("Prefab with SkillGridButton component — one spawned per unlocked skill.")]
+    public GameObject skillGridButtonPrefab;
+    [Tooltip("Parent with GridLayoutGroup inside skillGridPanel.")]
+    public Transform gridContainer;
 
-    [Header("Skill Icons")]
-    public Sprite holyBoltIcon;
-    public Sprite holyRainIcon;
-    public Sprite holyCircleHealIcon;
-    public Sprite healingOrbitIcon;
+    private ISkillCaster _caster;
+    private PlayerSkillManager _skillManager;
+    private PlayerStats _playerStats;
 
-    private SkillType hoveredSkill;
-    private bool hasHoveredSkill = false;
+    private SkillType _hoveredSkill;
+    private bool _hasHoveredSkill = false;
+
+    private readonly List<SkillGridButton> _generatedGridButtons = new List<SkillGridButton>();
+
+    public void SetSkillCaster(ISkillCaster caster)
+    {
+        _caster = caster;
+        if (caster is MonoBehaviour mb)
+        {
+            _skillManager = mb.GetComponent<PlayerSkillManager>();
+            _playerStats  = mb.GetComponent<PlayerStats>();
+        }
+
+        BuildGridButtons();
+        UpdateSelectedIcon();
+    }
 
     void Start()
     {
         if (skillGridPanel != null)
             skillGridPanel.SetActive(false);
-
-        UpdateSelectedIcon();
     }
 
     void Update()
     {
         HandleKeyBinding();
         UpdateSelectedIcon();
+
+        // Refresh grid button visibility when skills get unlocked
+        foreach (SkillGridButton btn in _generatedGridButtons)
+            btn?.RefreshVisibility();
     }
 
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        ToggleSkillGrid();
-    }
+    public void OnPointerClick(PointerEventData eventData) => ToggleSkillGrid();
 
     public void ToggleSkillGrid()
     {
-        if (skillGridPanel == null)
-            return;
-
-        bool newState = !skillGridPanel.activeSelf;
-        skillGridPanel.SetActive(newState);
-
-        if (newState)
-            RefreshGridButtons();
-        else
-            ClearHoveredSkill();
+        if (skillGridPanel == null) return;
+        skillGridPanel.SetActive(!skillGridPanel.activeSelf);
     }
 
-    void RefreshGridButtons()
+    // ── Grid generation ───────────────────────────────────────────────────────
+
+    void BuildGridButtons()
     {
-        SkillGridButton[] buttons = skillGridPanel.GetComponentsInChildren<SkillGridButton>(true);
+        if (skillGridButtonPrefab == null || gridContainer == null || _skillManager == null) return;
 
-        foreach (SkillGridButton button in buttons)
-            button.RefreshVisibility();
+        // Clear old
+        foreach (SkillGridButton btn in _generatedGridButtons)
+            if (btn != null) Destroy(btn.gameObject);
+        _generatedGridButtons.Clear();
+
+        // Spawn one button per skill the character's class can use
+        CharacterData character = GameSession.Instance?.SelectedCharacter;
+        List<SkillType> classSkills = ClassSkillConfig.GetSkillsForCharacter(character);
+
+        foreach (SkillType skill in classSkills)
+        {
+            GameObject go  = Instantiate(skillGridButtonPrefab, gridContainer);
+            SkillGridButton btn = go.GetComponent<SkillGridButton>();
+            if (btn == null) continue;
+
+            btn.skillType       = skill;
+            btn.skillManager    = _skillManager;
+            btn.playerStats     = _playerStats;
+            btn.skillSelectorUI = this;
+
+            _generatedGridButtons.Add(btn);
+        }
     }
+
+    // ── Skill selection ───────────────────────────────────────────────────────
 
     public void SetHoveredSkill(SkillType skill)
     {
-        hoveredSkill = skill;
-        hasHoveredSkill = true;
-        Debug.Log("Hovering skill: " + skill);
+        _hoveredSkill    = skill;
+        _hasHoveredSkill = true;
     }
 
-    public void ClearHoveredSkill()
-    {
-        hasHoveredSkill = false;
-    }
+    public void ClearHoveredSkill() => _hasHoveredSkill = false;
 
     public void SelectSkill(SkillType skill)
     {
-        if (playerSkills == null)
-            return;
-
-        playerSkills.SetSelectedSkill(skill);
-
-        if (skillGridPanel != null)
-            skillGridPanel.SetActive(false);
-
+        if (_caster == null) return;
+        _caster.SetSelectedSkill(skill);
+        if (skillGridPanel != null) skillGridPanel.SetActive(false);
         ClearHoveredSkill();
         UpdateSelectedIcon();
     }
 
     void HandleKeyBinding()
     {
-        if (!hasHoveredSkill || playerSkills == null)
-            return;
-
-        if (Input.GetKeyDown(KeyCode.F8))
-            BindHoveredSkill(KeyCode.F8);
-
-        if (Input.GetKeyDown(KeyCode.F9))
-            BindHoveredSkill(KeyCode.F9);
-
-        if (Input.GetKeyDown(KeyCode.F10))
-            BindHoveredSkill(KeyCode.F10);
-
-        if (Input.GetKeyDown(KeyCode.F11))
-            BindHoveredSkill(KeyCode.F11);
+        if (!_hasHoveredSkill || _caster == null) return;
+        if (Input.GetKeyDown(KeyCode.F8))  BindHoveredSkill(KeyCode.F8);
+        if (Input.GetKeyDown(KeyCode.F9))  BindHoveredSkill(KeyCode.F9);
+        if (Input.GetKeyDown(KeyCode.F10)) BindHoveredSkill(KeyCode.F10);
+        if (Input.GetKeyDown(KeyCode.F11)) BindHoveredSkill(KeyCode.F11);
     }
 
     void BindHoveredSkill(KeyCode key)
     {
-        playerSkills.BindSkill(key, hoveredSkill);
-        playerSkills.SetSelectedSkill(hoveredSkill);
+        _caster.BindSkill(key, _hoveredSkill);
+        _caster.SetSelectedSkill(_hoveredSkill);
         UpdateSelectedIcon();
-
-        Debug.Log("Assigned " + hoveredSkill + " to " + key);
     }
 
     void UpdateSelectedIcon()
     {
-        if (playerSkills == null || selectedSkillIcon == null)
-            return;
-
-        selectedSkillIcon.sprite = GetIcon(playerSkills.currentSelectedSkill);
-    }
-
-    Sprite GetIcon(SkillType skill)
-    {
-        if (skill == SkillType.HolyBolt)
-            return holyBoltIcon;
-
-        if (skill == SkillType.HolyRain)
-            return holyRainIcon;
-
-        if (skill == SkillType.HolyCircleHeal)
-            return holyCircleHealIcon;
-
-        if (skill == SkillType.HealingOrbit)
-            return healingOrbitIcon;
-
-        return null;
+        if (_caster == null || selectedSkillIcon == null) return;
+        SkillData data = _skillManager?.GetSkillData(_caster.CurrentSelectedSkill);
+        selectedSkillIcon.sprite  = data?.skillIcon;
+        selectedSkillIcon.enabled = data?.skillIcon != null;
     }
 }

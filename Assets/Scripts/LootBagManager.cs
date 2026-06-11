@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using FishNet;
 using UnityEngine;
 
 public class LootBagManager : MonoBehaviour
@@ -10,59 +11,41 @@ public class LootBagManager : MonoBehaviour
 
     [Header("Grouping")]
     public float mergeRadius = 5f;
-    public float mergeTimeWindow = 8f;
     public float dropHeight = 0f;
     public int maxUniqueItemsPerBag = 20;
 
     private List<LootBag> activeBags = new List<LootBag>();
 
-    void Awake()
-    {
-        Instance = this;
-    }
+    void Awake() => Instance = this;
 
     public void AddLoot(ItemData item, Vector3 position)
     {
-        if (item == null)
-            return;
+        if (item == null) return;
+        if (!InstanceFinder.IsServerStarted) return;
 
         LootBag bag = FindMergeBag(position, item);
-
-        if (bag == null)
-            bag = CreateBag(position);
-
-        if (bag != null)
-            bag.AddItem(item, 1);
+        if (bag == null) bag = CreateBag(position);
+        if (bag != null) bag.ServerAddItem(item, 1);
     }
 
     LootBag FindMergeBag(Vector3 position, ItemData item)
     {
-        activeBags.RemoveAll(bag => bag == null);
-
+        activeBags.RemoveAll(b => b == null);
         foreach (LootBag bag in activeBags)
-        {
-            if (bag != null && bag.CanMerge(position, mergeRadius, mergeTimeWindow, item))
+            if (bag != null && bag.CanMerge(position, mergeRadius, item))
                 return bag;
-        }
-
         return null;
     }
 
     LootBag CreateBag(Vector3 position)
     {
-        if (lootBagPrefab == null)
-            return null;
+        if (lootBagPrefab == null) return null;
 
         position.y = dropHeight;
-
-        GameObject bagObject = Instantiate(
-            lootBagPrefab,
-            position,
-            lootBagPrefab.transform.rotation
-        );
+        GameObject bagObject = Instantiate(lootBagPrefab, position, lootBagPrefab.transform.rotation);
+        InstanceFinder.ServerManager.Spawn(bagObject);
 
         LootBag bag = bagObject.GetComponent<LootBag>();
-
         if (bag != null)
         {
             bag.maxUniqueItems = maxUniqueItemsPerBag;

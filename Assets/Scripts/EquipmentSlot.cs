@@ -55,7 +55,12 @@ public class EquipmentSlot : MonoBehaviour,
 
     public bool CanEquip(ItemData item)
     {
-        return item != null && item.itemType == allowedItemType;
+        if (item == null) return false;
+        if (item.itemType == allowedItemType) return true;
+        // Vampire equivalents share the same slot
+        if (allowedItemType == ItemType.Gloves && item.itemType == ItemType.Armguard) return true;
+        if (allowedItemType == ItemType.Belt   && item.itemType == ItemType.Sash)     return true;
+        return false;
     }
 
     public void EquipItem(ItemData item)
@@ -151,6 +156,10 @@ public class EquipmentSlot : MonoBehaviour,
             return;
 
         if (!CanEquip(inventorySlot.currentItem))
+            return;
+
+        // Faction restriction check
+        if (equipmentManager != null && !equipmentManager.TryEquipFromInventory(inventorySlot))
             return;
 
         ItemData draggedItem = inventorySlot.currentItem;

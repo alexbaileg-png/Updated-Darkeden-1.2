@@ -49,7 +49,7 @@ public class CharacterCreationManager : MonoBehaviour
     private VampireBloodline _selectedBloodline;
     private SlayerClass      _selectedSlayerClass;
     private bool _classSelected = false;
-    private int  _step = 0; // 0=faction, 1=gender, 2=class, 3=name
+    private int  _step = 0; // 0=faction, 1=class, 2=gender, 3=name
 
     void Start()
     {
@@ -67,14 +67,16 @@ public class CharacterCreationManager : MonoBehaviour
     {
         _selectedFaction = PlayerFaction.Vampire;
         _classSelected = false;
-        ShowStep(1); // go to gender
+        ShowStep(1);
+        ShowVampireClasses();
     }
 
     public void OnSlayerSelected()
     {
         _selectedFaction = PlayerFaction.Slayer;
         _classSelected = false;
-        ShowStep(1); // go to gender
+        ShowStep(1);
+        ShowSlayerClasses();
     }
 
     void ShowVampireClasses()
@@ -126,7 +128,7 @@ public class CharacterCreationManager : MonoBehaviour
         _selectedBloodline = bloodline;
         _classSelected = true;
         if (classDescriptionText != null) classDescriptionText.text = description;
-        ShowStep(3); // go to name
+        ShowStep(2);
     }
 
     void SelectSlayer(SlayerClass slayerClass, string description)
@@ -134,7 +136,7 @@ public class CharacterCreationManager : MonoBehaviour
         _selectedSlayerClass = slayerClass;
         _classSelected = true;
         if (classDescriptionText != null) classDescriptionText.text = description;
-        ShowStep(3); // go to name
+        ShowStep(2);
     }
 
     // ── Gender ────────────────────────────────────────────────────────────────
@@ -143,18 +145,14 @@ public class CharacterCreationManager : MonoBehaviour
     {
         _selectedGender = PlayerGender.Male;
         HighlightGenderButton(PlayerGender.Male);
-        ShowStep(2); // go to class
-        if (_selectedFaction == PlayerFaction.Vampire) ShowVampireClasses();
-        else ShowSlayerClasses();
+        ShowStep(3);
     }
 
     public void OnFemaleSelected()
     {
         _selectedGender = PlayerGender.Female;
         HighlightGenderButton(PlayerGender.Female);
-        ShowStep(2); // go to class
-        if (_selectedFaction == PlayerFaction.Vampire) ShowVampireClasses();
-        else ShowSlayerClasses();
+        ShowStep(3);
     }
 
     void HighlightGenderButton(PlayerGender gender)
@@ -230,8 +228,8 @@ public class CharacterCreationManager : MonoBehaviour
     {
         _step = step;
         if (factionPanel != null) factionPanel.SetActive(step == 0);
-        if (genderPanel  != null) genderPanel.SetActive(step == 1);
-        if (classPanel   != null) classPanel.SetActive(step == 2);
+        if (classPanel   != null) classPanel.SetActive(step == 1);
+        if (genderPanel  != null) genderPanel.SetActive(step == 2);
         if (namePanel    != null) namePanel.SetActive(step == 3);
         if (backButton   != null) backButton.gameObject.SetActive(step > 0);
         if (confirmCreateButton != null) confirmCreateButton.interactable = false;

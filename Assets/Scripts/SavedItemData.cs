@@ -6,6 +6,7 @@ public class SavedItemData
 {
     public string uniqueItemId;
     public string baseItemId;
+    public string displayName;    // rolled/custom name — empty means use template name
 
     public int slotIndex = -1;
     public string equipmentSlotId = "";
@@ -13,6 +14,7 @@ public class SavedItemData
     public int quantity;
 
     public ItemRarity rarity;
+    public int sellValue;
 
     public int strengthBonus;
     public int dexterityBonus;

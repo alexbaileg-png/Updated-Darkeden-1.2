@@ -14,6 +14,7 @@ public class EquipmentManager : MonoBehaviour
     public EquipmentSlot topSlot;
     public EquipmentSlot bottomSlot;
     public EquipmentSlot bootsSlot;
+    // Slayer only
     public EquipmentSlot glovesSlot;
     public EquipmentSlot beltSlot;
     public EquipmentSlot leftWeaponSlot;
@@ -63,8 +64,9 @@ public class EquipmentManager : MonoBehaviour
             case ItemType.Top: return topSlot != null ? topSlot.currentItem : null;
             case ItemType.Bottom: return bottomSlot != null ? bottomSlot.currentItem : null;
             case ItemType.Boots: return bootsSlot != null ? bootsSlot.currentItem : null;
-            case ItemType.Gloves: return glovesSlot != null ? glovesSlot.currentItem : null;
-            case ItemType.Belt: return beltSlot != null ? beltSlot.currentItem : null;
+            case ItemType.Gloves:    return glovesSlot    != null ? glovesSlot.currentItem    : null;
+            case ItemType.Belt:      return beltSlot      != null ? beltSlot.currentItem      : null;
+
 
             case ItemType.Weapon:
                 if (rightWeaponSlot != null && rightWeaponSlot.currentItem != null)
@@ -151,8 +153,9 @@ public class EquipmentManager : MonoBehaviour
             case ItemType.Top: return topSlot;
             case ItemType.Bottom: return bottomSlot;
             case ItemType.Boots: return bootsSlot;
-            case ItemType.Gloves: return glovesSlot;
-            case ItemType.Belt: return beltSlot;
+            case ItemType.Gloves:   return glovesSlot;
+            case ItemType.Belt:     return beltSlot;
+
 
             case ItemType.Weapon:
                 if (rightWeaponSlot != null && rightWeaponSlot.currentItem == null)

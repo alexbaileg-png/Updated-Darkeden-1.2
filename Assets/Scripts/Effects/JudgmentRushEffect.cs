@@ -9,9 +9,9 @@ using UnityEngine;
 public class JudgmentRushEffect : MonoBehaviour
 {
     [Header("Timing")]
-    public float lifetime     = 0.3f;
-    public float expandTime   = 0.05f;   // time to reach full scale
-    public float holdTime     = 0.08f;   // time at full scale
+    public float lifetime     = 0.6f;
+    public float expandTime   = 0.08f;   // time to reach full scale
+    public float holdTime     = 0.15f;   // time at full scale
     // remainder of lifetime is spent fading/shrinking
 
     [Header("Scale")]
@@ -35,14 +35,6 @@ public class JudgmentRushEffect : MonoBehaviour
     void Awake()
     {
         Transform target = slashMesh != null ? slashMesh : transform;
-
-        // Lock Y position so gravity or drift can't move it
-        Rigidbody rb = GetComponentInChildren<Rigidbody>();
-        if (rb != null)
-        {
-            rb.useGravity = false;
-            rb.isKinematic = true;
-        }
 
         // Length (Z) matches the dash distance; width and height are fixed
         _fullScale = new Vector3(widthScale, heightScale, rushDistance);

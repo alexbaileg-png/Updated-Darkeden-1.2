@@ -17,40 +17,6 @@ public class LoginManager : MonoBehaviour
     public TMP_Text statusText;
     public GameObject loadingOverlay;
 
-    void Awake()
-    {
-        // Hide password
-        if (passwordField != null)
-            passwordField.contentType = TMP_InputField.ContentType.Password;
-
-        // Enter on password triggers login
-        if (passwordField != null)
-            passwordField.onSubmit.AddListener(_ => OnLoginClicked());
-    }
-
-    void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Tab))
-        {
-            if (usernameField != null && usernameField.isFocused)
-            {
-                passwordField?.ActivateInputField();
-            }
-            else if (passwordField != null && passwordField.isFocused)
-            {
-                usernameField?.ActivateInputField();
-            }
-        }
-
-        if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
-        {
-            if (usernameField != null && usernameField.isFocused)
-                passwordField?.ActivateInputField();
-            else
-                OnLoginClicked();
-        }
-    }
-
     async void Start()
     {
         SetLoading(true);
@@ -153,10 +119,10 @@ public class LoginManager : MonoBehaviour
         if (GameSession.Instance == null)
             new GameObject("GameSession").AddComponent<GameSession>();
 
-        AccountData account = await CloudDataService.LoadAccountAsync();
+        AccountData account = await CloudSaveService.LoadAccountAsync();
         GameSession.Instance.SetAccountData(account);
 
-        SceneManager.LoadScene("Character Selection");
+        SceneManager.LoadScene("CharacterSelect");
     }
 
     void SetStatus(string message) { if (statusText != null) statusText.text = message; }

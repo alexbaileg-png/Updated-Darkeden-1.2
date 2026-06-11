@@ -62,6 +62,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: -8098169881513260187, guid: 2cb4a71e191172a4f8b692e60383c94a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 9114813975902080994}
+    - targetCorrespondingSourceObject: {fileID: -8098169881513260187, guid: 2cb4a71e191172a4f8b692e60383c94a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 0}
   m_SourcePrefab: {fileID: 3150474306388093854, guid: 2cb4a71e191172a4f8b692e60383c94a, type: 3}
 --- !u!1 &8591514075971792796 stripped
 GameObject:
@@ -80,7 +83,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59e64615f2d75b24597ecb4187b1096d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
-  player: {fileID: 0}
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 0}
+  _networkObjectCache: {fileID: 0}
   moveSpeed: 3
   chaseRange: 30
   stopDistance: 1
@@ -102,7 +107,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20984d183cbc2494ea5311b2ab5b39cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 0}
+  _networkObjectCache: {fileID: 0}
   maxHealth: 50
-  currentHealth: 0
-  healthBar: {fileID: 0}
+  xpReward: 25
   destroyDelay: 10
+  healthBar: {fileID: 0}

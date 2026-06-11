@@ -34,7 +34,13 @@ public class StatsPanelUI : MonoBehaviour
     public void UpdateStatsPanel()
     {
         if (playerStats == null)
+            playerStats = PlayerStats.LocalInstance;
+
+        if (playerStats == null)
             return;
+
+        bool isVampire = playerStats.faction == PlayerFaction.Vampire;
+        if (manaValue != null) manaValue.transform.parent.gameObject.SetActive(!isVampire);
 
         if (availablePointsText != null)
             availablePointsText.text = "Points: " + playerStats.availableStatPoints;
@@ -64,23 +70,8 @@ public class StatsPanelUI : MonoBehaviour
             manaValue.text = playerStats.currentMana + " / " + playerStats.maxMana;
     }
 
-    public void AddStrength()
-    {
-        playerStats.SpendStatPoint("Strength");
-    }
-
-    public void AddDexterity()
-    {
-        playerStats.SpendStatPoint("Dexterity");
-    }
-
-    public void AddIntelligence()
-    {
-        playerStats.SpendStatPoint("Intelligence");
-    }
-
-    public void AddEndurance()
-    {
-        playerStats.SpendStatPoint("Endurance");
-    }
+    public void AddStrength() => playerStats?.ServerSpendStatPoint("Strength");
+    public void AddDexterity() => playerStats?.ServerSpendStatPoint("Dexterity");
+    public void AddIntelligence() => playerStats?.ServerSpendStatPoint("Intelligence");
+    public void AddEndurance() => playerStats?.ServerSpendStatPoint("Endurance");
 }

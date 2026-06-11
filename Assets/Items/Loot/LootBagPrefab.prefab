@@ -207,6 +207,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d1a754f2b99bbe48a185982e4b644ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LootBag
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 0}
+  _networkObjectCache: {fileID: 0}
+  openKey: 101
+  openRange: 3
+  despawnTime: 180
+  labelRoot: {fileID: 6245842483328157520}
+  labelText: {fileID: 3914794731083858729}
+  maxUniqueItems: 20
   items:
   - item: {fileID: 0}
     quantity: 0
@@ -228,12 +237,6 @@ MonoBehaviour:
     quantity: 0
   - item: {fileID: 0}
     quantity: 0
-  openKey: 101
-  openRange: 3
-  despawnTime: 180
-  labelRoot: {fileID: 6245842483328157520}
-  labelText: {fileID: 3914794731083858729}
-  lastAddedTime: 0
 --- !u!1 &6245842483328157520
 GameObject:
   m_ObjectHideFlags: 0

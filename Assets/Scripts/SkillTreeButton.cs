@@ -46,10 +46,14 @@ public class SkillTreeButton : MonoBehaviour, IPointerEnterHandler, IPointerExit
         if (skillManager == null || playerStats == null)
             return;
 
-        SkillData data = skillManager.GetSkillData(skillType);
+        // Hide skill entirely if it doesn't belong to this character's class
+        CharacterData character = GameSession.Instance?.SelectedCharacter;
+        bool classCanUseSkill = character != null && ClassSkillConfig.CanUseSkill(character, skillType);
+        gameObject.SetActive(classCanUseSkill);
+        if (!classCanUseSkill) return;
 
-        if (data == null)
-            return;
+        SkillData data = skillManager.GetSkillData(skillType);
+        if (data == null) return;
 
         bool unlocked = skillManager.IsSkillUnlocked(skillType);
         int skillLevel = skillManager.GetSkillLevel(skillType);

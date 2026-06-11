@@ -8,39 +8,23 @@ public class VendorNPC : MonoBehaviour
     [Header("Dialogue")]
     public MerchantDialogueUI merchantDialogueUI;
 
-    [Header("Player")]
-    public Transform player;
-
     [Header("Interaction")]
     public KeyCode interactKey = KeyCode.E;
     public float interactDistance = 3f;
 
-    void Start()
-    {
-        if (player == null)
-        {
-            GameObject playerObject = GameObject.Find("Player");
-
-            if (playerObject != null)
-                player = playerObject.transform;
-        }
-    }
-
     void Update()
     {
-        if (player == null || merchantDialogueUI == null)
+        // Always resolve from LocalInstance — works with network-spawned players
+        PlayerStats localPlayer = PlayerStats.LocalInstance;
+        if (localPlayer == null || merchantDialogueUI == null)
             return;
 
-        float distance = Vector3.Distance(transform.position, player.position);
+        float distance = Vector3.Distance(transform.position, localPlayer.transform.position);
 
         if (distance <= interactDistance && Input.GetKeyDown(interactKey))
-        {
             merchantDialogueUI.OpenDialogue(merchantName);
-        }
 
         if (distance > interactDistance)
-        {
             merchantDialogueUI.CloseAll();
-        }
     }
 }

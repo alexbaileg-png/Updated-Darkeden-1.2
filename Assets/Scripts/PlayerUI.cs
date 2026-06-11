@@ -16,6 +16,9 @@ public class PlayerUI : MonoBehaviour
     void Update()
     {
         if (playerStats == null)
+            playerStats = PlayerStats.LocalInstance;
+
+        if (playerStats == null)
             return;
 
         UpdateXPUI();

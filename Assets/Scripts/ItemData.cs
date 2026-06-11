@@ -1,14 +1,15 @@
 using UnityEngine;
 
+public enum FactionRestriction { Any, SlayerOnly, VampireOnly }
+
 public enum ItemType
 {
+    // ── Shared slots ──────────────────────────────────────────────────────────
     Helmet,
     Necklace,
     Top,
     Bottom,
     Boots,
-    Gloves,
-    Belt,
     Weapon,
     Trophy,
     Material,
@@ -17,7 +18,13 @@ public enum ItemType
     EnchantStone,
     RefiningStone,
     HealthVial,
-    ManaVial
+    ManaVial,
+
+    // ── Slayer only ───────────────────────────────────────────────────────────
+    Gloves,
+    Belt,
+
+
 }
 
 public enum ItemRarity
@@ -54,6 +61,9 @@ public class ItemData : ScriptableObject
 {
     [Header("Save ID")]
     public string itemId;
+
+    [Header("Faction")]
+    public FactionRestriction factionRestriction = FactionRestriction.Any;
 
     [Header("Basic Info")]
     public string itemName;

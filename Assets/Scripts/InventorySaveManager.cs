@@ -74,9 +74,11 @@ public class InventorySaveManager : MonoBehaviour
         SavedItemData save = new SavedItemData();
 
         save.uniqueItemId = System.Guid.NewGuid().ToString();
-        save.baseItemId = item.itemId;
-        save.quantity = quantity;
-        save.rarity = item.rarity;
+        save.baseItemId   = item.itemId;
+        save.displayName  = item.itemName;
+        save.quantity     = quantity;
+        save.rarity       = item.rarity;
+        save.sellValue    = item.sellValue;
 
         save.strengthBonus = item.strengthBonus;
         save.dexterityBonus = item.dexterityBonus;
@@ -210,7 +212,12 @@ public class InventorySaveManager : MonoBehaviour
 
         ItemData runtimeItem = ScriptableObject.Instantiate(template);
 
-        runtimeItem.rarity = savedItem.rarity;
+        // Restore rolled name if one was saved, otherwise keep template name
+        if (!string.IsNullOrEmpty(savedItem.displayName))
+            runtimeItem.itemName = savedItem.displayName;
+
+        runtimeItem.rarity    = savedItem.rarity;
+        runtimeItem.sellValue = savedItem.sellValue > 0 ? savedItem.sellValue : template.sellValue;
 
         runtimeItem.strengthBonus = savedItem.strengthBonus;
         runtimeItem.dexterityBonus = savedItem.dexterityBonus;

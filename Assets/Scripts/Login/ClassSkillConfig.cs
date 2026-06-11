@@ -20,10 +20,7 @@ public static class ClassSkillConfig
         },
         { "Swordmaster", new List<SkillType>
             {
-                SkillType.JudgmentRush,
-                SkillType.Consecration,
-                SkillType.AegisOfFaith,
-                SkillType.RadiantFlurry,
+                // Add Swordmaster skills here as they are created
             }
         },
         { "Soldier", new List<SkillType>
@@ -55,10 +52,7 @@ public static class ClassSkillConfig
         },
         { "Dominator", new List<SkillType>
             {
-                SkillType.DarkBolt,
-                SkillType.BloodDrain,
-                SkillType.BloodFog,
-                SkillType.VoidBurst,
+                // Add Dominator skills here as they are created
             }
         },
     };

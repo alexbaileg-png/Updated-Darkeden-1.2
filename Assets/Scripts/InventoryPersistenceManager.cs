@@ -1,5 +1,4 @@
 using UnityEngine;
-using System.Collections;
 using System.IO;
 
 public class InventoryPersistenceManager : MonoBehaviour
@@ -13,18 +12,17 @@ public class InventoryPersistenceManager : MonoBehaviour
 
     private string SavePath
     {
-        get { return Path.Combine(Application.persistentDataPath, saveFileName); }
+        get
+        {
+            string prefix = GameSession.Instance?.SelectedCharacter?.characterId ?? "";
+            string file = string.IsNullOrEmpty(prefix) ? saveFileName : prefix + "_" + saveFileName;
+            return Path.Combine(Application.persistentDataPath, file);
+        }
     }
 
     void Awake()
     {
         Instance = this;
-    }
-
-    IEnumerator Start()
-    {
-        yield return null;
-        LoadInventory();
     }
 
     void OnApplicationQuit()

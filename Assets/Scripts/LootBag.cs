@@ -1,7 +1,18 @@
 using System.Collections.Generic;
+using FishNet.Object;
+using FishNet.Object.Synchronizing;
+using FishNet.Connection;
 using UnityEngine;
 using TMPro;
 
+[System.Serializable]
+public struct NetworkLootEntry
+{
+    public string itemName;
+    public int quantity;
+}
+
+// Keep for UI compatibility
 [System.Serializable]
 public class LootBagEntry
 {
@@ -15,12 +26,8 @@ public class LootBagEntry
     }
 }
 
-public class LootBag : MonoBehaviour
+public class LootBag : NetworkBehaviour
 {
-    [Header("Loot")]
-    public List<LootBagEntry> items = new List<LootBagEntry>();
-    public int maxUniqueItems = 20;
-
     [Header("Pickup")]
     public KeyCode openKey = KeyCode.E;
     public float openRange = 3f;
@@ -32,234 +39,185 @@ public class LootBag : MonoBehaviour
     public GameObject labelRoot;
     public TMP_Text labelText;
 
-    [HideInInspector] public float lastAddedTime;
+    public int maxUniqueItems = 20;
 
-    void Start()
+    // Server-authoritative item list — syncs to all clients
+    private readonly SyncList<NetworkLootEntry> _networkItems = new SyncList<NetworkLootEntry>();
+
+    // Local cache rebuilt from SyncList for UI use
+    public List<LootBagEntry> items = new List<LootBagEntry>();
+
+    public override void OnStartNetwork()
     {
-        lastAddedTime = Time.time;
+        base.OnStartNetwork();
+        _networkItems.OnChange += OnNetworkItemsChanged;
+    }
 
-        RefreshLabel();
+    public override void OnStopNetwork()
+    {
+        base.OnStopNetwork();
+        _networkItems.OnChange -= OnNetworkItemsChanged;
+    }
+
+    public override void OnStartClient()
+    {
+        base.OnStartClient();
+        RebuildLocalCache();
         HideLabel();
-
-        Destroy(gameObject, despawnTime);
     }
 
-    void Update()
+    public override void OnStartServer()
     {
-        if (Input.GetKeyDown(openKey))
-            TryOpen();
-
-        CheckIfEmpty();
+        base.OnStartServer();
+        ServerManager.Spawn(gameObject);
+        Invoke(nameof(ServerDespawn), despawnTime);
     }
 
-    public bool IsFullFor(ItemData item)
+    void ServerDespawn()
     {
-        if (item == null)
-            return true;
+        if (IsServerStarted)
+            ServerManager.Despawn(GetComponent<NetworkObject>());
+    }
 
-        if (item.isStackable)
+    void OnNetworkItemsChanged(SyncListOperation op, int index, NetworkLootEntry oldItem, NetworkLootEntry newItem, bool asServer)
+    {
+        RebuildLocalCache();
+        RefreshLabel();
+
+        if (LootBagUI.Instance != null && LootBagUI.Instance.IsShowingBag(this))
+            LootBagUI.Instance.Refresh();
+
+        if (_networkItems.Count == 0)
         {
-            foreach (LootBagEntry entry in items)
-            {
-                if (entry.item == item)
-                    return false;
-            }
+            if (LootBagUI.Instance != null) LootBagUI.Instance.CloseBag();
+            if (IsServerStarted) ServerManager.Despawn(GetComponent<NetworkObject>());
         }
-
-        return items.Count >= maxUniqueItems;
     }
 
-    public bool CanMerge(Vector3 position, float radius, float timeWindow, ItemData item)
+    void RebuildLocalCache()
     {
-        if (IsFullFor(item))
-            return false;
-
-        float distance = Vector3.Distance(transform.position, position);
-
-        return distance <= radius;
+        items.Clear();
+        foreach (NetworkLootEntry entry in _networkItems)
+        {
+            ItemData data = ItemRegistry.Instance != null ? ItemRegistry.Instance.Get(entry.itemName) : null;
+            if (data != null)
+                items.Add(new LootBagEntry(data, entry.quantity));
+        }
     }
 
-    public bool AddItem(ItemData item, int quantity = 1)
+    // ── Server-side item management ───────────────────────────────────────────
+
+    public bool ServerAddItem(ItemData item, int quantity = 1)
     {
-        if (item == null)
-            return false;
+        if (!IsServerStarted || item == null) return false;
 
-        if (IsFullFor(item))
-            return false;
-
-        lastAddedTime = Time.time;
+        string key = ItemRegistry.Instance != null ? ItemRegistry.Instance.GetKey(item) : item.name;
 
         if (item.isStackable)
         {
-            foreach (LootBagEntry entry in items)
+            for (int i = 0; i < _networkItems.Count; i++)
             {
-                if (entry.item == item)
+                if (_networkItems[i].itemName == key)
                 {
-                    entry.quantity += quantity;
-                    RefreshLabel();
+                    _networkItems[i] = new NetworkLootEntry { itemName = key, quantity = _networkItems[i].quantity + quantity };
                     return true;
                 }
             }
         }
 
-        items.Add(new LootBagEntry(item, quantity));
-        RefreshLabel();
-
+        if (_networkItems.Count >= maxUniqueItems) return false;
+        _networkItems.Add(new NetworkLootEntry { itemName = key, quantity = quantity });
         return true;
     }
 
-    void OnMouseDown()
+    public bool IsFullFor(ItemData item)
     {
-        TryOpen();
+        if (item == null) return true;
+        string key = ItemRegistry.Instance != null ? ItemRegistry.Instance.GetKey(item) : item.name;
+        if (item.isStackable)
+            foreach (NetworkLootEntry e in _networkItems)
+                if (e.itemName == key) return false;
+        return _networkItems.Count >= maxUniqueItems;
     }
+
+    public bool CanMerge(Vector3 position, float radius, ItemData item)
+    {
+        if (IsFullFor(item)) return false;
+        return Vector3.Distance(transform.position, position) <= radius;
+    }
+
+    // ── Client requests ───────────────────────────────────────────────────────
+
+    [ServerRpc(RequireOwnership = false)]
+    public void ServerTakeEntry(int index, NetworkConnection sender = null)
+    {
+        if (index < 0 || index >= _networkItems.Count) return;
+
+        NetworkLootEntry entry = _networkItems[index];
+        ItemData item = ItemRegistry.Instance != null ? ItemRegistry.Instance.Get(entry.itemName) : null;
+        if (item == null) return;
+
+        if (entry.quantity > 1)
+            _networkItems[index] = new NetworkLootEntry { itemName = entry.itemName, quantity = entry.quantity - 1 };
+        else
+            _networkItems.RemoveAt(index);
+
+        TargetAddItemToInventory(sender, entry.itemName, 1);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void ServerTakeAll(NetworkConnection sender = null)
+    {
+        List<NetworkLootEntry> snapshot = new List<NetworkLootEntry>(_networkItems);
+        _networkItems.Clear();
+
+        foreach (NetworkLootEntry entry in snapshot)
+            TargetAddItemToInventory(sender, entry.itemName, entry.quantity);
+    }
+
+    [TargetRpc]
+    void TargetAddItemToInventory(NetworkConnection conn, string itemName, int quantity)
+    {
+        ItemData item = ItemRegistry.Instance != null ? ItemRegistry.Instance.Get(itemName) : null;
+        if (item == null) return;
+
+        InventoryGrid grid = FindObjectOfType<InventoryGrid>(true);
+        if (grid == null) return;
+
+        for (int i = 0; i < quantity; i++)
+            grid.AddItem(item, 1);
+    }
+
+    // ── UI interaction ────────────────────────────────────────────────────────
+
+    void Update()
+    {
+        if (!IsOwner && !IsClientStarted) return;
+
+        if (Input.GetKeyDown(openKey))
+            TryOpen();
+    }
+
+    void OnMouseDown() => TryOpen();
 
     void TryOpen()
     {
         PlayerLootPickup playerPickup = FindObjectOfType<PlayerLootPickup>();
-
-        if (playerPickup == null)
-            return;
-
-        float distance = Vector3.Distance(playerPickup.transform.position, transform.position);
-
-        if (distance > openRange)
-            return;
-
+        if (playerPickup == null) return;
+        if (Vector3.Distance(playerPickup.transform.position, transform.position) > openRange) return;
         if (LootBagUI.Instance != null)
             LootBagUI.Instance.OpenBag(this, playerPickup.inventoryGrid);
-    }
-public bool TakeEntireStack(int index, InventoryGrid inventoryGrid)
-{
-    if (inventoryGrid == null)
-        return false;
-
-    if (index < 0 || index >= items.Count)
-        return false;
-
-    LootBagEntry entry = items[index];
-
-    if (entry == null || entry.item == null)
-        return false;
-
-    while (entry.quantity > 0)
-    {
-        bool added = inventoryGrid.AddItem(entry.item, 1);
-
-        if (!added)
-            break;
-
-        entry.quantity--;
-    }
-
-    if (entry.quantity <= 0)
-        items.RemoveAt(index);
-
-    RefreshLabel();
-    CheckIfEmpty();
-
-    return true;
-}
-    public bool TakeEntry(int index, InventoryGrid inventoryGrid)
-    {
-        if (inventoryGrid == null)
-            return false;
-
-        if (index < 0 || index >= items.Count)
-            return false;
-
-        LootBagEntry entry = items[index];
-
-        if (entry == null || entry.item == null)
-            return false;
-
-        bool added = inventoryGrid.AddItem(entry.item, 1);
-
-        if (!added)
-            return false;
-
-        entry.quantity--;
-
-        if (entry.quantity <= 0)
-            items.RemoveAt(index);
-
-        RefreshLabel();
-        CheckIfEmpty();
-
-        return true;
-    }
-
-    public void TakeAll(InventoryGrid inventoryGrid)
-    {
-        if (inventoryGrid == null)
-            return;
-
-        for (int i = items.Count - 1; i >= 0; i--)
-        {
-            LootBagEntry entry = items[i];
-
-            if (entry == null || entry.item == null)
-                continue;
-
-            while (entry.quantity > 0)
-            {
-                bool added = inventoryGrid.AddItem(entry.item, 1);
-
-                if (!added)
-                    break;
-
-                entry.quantity--;
-            }
-
-            if (entry.quantity <= 0)
-                items.RemoveAt(i);
-        }
-
-        RefreshLabel();
-        CheckIfEmpty();
-    }
-
-    public void CheckIfEmpty()
-    {
-        items.RemoveAll(entry =>
-            entry == null ||
-            entry.item == null ||
-            entry.quantity <= 0
-        );
-
-        if (items.Count > 0)
-            return;
-
-        if (LootBagUI.Instance != null)
-            LootBagUI.Instance.CloseBag();
-
-        Destroy(gameObject);
     }
 
     void RefreshLabel()
     {
         if (labelText != null)
-            labelText.text = "Loot Bag (" + items.Count + "/" + maxUniqueItems + ")";
+            labelText.text = "Loot Bag (" + _networkItems.Count + "/" + maxUniqueItems + ")";
     }
 
-    void OnMouseEnter()
-    {
-        ShowLabel();
-    }
-
-    void OnMouseExit()
-    {
-        HideLabel();
-    }
-
-    public void ShowLabel()
-    {
-        if (labelRoot != null)
-            labelRoot.SetActive(true);
-    }
-
-    public void HideLabel()
-    {
-        if (labelRoot != null)
-            labelRoot.SetActive(false);
-    }
+    void OnMouseEnter() { if (labelRoot != null) labelRoot.SetActive(true); }
+    void OnMouseExit() { if (labelRoot != null) labelRoot.SetActive(false); }
+    public void ShowLabel() { if (labelRoot != null) labelRoot.SetActive(true); }
+    public void HideLabel() { if (labelRoot != null) labelRoot.SetActive(false); }
+    public void CheckIfEmpty() { } // kept for UI compatibility — SyncList handles this now
 }
