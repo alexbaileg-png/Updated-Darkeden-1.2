@@ -36,10 +36,16 @@ public class EnemySpawner : MonoBehaviour
             return;
 
         Vector2 randomCircle = Random.insideUnitCircle * spawnRadius;
-        Vector3 spawnPosition = transform.position + new Vector3(randomCircle.x, 0f, randomCircle.y);
+        Vector3 candidate = transform.position + new Vector3(randomCircle.x, 50f, randomCircle.y);
+
+        // Raycast down to land on terrain/ground
+        if (Physics.Raycast(candidate, Vector3.down, out RaycastHit hit, 100f))
+            candidate = hit.point;
+        else
+            candidate.y = transform.position.y;
 
         NetworkObject enemy = InstanceFinder.NetworkManager.GetPooledInstantiated(
-            enemyPrefab, spawnPosition, Quaternion.identity, true);
+            enemyPrefab, candidate, Quaternion.identity, true);
 
         InstanceFinder.ServerManager.Spawn(enemy);
     }

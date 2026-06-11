@@ -40,6 +40,8 @@ public class NetworkPlayerController : NetworkBehaviour
 
         if (modelAnimator == null && modelTransform != null)
             modelAnimator = modelTransform.GetComponent<Animator>();
+        if (modelAnimator == null)
+            modelAnimator = GetComponentInChildren<Animator>();
 
         // NetworkPlayerController owns movement on the network prefab — disable the
         // standalone PlayerMovement if it was left on the prefab.
@@ -101,7 +103,7 @@ public class NetworkPlayerController : NetworkBehaviour
     {
         if (!_moving)
         {
-            if (_syncMoving.Value) _syncMoving.Value = false;
+            if (_syncMoving.Value) { _syncMoving.Value = false; SetMoveAnimation(false); }
             return;
         }
 
@@ -114,13 +116,13 @@ public class NetworkPlayerController : NetworkBehaviour
             transform.position += moveDir * moveSpeed * Time.deltaTime;
             RotateVisual(moveDir);
 
-            if (!_syncMoving.Value) _syncMoving.Value = true;
+            if (!_syncMoving.Value) { _syncMoving.Value = true; SetMoveAnimation(true); }
         }
         else
         {
             _moving = false;
             _targetPosition = transform.position;
-            if (_syncMoving.Value) _syncMoving.Value = false;
+            if (_syncMoving.Value) { _syncMoving.Value = false; SetMoveAnimation(false); }
         }
     }
 
@@ -141,9 +143,15 @@ public class NetworkPlayerController : NetworkBehaviour
 
     void OnMovingChanged(bool prev, bool next, bool asServer)
     {
+        if (asServer) return; // clients handle visuals
+        SetMoveAnimation(next);
+    }
+
+    void SetMoveAnimation(bool moving)
+    {
         if (modelAnimator == null) return;
-        modelAnimator.SetBool("IsMoving", next);
-        modelAnimator.SetFloat("MoveSpeed", next ? moveSpeed : 0f);
+        modelAnimator.SetBool("IsMoving", moving);
+        modelAnimator.SetFloat("MoveSpeed", moving ? moveSpeed : 0f);
     }
 
     // ── Server-authoritative damage (called by EnemyAI / skills) ─────────────
