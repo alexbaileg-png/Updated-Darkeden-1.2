@@ -143,6 +143,18 @@ public class NetworkPlayerController : NetworkBehaviour
             stats.ReceiveDamage(damage, damageType);
     }
 
+    // ── Projectile damage (called by Projectile.cs on hit) ───────────────────
+
+    [ServerRpc]
+    public void ServerApplyProjectileDamage(EnemyHealth enemy, int damage, DamageType damageType, bool canCrit)
+    {
+        if (enemy == null || enemy.IsDead()) return;
+        PlayerStats stats = GetComponent<PlayerStats>();
+        int finalDamage = damage;
+        if (canCrit && stats != null) finalDamage = stats.ApplyCriticalDamage(finalDamage);
+        enemy.ReceiveDamage(finalDamage, damageType, stats);
+    }
+
     // ── Death / Respawn hooks (called by PlayerStats.OnDeadChanged) ───────────
 
     public void OnPlayerDied()
