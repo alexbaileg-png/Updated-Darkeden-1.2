@@ -247,8 +247,8 @@ public class SwordmasterSkillCaster : NetworkBehaviour, ISkillCaster
             PlayerStats ps = GetComponent<PlayerStats>();
             if (ps != null)
             {
-                ps.armorBonus     -= _aegisArmor;
-                ps.resistanceBonus -= _aegisResistance;
+                ps.gearArmor      -= (int)_aegisArmor;
+                ps.gearResistance  -= (int)_aegisResistance;
                 ps.RecalculateStats();
             }
         }
@@ -260,8 +260,8 @@ public class SwordmasterSkillCaster : NetworkBehaviour, ISkillCaster
         PlayerStats stats = GetComponent<PlayerStats>();
         if (stats != null)
         {
-            stats.armorBonus     += _aegisArmor;
-            stats.resistanceBonus += _aegisResistance;
+            stats.gearArmor      += (int)_aegisArmor;
+            stats.gearResistance  += (int)_aegisResistance;
             stats.RecalculateStats();
         }
 
@@ -280,8 +280,8 @@ public class SwordmasterSkillCaster : NetworkBehaviour, ISkillCaster
         PlayerStats stats = GetComponent<PlayerStats>();
         if (stats != null)
         {
-            stats.armorBonus     -= _aegisArmor;
-            stats.resistanceBonus -= _aegisResistance;
+            stats.gearArmor      -= (int)_aegisArmor;
+            stats.gearResistance  -= (int)_aegisResistance;
             stats.RecalculateStats();
         }
     }
