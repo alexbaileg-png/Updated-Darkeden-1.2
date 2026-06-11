@@ -38,17 +38,19 @@ public class NetworkPlayerController : NetworkBehaviour
 
         _targetPosition = transform.position;
 
-        // Borrow references from PlayerMovement if not assigned directly on NetworkPlayerController
+        // Always take animator/transform from PlayerMovement — it has the correct child reference per prefab
         PlayerMovement pm = GetComponent<PlayerMovement>();
         if (pm != null)
         {
-            if (modelTransform == null) modelTransform = pm.modelTransform;
-            if (modelAnimator == null)  modelAnimator  = pm.modelAnimator;
+            modelTransform = pm.modelTransform;
+            modelAnimator  = pm.modelAnimator;
         }
         if (modelAnimator == null && modelTransform != null)
             modelAnimator = modelTransform.GetComponent<Animator>();
         if (modelAnimator == null)
             modelAnimator = GetComponentInChildren<Animator>();
+
+        Debug.Log($"[NPC] OnStartClient — modelAnimator={(modelAnimator != null ? modelAnimator.name : "NULL")} isOwner={IsOwner}");
 
         // Disable standalone PlayerMovement — NetworkPlayerController owns movement.
         if (pm != null)
@@ -158,7 +160,11 @@ public class NetworkPlayerController : NetworkBehaviour
 
     void SetMoveAnimation(bool moving)
     {
-        if (modelAnimator == null) return;
+        if (modelAnimator == null)
+        {
+            Debug.LogWarning("[NPC] SetMoveAnimation called but modelAnimator is null");
+            return;
+        }
         modelAnimator.SetBool("IsMoving", moving);
         modelAnimator.SetFloat("MoveSpeed", moving ? moveSpeed : 0f);
     }
