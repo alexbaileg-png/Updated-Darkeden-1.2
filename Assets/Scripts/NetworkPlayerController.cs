@@ -18,8 +18,19 @@ public class NetworkPlayerController : NetworkBehaviour
     private bool _moving = false;
 
     // Synced to all clients so remote players animate correctly
-    [SyncVar(OnChange = nameof(OnMovingChanged))]
-    private bool _syncMoving;
+    private readonly SyncVar<bool> _syncMoving = new SyncVar<bool>();
+
+    public override void OnStartNetwork()
+    {
+        base.OnStartNetwork();
+        _syncMoving.OnChange += OnMovingChanged;
+    }
+
+    public override void OnStopNetwork()
+    {
+        base.OnStopNetwork();
+        _syncMoving.OnChange -= OnMovingChanged;
+    }
 
     public override void OnStartClient()
     {
@@ -90,7 +101,7 @@ public class NetworkPlayerController : NetworkBehaviour
     {
         if (!_moving)
         {
-            if (_syncMoving) _syncMoving = false;
+            if (_syncMoving.Value) _syncMoving.Value = false;
             return;
         }
 
@@ -103,13 +114,13 @@ public class NetworkPlayerController : NetworkBehaviour
             transform.position += moveDir * moveSpeed * Time.deltaTime;
             RotateVisual(moveDir);
 
-            if (!_syncMoving) _syncMoving = true;
+            if (!_syncMoving.Value) _syncMoving.Value = true;
         }
         else
         {
             _moving = false;
             _targetPosition = transform.position;
-            if (_syncMoving) _syncMoving = false;
+            if (_syncMoving.Value) _syncMoving.Value = false;
         }
     }
 
@@ -162,7 +173,7 @@ public class NetworkPlayerController : NetworkBehaviour
     public void OnPlayerDied()
     {
         _moving = false;
-        _syncMoving = false;
+        _syncMoving.Value = false;
         if (modelAnimator != null)
         {
             modelAnimator.SetBool("IsMoving", false);
