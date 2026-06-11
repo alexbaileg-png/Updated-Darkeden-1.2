@@ -111,25 +111,15 @@ public class CharacterPersistenceManager : MonoBehaviour
 
         if (playerStats != null)
         {
-            playerStats.level = data.level;
-            playerStats.currentXP = data.currentXP;
-            playerStats.xpToNextLevel = data.xpToNextLevel;
-            playerStats.availableStatPoints = data.availableStatPoints;
-
-            playerStats.baseStrength = data.baseStrength;
-            playerStats.baseDexterity = data.baseDexterity;
-            playerStats.baseIntelligence = data.baseIntelligence;
-            playerStats.baseEndurance = data.baseEndurance;
-
-            playerStats.RecalculateStats();
-
-            playerStats.currentHealth = playerStats.maxHealth;
-            playerStats.currentMana = playerStats.maxMana;
+            playerStats.LoadFromSave(
+                data.level, data.currentXP, data.xpToNextLevel, data.availableStatPoints,
+                data.baseStrength, data.baseDexterity, data.baseIntelligence, data.baseEndurance
+            );
         }
 
         if (playerSkillManager != null)
         {
-            playerSkillManager.availableSkillPoints = data.availableSkillPoints;
+            playerSkillManager.LoadSkillPoints(data.availableSkillPoints);
 
             if (playerSkillManager.skillProgress != null && data.savedSkills != null)
             {

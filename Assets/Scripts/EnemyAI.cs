@@ -1,8 +1,37 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyAI : MonoBehaviour
 {
+    // ── Static player registry — populated by PlayerStats.OnStartServer ───────
+    private static readonly List<PlayerStats> _registeredPlayers = new List<PlayerStats>();
+
+    public static void RegisterPlayer(PlayerStats ps)
+    {
+        if (!_registeredPlayers.Contains(ps)) _registeredPlayers.Add(ps);
+    }
+
+    public static void UnregisterPlayer(PlayerStats ps)
+    {
+        _registeredPlayers.Remove(ps);
+    }
+
+    public static PlayerStats GetNearestPlayer(Vector3 position)
+    {
+        PlayerStats nearest = null;
+        float bestDist = float.MaxValue;
+        foreach (PlayerStats ps in _registeredPlayers)
+        {
+            if (ps == null || ps.isDead) continue;
+            float dist = Vector3.Distance(position, ps.transform.position);
+            if (dist < bestDist) { bestDist = dist; nearest = ps; }
+        }
+        return nearest;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+
     public Transform player;
 
     [Header("Movement")]
@@ -28,29 +57,23 @@ public class EnemyAI : MonoBehaviour
     {
         if (modelAnimator == null && modelTransform != null)
             modelAnimator = modelTransform.GetComponent<Animator>();
-
-        if (player == null)
-        {
-            GameObject playerObject = GameObject.Find("Player");
-
-            if (playerObject != null)
-                player = playerObject.transform;
-        }
-
-        if (player != null)
-            playerStats = player.GetComponent<PlayerStats>();
     }
 
     void Update()
     {
+        // Use the registry to always target the nearest living player
+        PlayerStats nearest = GetNearestPlayer(transform.position);
+        if (nearest != null)
+        {
+            player      = nearest.transform;
+            playerStats = nearest;
+        }
+
         if (player == null)
         {
             SetMoving(false);
             return;
         }
-
-        if (playerStats == null)
-            playerStats = player.GetComponent<PlayerStats>();
 
         Vector3 direction = player.position - transform.position;
         direction.y = 0f;
@@ -166,5 +189,22 @@ public class EnemyAI : MonoBehaviour
 
         modelAnimator.SetBool("IsMoving", isMoving);
         modelAnimator.SetFloat("MoveSpeed", isMoving ? moveSpeed : 0f);
+    }
+
+    private float _baseChaseRange = -1f;
+
+    public void ApplyFogDebuff(float detectionMultiplier)
+    {
+        if (_baseChaseRange < 0f) _baseChaseRange = chaseRange;
+        chaseRange = _baseChaseRange * detectionMultiplier;
+    }
+
+    public void RemoveFogDebuff()
+    {
+        if (_baseChaseRange >= 0f)
+        {
+            chaseRange = _baseChaseRange;
+            _baseChaseRange = -1f;
+        }
     }
 }
