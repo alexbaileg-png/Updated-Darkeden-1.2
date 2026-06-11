@@ -39,19 +39,30 @@ public class FactionPlayerSpawner : MonoBehaviour
         Debug.Log($"[FactionPlayerSpawner] Pending faction={faction} gender={gender} class={className}");
     }
 
-    void Awake()
+    void Start()
     {
         _networkManager = GetComponentInParent<NetworkManager>();
         if (_networkManager == null)
             _networkManager = FishNet.InstanceFinder.NetworkManager;
 
-        if (_networkManager != null)
-            _networkManager.SceneManager.OnClientLoadedStartScenes += OnClientLoaded;
+        if (_networkManager == null)
+        {
+            Debug.LogError("[FactionPlayerSpawner] NetworkManager not found.");
+            return;
+        }
+
+        if (_networkManager.SceneManager == null)
+        {
+            Debug.LogError("[FactionPlayerSpawner] SceneManager not ready yet.");
+            return;
+        }
+
+        _networkManager.SceneManager.OnClientLoadedStartScenes += OnClientLoaded;
     }
 
     void OnDestroy()
     {
-        if (_networkManager != null)
+        if (_networkManager != null && _networkManager.SceneManager != null)
             _networkManager.SceneManager.OnClientLoadedStartScenes -= OnClientLoaded;
     }
 
