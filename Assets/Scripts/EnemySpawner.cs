@@ -26,11 +26,17 @@ public class EnemySpawner : MonoBehaviour
 
     void TrySpawnEnemy()
     {
-        if (FindObjectsOfType<EnemyHealth>().Length >= maxEnemies)
+        if (enemyPrefab == null)
+        {
+            Debug.LogWarning("EnemySpawner: enemyPrefab is not assigned.", this);
+            return;
+        }
+
+        if (FindObjectsByType<EnemyHealth>(FindObjectsSortMode.None).Length >= maxEnemies)
             return;
 
         Vector2 randomCircle = Random.insideUnitCircle * spawnRadius;
-        Vector3 spawnPosition = new Vector3(randomCircle.x, 1f, randomCircle.y);
+        Vector3 spawnPosition = transform.position + new Vector3(randomCircle.x, 0f, randomCircle.y);
 
         NetworkObject enemy = InstanceFinder.NetworkManager.GetPooledInstantiated(
             enemyPrefab, spawnPosition, Quaternion.identity, true);
