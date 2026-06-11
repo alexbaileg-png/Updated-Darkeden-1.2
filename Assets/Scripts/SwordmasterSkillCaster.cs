@@ -377,7 +377,7 @@ public class SwordmasterSkillCaster : NetworkBehaviour, ISkillCaster
         if (_skillManager == null) return 10;
         foreach (var p in _skillManager.skillProgress)
             if (p.skill != null && p.skill.skillType == skill)
-                return p.skill.manaCost;
+                return p.skill.baseManaCost;
         return 10;
     }
 
@@ -386,7 +386,7 @@ public class SwordmasterSkillCaster : NetworkBehaviour, ISkillCaster
         if (_skillManager == null) return 3f;
         foreach (var p in _skillManager.skillProgress)
             if (p.skill != null && p.skill.skillType == skill)
-                return p.skill.cooldown;
+                return p.skill.baseCooldown;
         return 3f;
     }
 }
