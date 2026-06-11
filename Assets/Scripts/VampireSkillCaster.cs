@@ -6,7 +6,7 @@ using UnityEngine;
 /// Handles all vampire bloodline skills.
 /// Attach this to the PlayerNetworkPrefabVampire prefab.
 /// </summary>
-public class VampireSkillCaster : NetworkBehaviour
+public class VampireSkillCaster : NetworkBehaviour, ISkillCaster
 {
     [Header("Keybinds")]
     public SkillType f8Skill  = SkillType.DarkBolt;
@@ -338,9 +338,17 @@ public class VampireSkillCaster : NetworkBehaviour
     float GetCooldown(SkillType skill)  => _skillManager != null ? _skillManager.GetSkillCooldown(skill) : 1f;
     int GetManaCost(SkillType skill)    => _skillManager != null ? _skillManager.GetSkillManaCost(skill) : 0;
 
-    public float GetCooldownRemaining()       => Mathf.Max(0f, _nextCastTime - Time.time);
-    public float GetCurrentSkillCooldown()    => GetCooldown(_selectedSkill);
+    public SkillType CurrentSelectedSkill      => _selectedSkill;
+    public float GetCooldownRemaining()        => Mathf.Max(0f, _nextCastTime - Time.time);
+    public float GetCurrentSkillCooldown()     => GetCooldown(_selectedSkill);
     public void  SetSelectedSkill(SkillType s) => _selectedSkill = s;
+    public void  BindSkill(KeyCode key, SkillType skill)
+    {
+        if (key == KeyCode.F8)  f8Skill  = skill;
+        if (key == KeyCode.F9)  f9Skill  = skill;
+        if (key == KeyCode.F10) f10Skill = skill;
+        if (key == KeyCode.F11) f11Skill = skill;
+    }
 
     Vector3 GetAimDirection()
     {
