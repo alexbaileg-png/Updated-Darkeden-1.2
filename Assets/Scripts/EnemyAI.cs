@@ -175,4 +175,21 @@ public class EnemyAI : NetworkBehaviour
         modelAnimator.SetBool("IsMoving", isMoving);
         modelAnimator.SetFloat("MoveSpeed", isMoving ? moveSpeed : 0f);
     }
+
+    private float _baseChaseRange = -1f;
+
+    public void ApplyFogDebuff(float detectionMultiplier)
+    {
+        if (_baseChaseRange < 0f) _baseChaseRange = chaseRange;
+        chaseRange = _baseChaseRange * detectionMultiplier;
+    }
+
+    public void RemoveFogDebuff()
+    {
+        if (_baseChaseRange >= 0f)
+        {
+            chaseRange = _baseChaseRange;
+            _baseChaseRange = -1f;
+        }
+    }
 }
