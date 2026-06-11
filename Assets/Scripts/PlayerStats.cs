@@ -95,11 +95,22 @@ public class PlayerStats : NetworkBehaviour, IDamageable
     void OnDeadChanged(bool prev, bool next, bool asServer)
     {
         NetworkPlayerController netCtrl = GetComponent<NetworkPlayerController>();
-        if (netCtrl == null) return;
-        if (next)
-            netCtrl.OnPlayerDied();
-        else
-            netCtrl.OnPlayerRespawned(transform.position);
+        if (netCtrl != null)
+        {
+            if (next) netCtrl.OnPlayerDied();
+            else      netCtrl.OnPlayerRespawned(transform.position);
+        }
+
+        // Show/hide death screen only for the player who owns this object
+        if (IsOwner)
+        {
+            DeathScreenUI deathScreen = FindObjectOfType<DeathScreenUI>(true);
+            if (deathScreen != null)
+            {
+                if (next) deathScreen.Show();
+                else      deathScreen.Hide();
+            }
+        }
     }
 
     public override void OnStartServer()

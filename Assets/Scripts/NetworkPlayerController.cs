@@ -204,7 +204,7 @@ public class NetworkPlayerController : NetworkBehaviour
     public void OnPlayerDied()
     {
         _moving = false;
-        _syncMoving.Value = false;
+        if (IsServerStarted) _syncMoving.Value = false; // SyncVar can only be written on server
         if (modelAnimator != null)
         {
             modelAnimator.SetBool("IsMoving", false);
