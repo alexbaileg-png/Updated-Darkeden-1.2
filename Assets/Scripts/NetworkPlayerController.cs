@@ -38,6 +38,13 @@ public class NetworkPlayerController : NetworkBehaviour
 
         _targetPosition = transform.position;
 
+        // Borrow references from PlayerMovement if not assigned directly on NetworkPlayerController
+        PlayerMovement pm = GetComponent<PlayerMovement>();
+        if (pm != null)
+        {
+            if (modelTransform == null) modelTransform = pm.modelTransform;
+            if (modelAnimator == null)  modelAnimator  = pm.modelAnimator;
+        }
         if (modelAnimator == null && modelTransform != null)
             modelAnimator = modelTransform.GetComponent<Animator>();
         if (modelAnimator == null)

@@ -9,6 +9,8 @@ public class EnemySpawner : MonoBehaviour
     public int maxEnemies = 10;
     public float spawnRadius = 15f;
     public float spawnInterval = 2f;
+    [Tooltip("Y offset above ground hit point to account for model pivot position")]
+    public float spawnYOffset = 1f;
 
     private float nextSpawnTime = 0f;
 
@@ -40,9 +42,9 @@ public class EnemySpawner : MonoBehaviour
 
         // Raycast down to land on terrain/ground
         if (Physics.Raycast(candidate, Vector3.down, out RaycastHit hit, 100f))
-            candidate = hit.point;
+            candidate = hit.point + Vector3.up * spawnYOffset;
         else
-            candidate.y = transform.position.y;
+            candidate.y = transform.position.y + spawnYOffset;
 
         NetworkObject enemy = InstanceFinder.NetworkManager.GetPooledInstantiated(
             enemyPrefab, candidate, Quaternion.identity, true);
