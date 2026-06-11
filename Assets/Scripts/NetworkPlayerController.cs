@@ -148,7 +148,7 @@ public class NetworkPlayerController : NetworkBehaviour
     public void OnPlayerDied()
     {
         _moving = false;
-        if (_syncMoving.Value) _syncMoving.Value = false;
+        _syncMoving = false;
         if (modelAnimator != null)
         {
             modelAnimator.SetBool("IsMoving", false);
