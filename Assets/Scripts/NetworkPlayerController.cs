@@ -113,6 +113,8 @@ public class NetworkPlayerController : NetworkBehaviour
         }
     }
 
+    public void RotateVisualPublic(Vector3 direction) => RotateVisual(direction);
+
     void RotateVisual(Vector3 direction)
     {
         if (direction.sqrMagnitude <= 0.01f) return;
