@@ -24,7 +24,9 @@ public enum ItemType
     Gloves,
     Belt,
 
-
+    // ── Vampire only ──────────────────────────────────────────────────────────
+    Armguard,
+    Sash,
 }
 
 public enum ItemRarity
