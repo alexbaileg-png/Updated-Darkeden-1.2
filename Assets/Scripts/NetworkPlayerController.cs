@@ -142,4 +142,29 @@ public class NetworkPlayerController : NetworkBehaviour
         if (stats != null)
             stats.ReceiveDamage(damage, damageType);
     }
+
+    // ── Death / Respawn hooks (called by PlayerStats.OnDeadChanged) ───────────
+
+    public void OnPlayerDied()
+    {
+        _moving = false;
+        if (_syncMoving.Value) _syncMoving.Value = false;
+        if (modelAnimator != null)
+        {
+            modelAnimator.SetBool("IsMoving", false);
+            modelAnimator.ResetTrigger("Die");
+            modelAnimator.SetTrigger("Die");
+        }
+    }
+
+    public void OnPlayerRespawned(Vector3 spawnPos)
+    {
+        _targetPosition = spawnPos;
+        _moving = false;
+        if (modelAnimator != null)
+        {
+            modelAnimator.SetBool("IsMoving", false);
+            modelAnimator.Play("Idle");
+        }
+    }
 }
