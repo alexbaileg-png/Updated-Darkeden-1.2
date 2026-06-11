@@ -47,10 +47,18 @@ public class NetworkPlayerController : NetworkBehaviour
         }
         if (modelAnimator == null && modelTransform != null)
             modelAnimator = modelTransform.GetComponent<Animator>();
-        if (modelAnimator == null)
-            modelAnimator = GetComponentInChildren<Animator>();
+        // Skip root Animator — it may use a different controller (e.g. NewCharacter) that lacks MoveSpeed
+        if (modelAnimator == null || modelAnimator.gameObject == gameObject)
+        {
+            foreach (Animator a in GetComponentsInChildren<Animator>())
+            {
+                if (a.gameObject != gameObject) { modelAnimator = a; break; }
+            }
+        }
 
-        Debug.Log($"[NPC] OnStartClient — modelAnimator={(modelAnimator != null ? modelAnimator.name : "NULL")} isOwner={IsOwner}");
+        string ctrlName = modelAnimator != null && modelAnimator.runtimeAnimatorController != null
+            ? modelAnimator.runtimeAnimatorController.name : "none";
+        Debug.Log($"[NPC] OnStartClient — animator={modelAnimator?.name ?? "NULL"} ctrl={ctrlName} isOwner={IsOwner}");
 
         // Disable standalone PlayerMovement — NetworkPlayerController owns movement.
         if (pm != null)
@@ -76,8 +84,8 @@ public class NetworkPlayerController : NetworkBehaviour
         if (IsServerStarted)
             MoveOnServer();
 
-        // Drive animation on clients from the synced value every frame
-        if (IsClientStarted && !IsServerStarted)
+        // Drive animation every frame on all clients (including host where IsServerStarted is also true)
+        if (IsClientStarted)
             SetMoveAnimation(_syncMoving.Value);
     }
 

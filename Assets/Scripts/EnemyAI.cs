@@ -202,7 +202,7 @@ public class EnemyAI : NetworkBehaviour
     {
         if (modelAnimator == null) return;
         modelAnimator.SetBool("IsMoving", isMoving);
-        modelAnimator.SetFloat("MoveSpeed", isMoving ? moveSpeed : 0f);
+        modelAnimator.SetFloat("MoveSpeead", isMoving ? moveSpeed : 0f);
     }
 
     private float _baseChaseRange = -1f;
