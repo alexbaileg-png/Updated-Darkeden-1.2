@@ -166,6 +166,12 @@ public class LootBag : NetworkBehaviour
     }
 
     [ServerRpc(RequireOwnership = false)]
+    public void ServerTakeEntireStack(int index, NetworkConnection sender = null)
+    {
+        ServerTakeEntry(index, sender);
+    }
+
+    [ServerRpc(RequireOwnership = false)]
     public void ServerTakeAll(NetworkConnection sender = null)
     {
         List<NetworkLootEntry> snapshot = new List<NetworkLootEntry>(_networkItems);
