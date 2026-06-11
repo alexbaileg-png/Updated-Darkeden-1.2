@@ -1,9 +1,38 @@
 using System.Collections;
+using System.Collections.Generic;
 using FishNet.Object;
 using UnityEngine;
 
 public class EnemyAI : NetworkBehaviour
 {
+    // ── Static player registry — populated by PlayerStats.OnStartServer ───────
+    private static readonly List<PlayerStats> _registeredPlayers = new List<PlayerStats>();
+
+    public static void RegisterPlayer(PlayerStats ps)
+    {
+        if (!_registeredPlayers.Contains(ps)) _registeredPlayers.Add(ps);
+    }
+
+    public static void UnregisterPlayer(PlayerStats ps)
+    {
+        _registeredPlayers.Remove(ps);
+    }
+
+    public static PlayerStats GetNearestPlayer(Vector3 position)
+    {
+        PlayerStats nearest = null;
+        float bestDist = float.MaxValue;
+        foreach (PlayerStats ps in _registeredPlayers)
+        {
+            if (ps == null || ps.isDead) continue;
+            float dist = Vector3.Distance(position, ps.transform.position);
+            if (dist < bestDist) { bestDist = dist; nearest = ps; }
+        }
+        return nearest;
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+
     [Header("Movement")]
     public float moveSpeed = 3f;
     public float chaseRange = 30f;
