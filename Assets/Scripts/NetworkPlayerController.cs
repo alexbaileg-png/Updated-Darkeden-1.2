@@ -50,9 +50,7 @@ public class NetworkPlayerController : NetworkBehaviour
         if (modelAnimator == null)
             modelAnimator = GetComponentInChildren<Animator>();
 
-        // NetworkPlayerController owns movement on the network prefab — disable the
-        // standalone PlayerMovement if it was left on the prefab.
-        PlayerMovement pm = GetComponent<PlayerMovement>();
+        // Disable standalone PlayerMovement — NetworkPlayerController owns movement.
         if (pm != null)
             pm.enabled = false;
 
