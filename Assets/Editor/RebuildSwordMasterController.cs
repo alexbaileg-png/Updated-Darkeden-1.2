@@ -11,15 +11,9 @@ public static class RebuildSwordMasterController
         const string controllerPath = "Assets/Characters/Slayers/Swordmaster/SwordMaster.controller";
         const string root = "Assets/Characters/Slayers/Swordmaster/";
 
-        // Load existing controller — preserves GUID so prefab references stay valid
         AnimatorController ctrl = AssetDatabase.LoadAssetAtPath<AnimatorController>(controllerPath);
-        if (ctrl == null)
-        {
-            Debug.LogError("[RebuildSwordMaster] Controller not found at: " + controllerPath);
-            return;
-        }
+        if (ctrl == null) { Debug.LogError("[RebuildSwordMaster] Controller not found at: " + controllerPath); return; }
 
-        // ── Load animation clips ──────────────────────────────────────────────
         AnimationClip idleClip         = LoadClip(root + "Meshy_AI_Slayer_Swordmaster_G_biped_Character_output@Idle.fbx");
         AnimationClip runClip          = LoadClip(root + "Meshy_AI_Slayer_Swordmaster_G_biped_Character_output@Running.fbx");
         AnimationClip deathClip        = LoadClip(root + "Meshy_AI_Slayer_Swordmaster_G_biped_Character_output@Sword And Shield Death.fbx");
@@ -27,19 +21,8 @@ public static class RebuildSwordMasterController
         AnimationClip castClip         = LoadClip(root + "Meshy_AI_Slayer_Swordmaster_G_biped_Character_output@Standing 2H Cast Spell 01.fbx");
         AnimationClip consecrationClip = LoadClip(root + "Great Sword Jump Attack.fbx");
 
-        // ── Clear existing state machine ──────────────────────────────────────
-        AnimatorStateMachine sm = ctrl.layers[0].stateMachine;
+        ClearController(ctrl, controllerPath);
 
-        // Remove all states (in-place — preserves controller GUID)
-        foreach (var cs in sm.states.ToArray())
-            sm.RemoveState(cs.state);
-
-        // Remove all AnyState transitions
-        sm.anyStateTransitions = new AnimatorStateTransition[0];
-        sm.entryTransitions    = new AnimatorTransition[0];
-
-        // ── Clear & rebuild parameters ────────────────────────────────────────
-        ctrl.parameters = new AnimatorControllerParameter[0];
         ctrl.AddParameter(new AnimatorControllerParameter { name = "MoveSpeed",    type = AnimatorControllerParameterType.Float,   defaultFloat = 1f });
         ctrl.AddParameter(new AnimatorControllerParameter { name = "IsMoving",     type = AnimatorControllerParameterType.Bool });
         ctrl.AddParameter(new AnimatorControllerParameter { name = "Attack",       type = AnimatorControllerParameterType.Trigger });
@@ -48,7 +31,7 @@ public static class RebuildSwordMasterController
         ctrl.AddParameter(new AnimatorControllerParameter { name = "Die",          type = AnimatorControllerParameterType.Trigger });
         ctrl.AddParameter(new AnimatorControllerParameter { name = "Consecration", type = AnimatorControllerParameterType.Trigger });
 
-        // ── Add states ────────────────────────────────────────────────────────
+        AnimatorStateMachine sm = ctrl.layers[0].stateMachine;
         AnimatorState idle         = sm.AddState("Idle",         new Vector3(230,  110));
         AnimatorState running      = sm.AddState("Running",      new Vector3(590,  110));
         AnimatorState death        = sm.AddState("Death",        new Vector3(170, -100));
@@ -65,12 +48,9 @@ public static class RebuildSwordMasterController
 
         sm.defaultState = idle;
 
-        // ── Transitions ───────────────────────────────────────────────────────
-        // Idle ↔ Running
-        Transition(idle,    running, "IsMoving",     AnimatorConditionMode.If,    exitTime: false);
-        Transition(running, idle,    "IsMoving",     AnimatorConditionMode.IfNot, exitTime: false);
+        Transition(idle,    running, "IsMoving", AnimatorConditionMode.If,    exitTime: false);
+        Transition(running, idle,    "IsMoving", AnimatorConditionMode.IfNot, exitTime: false);
 
-        // Idle / Running → action states (trigger-based, no exit time)
         foreach (var src in new[] { idle, running })
         {
             Transition(src, death,        "Die",          AnimatorConditionMode.If, exitTime: false);
@@ -79,43 +59,11 @@ public static class RebuildSwordMasterController
             Transition(src, consecration, "Consecration", AnimatorConditionMode.If, exitTime: false);
         }
 
-        // Action states return to Idle
         ReturnToIdle(attack,       idle);
         ReturnToIdle(spell,        idle);
         ReturnToIdle(consecration, idle);
 
-        // ── Save ──────────────────────────────────────────────────────────────
-        EditorUtility.SetDirty(ctrl);
-        AssetDatabase.SaveAssets();
-        AssetDatabase.Refresh();
-
-        Debug.Log("[RebuildSwordMaster] Controller rebuilt in-place — GUID preserved. Path: " + controllerPath);
-    }
-
-    static void Transition(AnimatorState src, AnimatorState dst, string param,
-                           AnimatorConditionMode mode, bool exitTime)
-    {
-        var t = src.AddTransition(dst);
-        t.AddCondition(mode, 0, param);
-        t.hasExitTime = exitTime;
-        t.duration = 0.1f;
-    }
-
-    static void ReturnToIdle(AnimatorState src, AnimatorState idle)
-    {
-        var t = src.AddTransition(idle);
-        t.hasExitTime = true;
-        t.exitTime = 0.9f;
-        t.duration = 0.1f;
-    }
-
-    static AnimationClip LoadClip(string path)
-    {
-        foreach (var obj in AssetDatabase.LoadAllAssetsAtPath(path))
-            if (obj is AnimationClip c && !c.name.StartsWith("__"))
-                return c;
-        Debug.LogWarning("[RebuildSwordMaster] No clip at: " + path);
-        return null;
+        Save(ctrl, controllerPath);
     }
 
     // ── SlayerFemale ──────────────────────────────────────────────────────────
@@ -136,18 +84,15 @@ public static class RebuildSwordMasterController
         AnimationClip buffCastClip  = LoadClip("Assets/Characters/Slayers/Swordmaster/Meshy_AI_Slayer_Swordmaster_G_biped_Character_output@Standing 2H Cast Spell 01.fbx");
         AnimationClip spellCastClip = LoadClip(healerNew + "Meshy_AI_Divine_Healer_Knight_biped_Animation_mage_soell_cast_4_withSkin.fbx");
 
-        AnimatorStateMachine sm = ctrl.layers[0].stateMachine;
-        foreach (var cs in sm.states.ToArray()) sm.RemoveState(cs.state);
-        sm.anyStateTransitions = new AnimatorStateTransition[0];
-        sm.entryTransitions    = new AnimatorTransition[0];
+        ClearController(ctrl, controllerPath);
 
-        ctrl.parameters = new AnimatorControllerParameter[0];
         ctrl.AddParameter(new AnimatorControllerParameter { name = "IsMoving",  type = AnimatorControllerParameterType.Bool });
         ctrl.AddParameter(new AnimatorControllerParameter { name = "MoveSpeed", type = AnimatorControllerParameterType.Float, defaultFloat = 1f });
         ctrl.AddParameter(new AnimatorControllerParameter { name = "Cast",      type = AnimatorControllerParameterType.Trigger });
         ctrl.AddParameter(new AnimatorControllerParameter { name = "Spell",     type = AnimatorControllerParameterType.Trigger });
         ctrl.AddParameter(new AnimatorControllerParameter { name = "Die",       type = AnimatorControllerParameterType.Trigger });
 
+        AnimatorStateMachine sm = ctrl.layers[0].stateMachine;
         AnimatorState idle      = sm.AddState("Idle",       new Vector3(230,  110));
         AnimatorState running   = sm.AddState("Running",    new Vector3(590,  110));
         AnimatorState death     = sm.AddState("Die",        new Vector3(170, -100));
@@ -175,10 +120,64 @@ public static class RebuildSwordMasterController
         ReturnToIdle(buffCast,  idle);
         ReturnToIdle(spellCast, idle);
 
+        Save(ctrl, controllerPath);
+    }
+
+    // ── Shared helpers ────────────────────────────────────────────────────────
+
+    // Removes all states AND destroys orphaned sub-asset transitions that remain
+    // after RemoveState (these dangling fileIDs crash Unity 6's Edge.WakeUp).
+    static void ClearController(AnimatorController ctrl, string path)
+    {
+        AnimatorStateMachine sm = ctrl.layers[0].stateMachine;
+
+        foreach (var cs in sm.states.ToArray())
+            sm.RemoveState(cs.state);
+
+        sm.anyStateTransitions = new AnimatorStateTransition[0];
+        sm.entryTransitions    = new AnimatorTransition[0];
+        ctrl.parameters        = new AnimatorControllerParameter[0];
+
+        // Destroy any orphaned AnimatorStateTransition / AnimatorTransition sub-assets
+        foreach (var obj in AssetDatabase.LoadAllAssetsAtPath(path))
+        {
+            if (obj == null || obj == ctrl) continue;
+            if (obj is AnimatorStateTransition || obj is AnimatorTransition || obj is AnimatorState)
+                Object.DestroyImmediate(obj, true);
+        }
+    }
+
+    static void Save(AnimatorController ctrl, string path)
+    {
         EditorUtility.SetDirty(ctrl);
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
+        Debug.Log("[RebuildController] Rebuilt in-place — GUID preserved. Path: " + path);
+    }
 
-        Debug.Log("[RebuildSlayerFemale] Controller rebuilt in-place — GUID preserved. Path: " + controllerPath);
+    static void Transition(AnimatorState src, AnimatorState dst, string param,
+                           AnimatorConditionMode mode, bool exitTime)
+    {
+        var t = src.AddTransition(dst);
+        t.AddCondition(mode, 0, param);
+        t.hasExitTime = exitTime;
+        t.duration = 0.1f;
+    }
+
+    static void ReturnToIdle(AnimatorState src, AnimatorState idle)
+    {
+        var t = src.AddTransition(idle);
+        t.hasExitTime = true;
+        t.exitTime = 0.9f;
+        t.duration = 0.1f;
+    }
+
+    static AnimationClip LoadClip(string path)
+    {
+        foreach (var obj in AssetDatabase.LoadAllAssetsAtPath(path))
+            if (obj is AnimationClip c && !c.name.StartsWith("__"))
+                return c;
+        Debug.LogWarning("[RebuildController] No clip at: " + path);
+        return null;
     }
 }
