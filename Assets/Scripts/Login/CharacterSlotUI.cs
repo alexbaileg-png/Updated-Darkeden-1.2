@@ -21,7 +21,7 @@ public class CharacterSlotUI : MonoBehaviour
         _slotIndex = slotIndex;
         _onClicked = onClicked;
 
-        bool hasCharacter = character != null;
+        bool hasCharacter = character != null && !string.IsNullOrEmpty(character.characterName);
 
         if (occupiedPanel != null) occupiedPanel.SetActive(hasCharacter);
         if (emptyPanel != null) emptyPanel.SetActive(!hasCharacter);

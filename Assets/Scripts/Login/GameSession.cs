@@ -28,7 +28,10 @@ public class GameSession : MonoBehaviour
     public int GetEmptySlot()
     {
         for (int i = 0; i < AccountData.characters.Length; i++)
-            if (AccountData.characters[i] == null) return i;
+        {
+            var c = AccountData.characters[i];
+            if (c == null || string.IsNullOrEmpty(c.characterName)) return i;
+        }
         return -1;
     }
 }

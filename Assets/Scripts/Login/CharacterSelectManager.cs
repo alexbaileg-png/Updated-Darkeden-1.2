@@ -105,6 +105,7 @@ public class CharacterSelectManager : MonoBehaviour
         if (slot < 0 || GameSession.Instance == null) return null;
         CharacterData[] chars = GameSession.Instance.AccountData.characters;
         if (slot >= chars.Length) return null;
-        return chars[slot];
+        var c = chars[slot];
+        return (c != null && !string.IsNullOrEmpty(c.characterName)) ? c : null;
     }
 }
