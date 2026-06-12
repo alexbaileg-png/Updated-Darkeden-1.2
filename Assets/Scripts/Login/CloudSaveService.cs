@@ -18,10 +18,15 @@ public static class CloudDataService
             if (data.TryGetValue(AccountKey, out var item))
             {
                 var account = JsonUtility.FromJson<AccountData>(item.Value.GetAs<string>());
-                // JsonUtility serialises null array entries as default objects — restore them to null
+                // JsonUtility serialises null array entries as default objects — restore them to null.
+                // A slot is empty only when BOTH characterId and characterName are blank
+                // (old characters may have no characterId but still have a valid name).
                 for (int i = 0; i < account.characters.Length; i++)
-                    if (string.IsNullOrEmpty(account.characters[i]?.characterId))
+                {
+                    var c = account.characters[i];
+                    if (c != null && string.IsNullOrEmpty(c.characterId) && string.IsNullOrEmpty(c.characterName))
                         account.characters[i] = null;
+                }
                 return account;
             }
         }
