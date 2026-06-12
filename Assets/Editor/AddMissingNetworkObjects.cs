@@ -16,7 +16,7 @@ public static class AddMissingNetworkObjects
             "Assets/Items/Loot/LootBagPrefab.prefab",
         };
 
-        int fixed = 0;
+        int count = 0;
         foreach (string path in paths)
         {
             GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>(path);
@@ -33,7 +33,7 @@ public static class AddMissingNetworkObjects
                 {
                     root.AddComponent<NetworkObject>();
                     Debug.Log($"[Fix] Added NetworkObject to {path}");
-                    fixed++;
+                    count++;
                 }
                 else
                 {
@@ -44,6 +44,6 @@ public static class AddMissingNetworkObjects
 
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();
-        Debug.Log($"[Fix] Done — added NetworkObject to {fixed} prefab(s).");
+        Debug.Log($"[Fix] Done — added NetworkObject to {count} prefab(s).");
     }
 }
