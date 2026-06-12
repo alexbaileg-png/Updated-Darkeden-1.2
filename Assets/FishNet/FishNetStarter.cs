@@ -18,18 +18,18 @@ public class FishNetStarter : MonoBehaviour
 
         if (GUI.Button(new Rect(20, 20, 120, 35), "Start Host"))
         {
-            networkManager.ServerManager.StartConnection();
-            networkManager.ClientManager.StartConnection();
+            if (networkManager.ServerManager != null) networkManager.ServerManager.StartConnection();
+            if (networkManager.ClientManager != null) networkManager.ClientManager.StartConnection();
         }
 
         if (GUI.Button(new Rect(20, 60, 120, 35), "Start Server"))
         {
-            networkManager.ServerManager.StartConnection();
+            if (networkManager.ServerManager != null) networkManager.ServerManager.StartConnection();
         }
 
         if (GUI.Button(new Rect(20, 100, 120, 35), "Start Client"))
         {
-            networkManager.ClientManager.StartConnection();
+            if (networkManager.ClientManager != null) networkManager.ClientManager.StartConnection();
         }
     }
 }
