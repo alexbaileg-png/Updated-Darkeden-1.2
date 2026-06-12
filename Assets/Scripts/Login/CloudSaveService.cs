@@ -16,7 +16,14 @@ public static class CloudDataService
             var data = await CloudSaveService.Instance.Data.Player.LoadAsync(keys);
 
             if (data.TryGetValue(AccountKey, out var item))
-                return JsonUtility.FromJson<AccountData>(item.Value.GetAs<string>());
+            {
+                var account = JsonUtility.FromJson<AccountData>(item.Value.GetAs<string>());
+                // JsonUtility serialises null array entries as default objects — restore them to null
+                for (int i = 0; i < account.characters.Length; i++)
+                    if (string.IsNullOrEmpty(account.characters[i]?.characterId))
+                        account.characters[i] = null;
+                return account;
+            }
         }
         catch (Exception e)
         {
