@@ -150,6 +150,7 @@ GameObject:
   - component: {fileID: 3852418897615731493}
   - component: {fileID: 7476138235124143583}
   - component: {fileID: 6190602133126306908}
+  - component: {fileID: 6567807044022474983}
   m_Layer: 0
   m_Name: LootBagPrefab
   m_TagString: Untagged
@@ -207,8 +208,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d1a754f2b99bbe48a185982e4b644ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LootBag
-  _componentIndexCache: 255
-  _addedNetworkObject: {fileID: 0}
+  _componentIndexCache: 0
+  _addedNetworkObject: {fileID: 6567807044022474983}
   _networkObjectCache: {fileID: 0}
   openKey: 101
   openRange: 3
@@ -237,6 +238,63 @@ MonoBehaviour:
     quantity: 0
   - item: {fileID: 0}
     quantity: 0
+--- !u!114 &6567807044022474983
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1904587786797651166}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FishNet.Runtime::FishNet.Object.NetworkObject
+  _localLevelOfDetailCalculationType: 0
+  _useLevelOfDetail: 0
+  _useRootLevelOfDetail: 1
+  NetworkObserver: {fileID: 0}
+  _enablePrediction: 0
+  _predictionType: 0
+  _localReconcileCorrectionType: 2
+  _graphicalObject: {fileID: 0}
+  _detachGraphicalObject: 0
+  _enableStateForwarding: 1
+  _networkTransform: {fileID: 0}
+  _ownerInterpolation: 1
+  _ownerSmoothedProperties: 255
+  _adaptiveInterpolation: 3
+  _spectatorSmoothedProperties: 255
+  _spectatorInterpolation: 2
+  _enableTeleport: 0
+  _teleportThreshold: 1
+  <PrefabId>k__BackingField: 65535
+  <SpawnableCollectionId>k__BackingField: 0
+  <AssetPathHash>k__BackingField: 16938465624768859162
+  SceneId: 0
+  SerializedTransformProperties:
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0, w: 0}
+    Scale: {x: 0, y: 0, z: 0}
+    IsValid: 0
+  <IsNested>k__BackingField: 0
+  WasActiveDuringEdit: 0
+  WasActiveDuringEdit_Set1: 1
+  <ComponentIndex>k__BackingField: 0
+  <PredictedSpawn>k__BackingField: {fileID: 0}
+  <PredictedOwner>k__BackingField: {fileID: 0}
+  NetworkBehaviours: []
+  InitializedParentNetworkBehaviour: {fileID: 0}
+  InitializedNestedNetworkObjects: []
+  RuntimeParentNetworkBehaviour: {fileID: 0}
+  RuntimeChildNetworkBehaviours: []
+  _isNetworked: 1
+  _isSpawnable: 1
+  _isGlobal: 0
+  _initializeOrder: 0
+  _preventDespawnOnDisconnect: 0
+  _defaultDespawnType: 0
+  _initializedTimestamp: 0
 --- !u!1 &6245842483328157520
 GameObject:
   m_ObjectHideFlags: 0

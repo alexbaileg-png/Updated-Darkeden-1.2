@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: BloodFog
   m_EditorClassIdentifier: Assembly-CSharp::SkillData
   skillName: Blood Fog
-  skillType: 6
+  skillType: 10
+  skillCategory: 4
   skillIcon: {fileID: 21300000, guid: 079d5283e979493429f0f460ec37b74c, type: 3}
   description: 
   requiredPlayerLevel: 20

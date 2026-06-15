@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: DarkBoltData
   m_EditorClassIdentifier: Assembly-CSharp::SkillData
   skillName: Dark Bolt
-  skillType: 4
+  skillType: 8
   skillIcon: {fileID: 21300000, guid: e1d15c8fd069ee94cb8e9bf395f2d202, type: 3}
   description: 'When you put all the hate and darkness into a single point, it can
     be an artifact of death.

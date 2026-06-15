@@ -9,11 +9,17 @@ using UnityEngine;
 /// </summary>
 public class HealerSkillCaster : NetworkBehaviour, ISkillCaster
 {
-    [Header("Keybinds")]
-    public SkillType f8Skill  = SkillType.HolyBolt;
-    public SkillType f9Skill  = SkillType.HolyRain;
-    public SkillType f10Skill = SkillType.HolyCircleHeal;
-    public SkillType f11Skill = SkillType.HealingOrbit;
+    private readonly Dictionary<KeyCode, List<SkillType>> _keyBindings = new Dictionary<KeyCode, List<SkillType>>
+    {
+        { KeyCode.F8,  new List<SkillType>() },
+        { KeyCode.F9,  new List<SkillType>() },
+        { KeyCode.F10, new List<SkillType>() },
+        { KeyCode.F11, new List<SkillType>() },
+    };
+    private readonly Dictionary<KeyCode, int> _keyIndex = new Dictionary<KeyCode, int>
+    {
+        { KeyCode.F8, 0 }, { KeyCode.F9, 0 }, { KeyCode.F10, 0 }, { KeyCode.F11, 0 },
+    };
 
     // ── Holy Bolt ─────────────────────────────────────────────────────────────
     [Header("Holy Bolt")]
@@ -24,9 +30,10 @@ public class HealerSkillCaster : NetworkBehaviour, ISkillCaster
     // ── Holy Rain ─────────────────────────────────────────────────────────────
     [Header("Holy Rain")]
     public GameObject holyRainEffectPrefab;
-    public float rainRadius   = 6f;
-    public float rainDuration = 3f;      // how long rain lingers
-    public float rainTickRate = 0.5f;    // heal tick every X seconds
+    public float rainRadius    = 6f;
+    public float rainDuration  = 3f;
+    public float rainTickRate  = 0.5f;
+    public float rainCastRange = 12f;    // how far from the player the rain lands
 
     // ── Holy Circle Heal ──────────────────────────────────────────────────────
     [Header("Holy Circle Heal")]
@@ -42,7 +49,7 @@ public class HealerSkillCaster : NetworkBehaviour, ISkillCaster
 
     // ── Cast Settings ─────────────────────────────────────────────────────────
     [Header("Cast Settings")]
-    public float effectHeightOffset   = 1.2f;
+    public float effectHeightOffset   = 0.8f;
     public float holyBoltDelay        = 0.2f;
     public float holyRainDelay        = 0.4f;
     public float holyCircleHealDelay  = 0.4f;
@@ -51,18 +58,54 @@ public class HealerSkillCaster : NetworkBehaviour, ISkillCaster
     // ── ISkillCaster ──────────────────────────────────────────────────────────
     public SkillType CurrentSelectedSkill => _selectedSkill;
     public void SetSelectedSkill(SkillType skill) => _selectedSkill = skill;
+    public SavedKeyBindings GetBindings()
+    {
+        var saved = new SavedKeyBindings();
+        foreach (var kvp in _keyBindings)
+        {
+            var entry = new SavedKeyBinding { key = kvp.Key.ToString() };
+            foreach (var skill in kvp.Value)
+                entry.skills.Add(skill.ToString());
+            saved.bindings.Add(entry);
+        }
+        return saved;
+    }
+
+    public void LoadBindings(SavedKeyBindings saved)
+    {
+        if (saved?.bindings == null) return;
+        foreach (var entry in saved.bindings)
+        {
+            if (!System.Enum.TryParse(entry.key, out KeyCode key)) continue;
+            if (!_keyBindings.ContainsKey(key)) continue;
+            _keyBindings[key].Clear();
+            foreach (var skillStr in entry.skills)
+                if (System.Enum.TryParse(skillStr, out SkillType skill))
+                    _keyBindings[key].Add(skill);
+            _keyIndex[key] = 0;
+        }
+        foreach (var kvp in _keyBindings)
+            if (kvp.Value.Count > 0) { _selectedSkill = kvp.Value[0]; break; }
+    }
+
     public void BindSkill(KeyCode key, SkillType skill)
     {
-        if (key == KeyCode.F8)  f8Skill  = skill;
-        if (key == KeyCode.F9)  f9Skill  = skill;
-        if (key == KeyCode.F10) f10Skill = skill;
-        if (key == KeyCode.F11) f11Skill = skill;
+        if (!_keyBindings.ContainsKey(key)) return;
+        List<SkillType> list = _keyBindings[key];
+        if (list.Contains(skill))
+            list.Remove(skill);
+        else
+        {
+            list.Add(skill);
+            _keyIndex[key] = list.Count - 1;
+            _selectedSkill = skill;
+        }
     }
     public float GetCooldownRemaining()    => Mathf.Max(0f, _nextCastTime - Time.time);
     public float GetCurrentSkillCooldown() => _lastCooldown;
 
     // ── Runtime ───────────────────────────────────────────────────────────────
-    private SkillType _selectedSkill = SkillType.HolyBolt;
+    private SkillType _selectedSkill;
     private float _nextCastTime  = 0f;
     private float _lastCooldown  = 0f;
     private bool  _isCasting     = false;
@@ -95,10 +138,20 @@ public class HealerSkillCaster : NetworkBehaviour, ISkillCaster
 
     void HandleSkillSelection()
     {
-        if (Input.GetKeyDown(KeyCode.F8))  _selectedSkill = f8Skill;
-        if (Input.GetKeyDown(KeyCode.F9))  _selectedSkill = f9Skill;
-        if (Input.GetKeyDown(KeyCode.F10)) _selectedSkill = f10Skill;
-        if (Input.GetKeyDown(KeyCode.F11)) _selectedSkill = f11Skill;
+        if (Input.GetKeyDown(KeyCode.F8))  CycleKey(KeyCode.F8);
+        if (Input.GetKeyDown(KeyCode.F9))  CycleKey(KeyCode.F9);
+        if (Input.GetKeyDown(KeyCode.F10)) CycleKey(KeyCode.F10);
+        if (Input.GetKeyDown(KeyCode.F11)) CycleKey(KeyCode.F11);
+    }
+
+    void CycleKey(KeyCode key)
+    {
+        if (!_keyBindings.ContainsKey(key)) return;
+        List<SkillType> list = _keyBindings[key];
+        if (list.Count == 0) return;
+        int idx = (_keyIndex[key] + 1) % list.Count;
+        _keyIndex[key] = idx;
+        _selectedSkill = list[idx];
     }
 
     void HandleCasting()
@@ -129,6 +182,7 @@ public class HealerSkillCaster : NetworkBehaviour, ISkillCaster
     IEnumerator CastRoutine(SkillType skill)
     {
         _isCasting = true;
+        _netController?.ServerStopMovement();
 
         int   skillLevel = GetSkillLevel(skill);
         int   skillPower = GetSkillPower(skill, 25);
@@ -137,7 +191,10 @@ public class HealerSkillCaster : NetworkBehaviour, ISkillCaster
 
         Vector3 aimDir = GetAimDirection();
         if (aimDir.sqrMagnitude > 0.01f)
+        {
+            _netController?.RotateVisualPublic(aimDir.normalized);
             ServerRotateToward(aimDir.normalized);
+        }
 
         PlayCastAnimation(skill);
 
@@ -166,7 +223,13 @@ public class HealerSkillCaster : NetworkBehaviour, ISkillCaster
     void ServerRotateToward(Vector3 direction)
     {
         if (direction.sqrMagnitude > 0.01f)
-            transform.rotation = Quaternion.LookRotation(direction);
+            RpcRotateVisual(direction);
+    }
+
+    [ObserversRpc(ExcludeOwner = true)]
+    void RpcRotateVisual(Vector3 direction)
+    {
+        _netController?.RotateVisualPublic(direction);
     }
 
     [ServerRpc]
@@ -181,7 +244,7 @@ public class HealerSkillCaster : NetworkBehaviour, ISkillCaster
         switch (skill)
         {
             case SkillType.HolyBolt:       ServerHolyBolt(casterPos, aimDir, skillLevel, skillPower);  break;
-            case SkillType.HolyRain:       ServerHolyRain(casterPos, skillLevel, skillPower);          break;
+            case SkillType.HolyRain:       ServerHolyRain(casterPos, aimDir, skillLevel, skillPower);  break;
             case SkillType.HolyCircleHeal: ServerHolyCircleHeal(casterPos, skillLevel, skillPower);    break;
             case SkillType.HealingOrbit:   ServerHealingOrbit(skillLevel, skillPower);                 break;
         }
@@ -194,46 +257,37 @@ public class HealerSkillCaster : NetworkBehaviour, ISkillCaster
     {
         if (holyBoltProjectilePrefab == null) return;
 
-        Vector3 spawnPos = casterPos + Vector3.up * effectHeightOffset;
-        SpawnHolyBoltEffect(spawnPos, Quaternion.LookRotation(aimDir));
+        Vector3    spawnPos = casterPos + Vector3.up * effectHeightOffset;
+        Quaternion spawnRot = Quaternion.LookRotation(aimDir);
 
-        // Raycast along aim direction to find first enemy in range
+        SpawnHolyBoltEffect(spawnPos, spawnRot);
+
+        // Server-side invisible projectile that applies damage on impact
         PlayerStats stats = GetComponent<PlayerStats>();
-        EnemyHealth[] allEnemies = FindObjectsByType<EnemyHealth>(FindObjectsSortMode.None);
+        int damage = stats != null ? stats.GetMagicalSkillDamage(skillPower) : skillPower;
+        damage     = stats != null ? stats.ApplyCriticalDamage(damage)       : damage;
 
-        EnemyHealth closest = null;
-        float closestDot = 0.8f; // must be roughly in front
-
-        foreach (EnemyHealth enemy in allEnemies)
-        {
-            if (enemy == null || enemy.IsDead()) continue;
-            Vector3 toEnemy = enemy.transform.position - casterPos;
-            float dist = toEnemy.magnitude;
-            if (dist > boltRange) continue;
-
-            float dot = Vector3.Dot(toEnemy.normalized, aimDir);
-            if (dot > closestDot)
-            {
-                closestDot = dot;
-                closest    = enemy;
-            }
-        }
-
-        if (closest != null)
-        {
-            int damage = stats != null ? stats.GetMagicalSkillDamage(skillPower) : skillPower;
-            damage = stats != null ? stats.ApplyCriticalDamage(damage) : damage;
-            closest.ReceiveDamage(damage, DamageType.Magical, stats);
-        }
+        GameObject proj = new GameObject("HolyBoltServer");
+        proj.transform.SetPositionAndRotation(spawnPos, spawnRot);
+        HolyBoltProjectile bolt = proj.AddComponent<HolyBoltProjectile>();
+        bolt.speed     = boltSpeed;
+        bolt.range     = boltRange;
+        bolt.damage    = damage;
+        bolt.damageType = DamageType.Magical;
+        bolt.caster    = stats;
     }
 
     // ── Holy Rain ─────────────────────────────────────────────────────────────
     // Places a healing rain AoE — heals nearby players over time
 
-    void ServerHolyRain(Vector3 casterPos, int skillLevel, int skillPower)
+    void ServerHolyRain(Vector3 casterPos, Vector3 aimDir, int skillLevel, int skillPower)
     {
-        SpawnHolyRainEffect(casterPos);
-        StartCoroutine(HolyRainTick(casterPos, skillLevel, skillPower));
+        Vector3 center = casterPos + aimDir * rainCastRange;
+        center.y = casterPos.y;
+
+        SpawnHolyRainEffect(center);
+        if (!isActiveAndEnabled) enabled = true;
+        StartCoroutine(HolyRainTick(center, skillLevel, skillPower));
     }
 
     IEnumerator HolyRainTick(Vector3 center, int skillLevel, int skillPower)
@@ -241,21 +295,21 @@ public class HealerSkillCaster : NetworkBehaviour, ISkillCaster
         float duration = rainDuration + (skillLevel - 1) * 0.5f;
         float radius   = rainRadius   + (skillLevel - 1) * 0.5f;
         float elapsed  = 0f;
-        int   healAmt  = skillPower + (skillLevel - 1) * 5;
+        int   damage   = skillPower + (skillLevel - 1) * 5;
+
+        PlayerStats stats = GetComponent<PlayerStats>();
 
         while (elapsed < duration)
         {
             yield return new WaitForSeconds(rainTickRate);
             elapsed += rainTickRate;
 
-            // Heal all players in range
-            PlayerStats[] allPlayers = FindObjectsByType<PlayerStats>(FindObjectsSortMode.None);
-            foreach (PlayerStats player in allPlayers)
+            EnemyHealth[] enemies = FindObjectsByType<EnemyHealth>(FindObjectsSortMode.None);
+            foreach (EnemyHealth enemy in enemies)
             {
-                if (player == null) continue;
-                float dist = Vector3.Distance(center, player.transform.position);
-                if (dist <= radius)
-                    player.Heal(healAmt);
+                if (enemy == null || enemy.IsDead()) continue;
+                float dist = Vector3.Distance(center, enemy.transform.position);
+                if (dist <= radius) enemy.ReceiveDamage(damage, DamageType.Magical, stats);
             }
         }
     }
@@ -311,7 +365,10 @@ public class HealerSkillCaster : NetworkBehaviour, ISkillCaster
     void SpawnHolyBoltEffect(Vector3 pos, Quaternion rot)
     {
         if (holyBoltProjectilePrefab == null) return;
-        Instantiate(holyBoltProjectilePrefab, pos, rot);
+        GameObject go = Instantiate(holyBoltProjectilePrefab, pos, rot);
+        SimpleProjectileVisual vis = go.AddComponent<SimpleProjectileVisual>();
+        vis.speed    = boltSpeed;
+        vis.lifetime = boltRange / boltSpeed;
     }
 
     [ObserversRpc]

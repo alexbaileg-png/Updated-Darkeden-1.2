@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: AegisOfFaith
   m_EditorClassIdentifier: Assembly-CSharp::SkillData
   skillName: Aegis Of Faith
-  skillType: 10
+  skillType: 6
   skillIcon: {fileID: 21300000, guid: 8a721ac7b6806344d85b56ee949ba1d9, type: 3}
   description: 
   requiredPlayerLevel: 10

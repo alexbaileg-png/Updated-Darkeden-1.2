@@ -3795,6 +3795,7 @@ GameObject:
   - component: {fileID: 330585548}
   - component: {fileID: 330585549}
   - component: {fileID: 330585550}
+  - component: {fileID: 330585551}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -3959,7 +3960,67 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1765fb51c690ffc4c9ff4563221f6553, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HoverDetector
+  _componentIndexCache: 255
+  _addedNetworkObject: {fileID: 330585551}
+  _networkObjectCache: {fileID: 0}
   hoverRadius: 1
+--- !u!114 &330585551
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 330585543}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FishNet.Runtime::FishNet.Object.NetworkObject
+  _localLevelOfDetailCalculationType: 0
+  _useLevelOfDetail: 0
+  _useRootLevelOfDetail: 1
+  NetworkObserver: {fileID: 0}
+  _enablePrediction: 0
+  _predictionType: 0
+  _localReconcileCorrectionType: 2
+  _graphicalObject: {fileID: 0}
+  _detachGraphicalObject: 0
+  _enableStateForwarding: 1
+  _networkTransform: {fileID: 0}
+  _ownerInterpolation: 1
+  _ownerSmoothedProperties: 255
+  _adaptiveInterpolation: 3
+  _spectatorSmoothedProperties: 255
+  _spectatorInterpolation: 2
+  _enableTeleport: 0
+  _teleportThreshold: 1
+  <PrefabId>k__BackingField: 65535
+  <SpawnableCollectionId>k__BackingField: 0
+  <AssetPathHash>k__BackingField: 0
+  SceneId: 4128094898
+  SerializedTransformProperties:
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0, w: 0}
+    Scale: {x: 0, y: 0, z: 0}
+    IsValid: 0
+  <IsNested>k__BackingField: 0
+  WasActiveDuringEdit: 1
+  WasActiveDuringEdit_Set1: 1
+  <ComponentIndex>k__BackingField: 0
+  <PredictedSpawn>k__BackingField: {fileID: 0}
+  <PredictedOwner>k__BackingField: {fileID: 0}
+  NetworkBehaviours: []
+  InitializedParentNetworkBehaviour: {fileID: 0}
+  InitializedNestedNetworkObjects: []
+  RuntimeParentNetworkBehaviour: {fileID: 0}
+  RuntimeChildNetworkBehaviours: []
+  _isNetworked: 1
+  _isSpawnable: 1
+  _isGlobal: 0
+  _initializeOrder: 0
+  _preventDespawnOnDisconnect: 0
+  _defaultDespawnType: 0
+  _initializedTimestamp: 0
 --- !u!1 &336454143
 GameObject:
   m_ObjectHideFlags: 0
@@ -6518,7 +6579,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61dbfb73957eee74fb8ca67cc87e45e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WorldItemDropZone
-  player: {fileID: 1623734783}
   dropDistanceFromPlayer: 1.5
   dropHeight: 1
 --- !u!114 &619911782
@@ -6578,7 +6638,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::VendorNPC
   merchantName: Marvin The Merchant
   merchantDialogueUI: {fileID: 336454144}
-  player: {fileID: 1623734783}
   interactKey: 101
   interactDistance: 3
 --- !u!136 &625131789
@@ -9283,12 +9342,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SkillTreeUI
   skillManager: {fileID: 1623734788}
+  playerStats: {fileID: 0}
   skillPointsText: {fileID: 827669115}
-  skillButtons:
-  - {fileID: 1933917398}
-  - {fileID: 731909622}
-  - {fileID: 831066614}
-  - {fileID: 1645172975}
+  skillButtonPrefab: {fileID: 0}
+  buttonContainer: {fileID: 0}
 --- !u!1 &806460477
 GameObject:
   m_ObjectHideFlags: 0
@@ -10447,21 +10504,8 @@ MonoBehaviour:
   rows: 8
   columns: 8
   inventorySlotPrefab: {fileID: 6003216272885842138, guid: c10ce5d752f78d74996005db265829b0, type: 3}
-  startingItems:
-  - {fileID: 11400000, guid: 4ff8746adb6320d4fbd7a0ccd0687f74, type: 2}
-  - {fileID: 11400000, guid: 63435b7e2f30bbf47a66f146d45c93d5, type: 2}
-  - {fileID: 11400000, guid: fdbfad13e6bac824caab746e9433458d, type: 2}
-  - {fileID: 11400000, guid: 43d318145df03cd4fb63876179fbbc8f, type: 2}
-  - {fileID: 11400000, guid: d3ab716537d595f4598a8bab0d6acfca, type: 2}
-  - {fileID: 11400000, guid: 1f1bfaa7121857b4c911a37f58037dd9, type: 2}
-  - {fileID: 11400000, guid: bf6c0cc6ee4dfe1499b6c0d9e365e940, type: 2}
-  - {fileID: 11400000, guid: f13e4ae8aa5c2a446a3bd5dcbc0c8d4c, type: 2}
-  - {fileID: 11400000, guid: 9797f287f1c8296499cf897fddb57dfa, type: 2}
-  - {fileID: 11400000, guid: 2fa716cd5bb43a64f8a30f0cb6dc5a22, type: 2}
-  - {fileID: 11400000, guid: 71c711f625630bc4abc3254e6e5a3862, type: 2}
-  - {fileID: 11400000, guid: e49f3eb7042dafb439bfe20ae47d26a1, type: 2}
-  - {fileID: 11400000, guid: 2523f8b7bcd4c354daa5cda8dbd2afd9, type: 2}
-  - {fileID: 11400000, guid: 3f71a1f2a341c4849935e764994d4ab0, type: 2}
+  slayerStartingItems: []
+  vampireStartingItems: []
 --- !u!114 &891888591
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11212,7 +11256,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LootBagManager
   lootBagPrefab: {fileID: 1904587786797651166, guid: ccf3d3229a771944fb70a7582e6ed805, type: 3}
   mergeRadius: 5
-  mergeTimeWindow: 8
   dropHeight: 1.27
   maxUniqueItemsPerBag: 20
 --- !u!4 &914109558
@@ -12038,7 +12081,6 @@ MonoBehaviour:
   playerStats: {fileID: 1623734785}
   skillType: 2
   iconImage: {fileID: 0}
-  iconSprite: {fileID: 21300000, guid: b2498e91d6b7575499d942eaedd534c7, type: 3}
 --- !u!114 &989775965
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14088,7 +14130,6 @@ MonoBehaviour:
   playerStats: {fileID: 1623734785}
   skillType: 1
   iconImage: {fileID: 0}
-  iconSprite: {fileID: 21300000, guid: 74d7e8e75bd032843937954c7304caf6, type: 3}
 --- !u!114 &1191105929
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16923,7 +16964,6 @@ MonoBehaviour:
   playerStats: {fileID: 1623734785}
   skillType: 0
   iconImage: {fileID: 0}
-  iconSprite: {fileID: 21300000, guid: 63dbf63119d9550409a4697ec23cc21f, type: 3}
 --- !u!114 &1416429655
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18984,17 +19024,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1590233825}
   m_CullTransparentMesh: 1
---- !u!114 &1623734781 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 624755688521382164, guid: 6ea6613e738531446b02c99b3c66a30d, type: 3}
-  m_PrefabInstance: {fileID: 711903895054509423}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 465009875}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 99aabeff98224804a930220a91216129, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerProjectileAttack
 --- !u!4 &1623734783 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 515305705555684825, guid: 6ea6613e738531446b02c99b3c66a30d, type: 3}
@@ -21186,7 +21215,6 @@ MonoBehaviour:
   playerStats: {fileID: 1623734785}
   skillType: 3
   iconImage: {fileID: 0}
-  iconSprite: {fileID: 21300000, guid: 93e29294c7491744c940f7db1b0b61a9, type: 3}
 --- !u!114 &1766790860
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24896,13 +24924,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a883e7d962f06594688e13041c878c92, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SkillSelectorUI
-  playerSkills: {fileID: 1623734781}
   selectedSkillIcon: {fileID: 1978310851}
   skillGridPanel: {fileID: 819477338}
-  holyBoltIcon: {fileID: 21300000, guid: 63dbf63119d9550409a4697ec23cc21f, type: 3}
-  holyRainIcon: {fileID: 21300000, guid: 74d7e8e75bd032843937954c7304caf6, type: 3}
-  holyCircleHealIcon: {fileID: 21300000, guid: b2498e91d6b7575499d942eaedd534c7, type: 3}
-  healingOrbitIcon: {fileID: 21300000, guid: 93e29294c7491744c940f7db1b0b61a9, type: 3}
+  skillGridButtonPrefab: {fileID: 0}
+  gridContainer: {fileID: 0}
 --- !u!114 &1978310850
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24997,7 +25022,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09d8ffe99d5cf554a80f9c2baa890515, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SkillCooldownUI
-  playerSkills: {fileID: 1623734781}
   cooldownFill: {fileID: 707373777}
 --- !u!1 &1983277721
 GameObject:

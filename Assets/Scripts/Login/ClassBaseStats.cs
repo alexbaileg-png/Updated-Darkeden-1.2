@@ -21,61 +21,22 @@ public static class ClassBaseStats
         if (character == null) return Default();
 
         if (character.faction == PlayerFaction.Vampire)
-            return GetVampireStats(character.vampireBloodline);
+            return GetVampireStats();
         else
             return GetSlayerStats(character.slayerClass);
     }
 
-    static BaseStats GetVampireStats(VampireBloodline bloodline)
+    static BaseStats GetVampireStats()
     {
-        switch (bloodline)
+        return new BaseStats
         {
-            case VampireBloodline.BloodKnight:
-                return new BaseStats
-                {
-                    strength     = 18,
-                    dexterity    = 10,
-                    intelligence = 8,
-                    endurance    = 18,
-                    baseHealth   = 220,
-                    baseMana     = 80
-                };
-
-            case VampireBloodline.Shadow:
-                return new BaseStats
-                {
-                    strength     = 12,
-                    dexterity    = 20,
-                    intelligence = 10,
-                    endurance    = 12,
-                    baseHealth   = 140,
-                    baseMana     = 100
-                };
-
-            case VampireBloodline.Sorcerer:
-                return new BaseStats
-                {
-                    strength     = 8,
-                    dexterity    = 10,
-                    intelligence = 22,
-                    endurance    = 10,
-                    baseHealth   = 120,
-                    baseMana     = 200
-                };
-
-            case VampireBloodline.Dominator:
-                return new BaseStats
-                {
-                    strength     = 8,
-                    dexterity    = 12,
-                    intelligence = 18,
-                    endurance    = 14,
-                    baseHealth   = 140,
-                    baseMana     = 160
-                };
-
-            default: return Default();
-        }
+            strength     = 14,
+            dexterity    = 12,
+            intelligence = 14,
+            endurance    = 14,
+            baseHealth   = 160,
+            baseMana     = 140
+        };
     }
 
     static BaseStats GetSlayerStats(SlayerClass slayerClass)

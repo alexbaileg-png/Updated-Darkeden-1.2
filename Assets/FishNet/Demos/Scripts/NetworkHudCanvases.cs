@@ -199,7 +199,7 @@ namespace FishNet.Example
 
         public void OnClick_Server()
         {
-            if (_networkManager == null || _networkManager.ServerManager == null)
+            if (_networkManager == null)
                 return;
 
             if (_serverState != LocalConnectionState.Stopped)
@@ -212,7 +212,7 @@ namespace FishNet.Example
 
         public void OnClick_Client()
         {
-            if (_networkManager == null || _networkManager.ClientManager == null)
+            if (_networkManager == null)
                 return;
 
             if (_clientState != LocalConnectionState.Stopped)

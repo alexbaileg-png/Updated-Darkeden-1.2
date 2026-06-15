@@ -7,6 +7,7 @@ public class SkillSelectorUI : MonoBehaviour, IPointerClickHandler
 {
     [Header("Main Selector")]
     public Image selectedSkillIcon;
+    public Sprite defaultSkillIcon;
 
     [Header("Skill Grid")]
     public GameObject skillGridPanel;
@@ -29,11 +30,24 @@ public class SkillSelectorUI : MonoBehaviour, IPointerClickHandler
         _caster = caster;
         if (caster is MonoBehaviour mb)
         {
-            _skillManager = mb.GetComponent<PlayerSkillManager>();
-            _playerStats  = mb.GetComponent<PlayerStats>();
+            _skillManager = mb.GetComponent<PlayerSkillManager>()
+                         ?? mb.GetComponentInParent<PlayerSkillManager>()
+                         ?? mb.GetComponentInChildren<PlayerSkillManager>();
+            _playerStats  = mb.GetComponent<PlayerStats>()
+                         ?? mb.GetComponentInParent<PlayerStats>();
         }
 
         BuildGridButtons();
+        // Default to first unlocked skill so the preview isn't blank on spawn
+        if (_skillManager != null)
+        {
+            CharacterData character = GameSession.Instance?.SelectedCharacter;
+            var classSkills = ClassSkillConfig.GetSkillsForCharacter(character);
+            foreach (SkillType s in classSkills)
+            {
+                if (_skillManager.IsSkillUnlocked(s)) { _caster.SetSelectedSkill(s); break; }
+            }
+        }
         UpdateSelectedIcon();
     }
 
@@ -45,8 +59,13 @@ public class SkillSelectorUI : MonoBehaviour, IPointerClickHandler
 
     void Update()
     {
+        if (Input.GetMouseButtonDown(2)) ToggleSkillGrid();
         HandleKeyBinding();
         UpdateSelectedIcon();
+
+        // Retry building if first attempt ran before PlayerSkillManager was ready
+        if (_caster != null && _generatedGridButtons.Count == 0)
+            TryBuildGridButtons();
 
         // Refresh grid button visibility when skills get unlocked
         foreach (SkillGridButton btn in _generatedGridButtons)
@@ -63,21 +82,39 @@ public class SkillSelectorUI : MonoBehaviour, IPointerClickHandler
 
     // ── Grid generation ───────────────────────────────────────────────────────
 
+    void TryBuildGridButtons()
+    {
+        // Resolve _skillManager late if it was null during SetSkillCaster
+        if (_skillManager == null && _caster is MonoBehaviour mb)
+        {
+            _skillManager = mb.GetComponentInParent<PlayerSkillManager>();
+            if (_skillManager == null) _skillManager = mb.GetComponentInChildren<PlayerSkillManager>();
+        }
+        if (_skillManager != null) BuildGridButtons();
+    }
+
     void BuildGridButtons()
     {
-        if (skillGridButtonPrefab == null || gridContainer == null || _skillManager == null) return;
+        if (skillGridButtonPrefab == null || gridContainer == null || _skillManager == null)
+        {
+            Debug.Log($"[SkillGrid] BuildGridButtons bailed — prefab={skillGridButtonPrefab != null} container={gridContainer != null} mgr={_skillManager != null}");
+            return;
+        }
 
         // Clear old
         foreach (SkillGridButton btn in _generatedGridButtons)
             if (btn != null) Destroy(btn.gameObject);
         _generatedGridButtons.Clear();
 
-        // Spawn one button per skill the character's class can use
         CharacterData character = GameSession.Instance?.SelectedCharacter;
         List<SkillType> classSkills = ClassSkillConfig.GetSkillsForCharacter(character);
+        Debug.Log($"[SkillGrid] Building for class={character?.GetClassName()} skillCount={classSkills?.Count}");
 
         foreach (SkillType skill in classSkills)
         {
+            bool unlocked = _skillManager.IsSkillUnlocked(skill);
+            Debug.Log($"[SkillGrid] Skill {skill} unlocked={unlocked}");
+
             GameObject go  = Instantiate(skillGridButtonPrefab, gridContainer);
             SkillGridButton btn = go.GetComponent<SkillGridButton>();
             if (btn == null) continue;
@@ -89,6 +126,8 @@ public class SkillSelectorUI : MonoBehaviour, IPointerClickHandler
 
             _generatedGridButtons.Add(btn);
         }
+
+        Debug.Log($"[SkillGrid] Generated {_generatedGridButtons.Count} buttons");
     }
 
     // ── Skill selection ───────────────────────────────────────────────────────
@@ -122,7 +161,6 @@ public class SkillSelectorUI : MonoBehaviour, IPointerClickHandler
     void BindHoveredSkill(KeyCode key)
     {
         _caster.BindSkill(key, _hoveredSkill);
-        _caster.SetSelectedSkill(_hoveredSkill);
         UpdateSelectedIcon();
     }
 
@@ -130,7 +168,8 @@ public class SkillSelectorUI : MonoBehaviour, IPointerClickHandler
     {
         if (_caster == null || selectedSkillIcon == null) return;
         SkillData data = _skillManager?.GetSkillData(_caster.CurrentSelectedSkill);
-        selectedSkillIcon.sprite  = data?.skillIcon;
-        selectedSkillIcon.enabled = data?.skillIcon != null;
+        Sprite icon = data?.skillIcon ?? defaultSkillIcon;
+        selectedSkillIcon.sprite  = icon;
+        selectedSkillIcon.enabled = true;
     }
 }

@@ -1,11 +1,21 @@
 using UnityEngine;
 
+public enum SkillCategory
+{
+    MagicAttack,
+    Melee,
+    Buff,
+    Debuff,
+    Control
+}
+
 [CreateAssetMenu(fileName = "New Skill", menuName = "ARPG/Skill")]
 public class SkillData : ScriptableObject
 {
     [Header("Basic Info")]
     public string skillName;
     public SkillType skillType;
+    public SkillCategory skillCategory;
     public Sprite skillIcon;
 
     [TextArea]

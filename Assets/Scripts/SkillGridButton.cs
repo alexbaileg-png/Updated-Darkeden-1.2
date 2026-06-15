@@ -15,6 +15,10 @@ public class SkillGridButton : MonoBehaviour, IPointerEnterHandler, IPointerExit
     [Header("Icon")]
     public Image iconImage;
 
+    [Header("Visuals")]
+    public Color unlockedColor = Color.white;
+    public Color lockedColor   = new Color(0.4f, 0.4f, 0.4f, 1f);
+
     void Start()
     {
         if (iconImage == null)

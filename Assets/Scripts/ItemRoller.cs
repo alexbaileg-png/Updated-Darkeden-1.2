@@ -15,6 +15,7 @@ public static class ItemRoller
         }
 
         ItemData rolledItem = Object.Instantiate(baseItem);
+        rolledItem.runtimeId = System.Guid.NewGuid().ToString();
 
         rolledItem.rarity = RollRarity();
 

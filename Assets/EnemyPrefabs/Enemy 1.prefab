@@ -245,6 +245,7 @@ GameObject:
   - component: {fileID: 8873388908105989821}
   - component: {fileID: 5583362921374742940}
   - component: {fileID: 2719033796391859010}
+  - component: {fileID: 3031236541679997659}
   m_Layer: 0
   m_Name: Enemy 1
   m_TagString: Untagged
@@ -360,8 +361,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20984d183cbc2494ea5311b2ab5b39cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
-  _componentIndexCache: 255
-  _addedNetworkObject: {fileID: 0}
+  _componentIndexCache: 0
+  _addedNetworkObject: {fileID: 3031236541679997659}
   _networkObjectCache: {fileID: 0}
   maxHealth: 200
   xpReward: 20000
@@ -379,8 +380,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59e64615f2d75b24597ecb4187b1096d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
-  _componentIndexCache: 255
-  _addedNetworkObject: {fileID: 0}
+  _componentIndexCache: 1
+  _addedNetworkObject: {fileID: 3031236541679997659}
   _networkObjectCache: {fileID: 0}
   moveSpeed: 1
   chaseRange: 30
@@ -441,17 +442,17 @@ MonoBehaviour:
   defaultGroundLootPrefab: {fileID: 0}
   possibleDrops:
   - item: {fileID: 11400000, guid: 63435b7e2f30bbf47a66f146d45c93d5, type: 2}
-    dropChance: 5
+    dropChance: 80
   - item: {fileID: 11400000, guid: fdbfad13e6bac824caab746e9433458d, type: 2}
-    dropChance: 5
+    dropChance: 80
   - item: {fileID: 11400000, guid: 4ff8746adb6320d4fbd7a0ccd0687f74, type: 2}
-    dropChance: 5
+    dropChance: 80
   - item: {fileID: 11400000, guid: d3ab716537d595f4598a8bab0d6acfca, type: 2}
-    dropChance: 5
+    dropChance: 80
   - item: {fileID: 11400000, guid: 1f1bfaa7121857b4c911a37f58037dd9, type: 2}
-    dropChance: 5
+    dropChance: 80
   - item: {fileID: 11400000, guid: 43d318145df03cd4fb63876179fbbc8f, type: 2}
-    dropChance: 5
+    dropChance: 80
   - item: {fileID: 11400000, guid: dbe6450ff3be25147b8b53151ddb8693, type: 2}
     dropChance: 100
   - item: {fileID: 11400000, guid: bf6c0cc6ee4dfe1499b6c0d9e365e940, type: 2}
@@ -469,6 +470,22 @@ MonoBehaviour:
   - item: {fileID: 11400000, guid: 2523f8b7bcd4c354daa5cda8dbd2afd9, type: 2}
     dropChance: 90
   - item: {fileID: 11400000, guid: 3f71a1f2a341c4849935e764994d4ab0, type: 2}
+    dropChance: 80.2
+  - item: {fileID: 11400000, guid: 819cc88ba1f47ee4391718e7b5bc04a4, type: 2}
+    dropChance: 80.2
+  - item: {fileID: 11400000, guid: a9bd43cfb28bf4b4a8c59861dbeb602c, type: 2}
+    dropChance: 80.2
+  - item: {fileID: 11400000, guid: 4ae1d7b4928fb5a48946d1deed0e1be2, type: 2}
+    dropChance: 80.2
+  - item: {fileID: 11400000, guid: 5711f2a35d486524593e536ee64f8cc6, type: 2}
+    dropChance: 80.2
+  - item: {fileID: 11400000, guid: d7f536b04d313bc418f97fae2d6b0e1b, type: 2}
+    dropChance: 80.2
+  - item: {fileID: 11400000, guid: 712d7fb86b2222043b6525f67aa23817, type: 2}
+    dropChance: 80.2
+  - item: {fileID: 11400000, guid: e1c588fd195f9b041a1a456f22ce1ec6, type: 2}
+    dropChance: 80.2
+  - item: {fileID: 11400000, guid: d7cd9664c7856de47ab4af7e7f732168, type: 2}
     dropChance: 80.2
   maxDrops: 5
   dropScatterRadius: 1.2
@@ -496,6 +513,63 @@ CapsuleCollider:
   m_Height: 1
   m_Direction: 1
   m_Center: {x: 0, y: 0.5, z: 0}
+--- !u!114 &3031236541679997659
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1767432769423197496}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26b716c41e9b56b4baafaf13a523ba2e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: FishNet.Runtime::FishNet.Object.NetworkObject
+  _localLevelOfDetailCalculationType: 0
+  _useLevelOfDetail: 0
+  _useRootLevelOfDetail: 1
+  NetworkObserver: {fileID: 0}
+  _enablePrediction: 0
+  _predictionType: 0
+  _localReconcileCorrectionType: 2
+  _graphicalObject: {fileID: 0}
+  _detachGraphicalObject: 0
+  _enableStateForwarding: 1
+  _networkTransform: {fileID: 0}
+  _ownerInterpolation: 1
+  _ownerSmoothedProperties: 255
+  _adaptiveInterpolation: 3
+  _spectatorSmoothedProperties: 255
+  _spectatorInterpolation: 2
+  _enableTeleport: 0
+  _teleportThreshold: 1
+  <PrefabId>k__BackingField: 65535
+  <SpawnableCollectionId>k__BackingField: 0
+  <AssetPathHash>k__BackingField: 2517617719273881277
+  SceneId: 0
+  SerializedTransformProperties:
+    Position: {x: 0, y: 0, z: 0}
+    Rotation: {x: 0, y: 0, z: 0, w: 0}
+    Scale: {x: 0, y: 0, z: 0}
+    IsValid: 0
+  <IsNested>k__BackingField: 0
+  WasActiveDuringEdit: 0
+  WasActiveDuringEdit_Set1: 1
+  <ComponentIndex>k__BackingField: 0
+  <PredictedSpawn>k__BackingField: {fileID: 0}
+  <PredictedOwner>k__BackingField: {fileID: 0}
+  NetworkBehaviours: []
+  InitializedParentNetworkBehaviour: {fileID: 0}
+  InitializedNestedNetworkObjects: []
+  RuntimeParentNetworkBehaviour: {fileID: 0}
+  RuntimeChildNetworkBehaviours: []
+  _isNetworked: 1
+  _isSpawnable: 1
+  _isGlobal: 0
+  _initializeOrder: 0
+  _preventDespawnOnDisconnect: 0
+  _defaultDespawnType: 0
+  _initializedTimestamp: 0
 --- !u!1 &1840938806691661711
 GameObject:
   m_ObjectHideFlags: 0
@@ -599,8 +673,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20984d183cbc2494ea5311b2ab5b39cf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
-  _componentIndexCache: 255
-  _addedNetworkObject: {fileID: 0}
+  _componentIndexCache: 2
+  _addedNetworkObject: {fileID: 3031236541679997659}
   _networkObjectCache: {fileID: 0}
   maxHealth: 50
   xpReward: 25

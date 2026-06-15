@@ -64,6 +64,9 @@ public class ItemData : ScriptableObject
     [Header("Save ID")]
     public string itemId;
 
+    // Unique key assigned at runtime to each rolled instance — not saved to disk
+    [System.NonSerialized] public string runtimeId;
+
     [Header("Faction")]
     public FactionRestriction factionRestriction = FactionRestriction.Any;
 

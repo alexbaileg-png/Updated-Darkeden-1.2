@@ -20,7 +20,11 @@ public enum SkillType
 
     // ── Soldier (placeholder) ─────────────────────────────────────────────────
     // ── Enchanter (placeholder) ───────────────────────────────────────────────
-    // ── BloodKnight (placeholder) ─────────────────────────────────────────────
+    // ── BloodKnight ───────────────────────────────────────────────────────────
+    BloodyTalons,
+    BloodNova,
+    BloodArmor,
+    CrimsonCyclone,
     // ── Shadow (placeholder) ──────────────────────────────────────────────────
     // ── Sorcerer (placeholder) ────────────────────────────────────────────────
 }

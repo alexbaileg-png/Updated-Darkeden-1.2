@@ -46,11 +46,10 @@ public class SkillTreeButton : MonoBehaviour, IPointerEnterHandler, IPointerExit
         if (skillManager == null || playerStats == null)
             return;
 
-        // Hide skill entirely if it doesn't belong to this character's class
+        // Visibility is controlled by SkillTreeUI tabs — don't override it here
         CharacterData character = GameSession.Instance?.SelectedCharacter;
         bool classCanUseSkill = character != null && ClassSkillConfig.CanUseSkill(character, skillType);
-        gameObject.SetActive(classCanUseSkill);
-        if (!classCanUseSkill) return;
+        if (!classCanUseSkill) { gameObject.SetActive(false); return; }
 
         SkillData data = skillManager.GetSkillData(skillType);
         if (data == null) return;

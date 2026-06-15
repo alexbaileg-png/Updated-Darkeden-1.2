@@ -209,6 +209,9 @@ public class PlayerStats : NetworkBehaviour, IDamageable
 
         ISkillCaster skillCaster = EnableClassSkillCaster();
 
+        CharacterPersistenceManager persistence = FindObjectOfType<CharacterPersistenceManager>(true);
+        if (persistence != null) persistence.skillCaster = skillCaster;
+
         SkillSelectorUI skillSelector = FindObjectOfType<SkillSelectorUI>(true);
         if (skillSelector != null) skillSelector.SetSkillCaster(skillCaster);
 
@@ -272,31 +275,45 @@ public class PlayerStats : NetworkBehaviour, IDamageable
     {
         string className = GameSession.Instance?.SelectedCharacter?.GetClassName() ?? "";
 
-        SwordmasterSkillCaster swordmaster = GetComponent<SwordmasterSkillCaster>();
-        HealerSkillCaster      healer      = GetComponent<HealerSkillCaster>();
-        VampireSkillCaster     vampire     = GetComponent<VampireSkillCaster>();
+        SwordmasterSkillCaster[]  swordmasters  = GetComponentsInChildren<SwordmasterSkillCaster>(true);
+        HealerSkillCaster[]       healers       = GetComponentsInChildren<HealerSkillCaster>(true);
+        VampireSkillCaster[]      vampires      = GetComponentsInChildren<VampireSkillCaster>(true);
+        BloodKnightSkillCaster[]  bloodKnights  = GetComponentsInChildren<BloodKnightSkillCaster>(true);
+        PlayerProjectileAttack[]  projectiles   = GetComponentsInChildren<PlayerProjectileAttack>(true);
 
-        if (swordmaster != null) swordmaster.enabled = false;
-        if (healer      != null) healer.enabled      = false;
-        if (vampire     != null) vampire.enabled      = false;
+        foreach (var c in swordmasters) c.enabled = false;
+        foreach (var c in healers)      c.enabled = false;
+        foreach (var c in vampires)     c.enabled = false;
+        foreach (var c in bloodKnights) c.enabled = false;
+        foreach (var c in projectiles)  c.enabled = false;
 
         if (faction == PlayerFaction.Vampire)
         {
-            if (vampire != null) vampire.enabled = true;
-            return vampire;
+            var active = vampires.Length > 0 ? vampires[vampires.Length - 1] : null;
+            if (active != null) active.enabled = true;
+            return active;
         }
 
         switch (className)
         {
             case "Swordmaster":
-                if (swordmaster != null) swordmaster.enabled = true;
-                return swordmaster;
+            {
+                var active = swordmasters.Length > 0 ? swordmasters[swordmasters.Length - 1] : null;
+                if (active != null) active.enabled = true;
+                return active;
+            }
             case "Healer":
-                if (healer != null) healer.enabled = true;
-                return healer;
+            {
+                var active = healers.Length > 0 ? healers[healers.Length - 1] : null;
+                if (active != null) active.enabled = true;
+                return active;
+            }
             default:
-                if (swordmaster != null) swordmaster.enabled = true;
-                return swordmaster;
+            {
+                var active = swordmasters.Length > 0 ? swordmasters[swordmasters.Length - 1] : null;
+                if (active != null) active.enabled = true;
+                return active;
+            }
         }
     }
 

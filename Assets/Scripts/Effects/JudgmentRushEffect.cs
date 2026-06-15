@@ -22,9 +22,6 @@ public class JudgmentRushEffect : MonoBehaviour
     [Tooltip("The main slash mesh child. Leave null to use this object's transform.")]
     public Transform slashMesh;
 
-    [Tooltip("Optional glow/trail particles parented to this prefab.")]
-    public ParticleSystem[] burstParticles;
-
     // Set by SwordmasterSkillCaster after Instantiate
     [HideInInspector] public float rushDistance = 8f;
 
@@ -34,24 +31,18 @@ public class JudgmentRushEffect : MonoBehaviour
 
     void Awake()
     {
+        // Zero out immediately so nothing is visible before Start configures the scale
+        Transform target = slashMesh != null ? slashMesh : transform;
+        target.localScale = Vector3.zero;
+    }
+
+    void Start()
+    {
         Transform target = slashMesh != null ? slashMesh : transform;
 
-        // Length (Z) matches the dash distance; width and height are fixed
         _fullScale = new Vector3(widthScale, heightScale, rushDistance);
-        target.localScale = Vector3.zero;
-
         _renderers = target.GetComponentsInChildren<Renderer>();
 
-        // Fire burst particles immediately
-        foreach (var ps in burstParticles)
-        {
-            if (ps != null)
-            {
-                var main = ps.main;
-                main.loop = false;
-                ps.Play();
-            }
-        }
 
         Destroy(gameObject, lifetime);
         StartCoroutine(AnimateEffect(target));

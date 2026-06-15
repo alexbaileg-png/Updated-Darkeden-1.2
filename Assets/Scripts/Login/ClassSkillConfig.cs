@@ -20,7 +20,10 @@ public static class ClassSkillConfig
         },
         { "Swordmaster", new List<SkillType>
             {
-                // Add Swordmaster skills here as they are created
+                SkillType.JudgmentRush,
+                SkillType.Consecration,
+                SkillType.AegisOfFaith,
+                SkillType.RadiantFlurry,
             }
         },
         { "Soldier", new List<SkillType>
@@ -34,25 +37,16 @@ public static class ClassSkillConfig
             }
         },
 
-        // ── Vampire Bloodlines ────────────────────────────────────────────────
-        { "BloodKnight", new List<SkillType>
+        // ── Vampire ───────────────────────────────────────────────────────────
+        { "Vampire", new List<SkillType>
             {
-                // Add Blood Knight skills here as they are created
-            }
-        },
-        { "Shadow", new List<SkillType>
-            {
-                // Add Shadow skills here as they are created
-            }
-        },
-        { "Sorcerer", new List<SkillType>
-            {
-                // Add Sorcerer skills here as they are created
-            }
-        },
-        { "Dominator", new List<SkillType>
-            {
-                // Add Dominator skills here as they are created
+                SkillType.DarkBolt,
+                SkillType.BloodDrain,
+                SkillType.BloodFog,
+                SkillType.VoidBurst,
+                SkillType.BloodyTalons,
+                SkillType.BloodArmor,
+                SkillType.CrimsonCyclone,
             }
         },
     };

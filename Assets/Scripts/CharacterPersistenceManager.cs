@@ -11,6 +11,9 @@ public class CharacterPersistenceManager : MonoBehaviour
     public PlayerSkillManager playerSkillManager;
     public Transform playerTransform;
 
+    // Set at runtime by PlayerStats after enabling the correct caster
+    [System.NonSerialized] public ISkillCaster skillCaster;
+
     [Header("Save Settings")]
     public string saveFileName = "player_character.json";
 
@@ -85,6 +88,9 @@ public class CharacterPersistenceManager : MonoBehaviour
 
         data.hasReceivedStartingItems = playerStats.hasReceivedStartingItems;
 
+        if (skillCaster != null)
+            data.keyBindings = skillCaster.GetBindings();
+
         if (playerTransform != null)
         {
             data.positionX = playerTransform.position.x;
@@ -94,6 +100,14 @@ public class CharacterPersistenceManager : MonoBehaviour
 
         string json = JsonUtility.ToJson(data, true);
         File.WriteAllText(SavePath, json);
+
+        // Sync level back to cloud account data so character select shows correct level
+        CharacterData cloudChar = GameSession.Instance?.SelectedCharacter;
+        if (cloudChar != null && cloudChar.level != data.level)
+        {
+            cloudChar.level = data.level;
+            _ = CloudDataService.SaveAccountAsync(GameSession.Instance.AccountData);
+        }
 
         Debug.Log("Character saved to: " + SavePath);
     }
@@ -146,6 +160,9 @@ public class CharacterPersistenceManager : MonoBehaviour
 
         if (playerGold != null)
             playerGold.gold = data.gold;
+
+        if (skillCaster != null && data.keyBindings != null)
+            skillCaster.LoadBindings(data.keyBindings);
 
         if (playerTransform != null)
         {

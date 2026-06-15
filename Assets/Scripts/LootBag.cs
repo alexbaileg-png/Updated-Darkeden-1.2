@@ -69,7 +69,6 @@ public class LootBag : NetworkBehaviour
     public override void OnStartServer()
     {
         base.OnStartServer();
-        ServerManager.Spawn(gameObject);
         Invoke(nameof(ServerDespawn), despawnTime);
     }
 
@@ -99,7 +98,7 @@ public class LootBag : NetworkBehaviour
         items.Clear();
         foreach (NetworkLootEntry entry in _networkItems)
         {
-            ItemData data = ItemRegistry.Instance != null ? ItemRegistry.Instance.Get(entry.itemName) : null;
+            ItemData data = ItemRegistry.Get(entry.itemName);
             if (data != null)
                 items.Add(new LootBagEntry(data, entry.quantity));
         }
@@ -111,7 +110,7 @@ public class LootBag : NetworkBehaviour
     {
         if (!IsServerStarted || item == null) return false;
 
-        string key = ItemRegistry.Instance != null ? ItemRegistry.Instance.GetKey(item) : item.name;
+        string key = ItemRegistry.GetKey(item);
 
         if (item.isStackable)
         {
@@ -133,7 +132,7 @@ public class LootBag : NetworkBehaviour
     public bool IsFullFor(ItemData item)
     {
         if (item == null) return true;
-        string key = ItemRegistry.Instance != null ? ItemRegistry.Instance.GetKey(item) : item.name;
+        string key = ItemRegistry.GetKey(item);
         if (item.isStackable)
             foreach (NetworkLootEntry e in _networkItems)
                 if (e.itemName == key) return false;
@@ -154,7 +153,7 @@ public class LootBag : NetworkBehaviour
         if (index < 0 || index >= _networkItems.Count) return;
 
         NetworkLootEntry entry = _networkItems[index];
-        ItemData item = ItemRegistry.Instance != null ? ItemRegistry.Instance.Get(entry.itemName) : null;
+        ItemData item = ItemRegistry.Get(entry.itemName);
         if (item == null) return;
 
         if (entry.quantity > 1)
@@ -184,7 +183,7 @@ public class LootBag : NetworkBehaviour
     [TargetRpc]
     void TargetAddItemToInventory(NetworkConnection conn, string itemName, int quantity)
     {
-        ItemData item = ItemRegistry.Instance != null ? ItemRegistry.Instance.Get(itemName) : null;
+        ItemData item = ItemRegistry.Get(itemName);
         if (item == null) return;
 
         InventoryGrid grid = FindObjectOfType<InventoryGrid>(true);

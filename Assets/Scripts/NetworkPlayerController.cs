@@ -118,6 +118,14 @@ public class NetworkPlayerController : NetworkBehaviour
         _moving = true;
     }
 
+    [ServerRpc]
+    public void ServerStopMovement()
+    {
+        _moving = false;
+        _targetPosition = transform.position;
+        if (_syncMoving.Value) { _syncMoving.Value = false; SetMoveAnimation(false); }
+    }
+
     void MoveOnServer()
     {
         if (!_moving)

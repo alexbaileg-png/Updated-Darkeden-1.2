@@ -26,6 +26,11 @@ public class EnemyHealth : NetworkBehaviour, IDamageable
     private Animator       _animator;
     private LootDropTable  _lootDropTable;
 
+    void Awake()
+    {
+        _lootDropTable = GetComponent<LootDropTable>();
+    }
+
     public override void OnStartServer()
     {
         base.OnStartServer();
@@ -39,9 +44,8 @@ public class EnemyHealth : NetworkBehaviour, IDamageable
         _currentHealth.OnChange += OnHealthChanged;
         _isDead.OnChange        += OnDeadChanged;
 
-        _enemyAI      = GetComponent<EnemyAI>();
-        _animator     = GetComponentInChildren<Animator>();
-        _lootDropTable = GetComponent<LootDropTable>();
+        _enemyAI  = GetComponent<EnemyAI>();
+        _animator = GetComponentInChildren<Animator>();
 
         UpdateHealthBar(_currentHealth.Value);
     }
@@ -103,7 +107,7 @@ public class EnemyHealth : NetworkBehaviour, IDamageable
         }
 
         if (_lootDropTable != null)
-            _lootDropTable.DropLoot();
+            _lootDropTable.DropLoot(attacker);
 
         if (gameObject.activeInHierarchy)
             StartCoroutine(DespawnAfterDeath());

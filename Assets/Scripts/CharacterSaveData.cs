@@ -24,6 +24,8 @@ public class CharacterSaveData
 
     public bool hasReceivedStartingItems;
 
+    public SavedKeyBindings keyBindings = new SavedKeyBindings();
+
     public float positionX;
     public float positionY;
     public float positionZ;
@@ -35,4 +37,17 @@ public class SavedSkillData
     public string skillType;
     public bool unlocked;
     public int skillLevel;
+}
+
+[Serializable]
+public class SavedKeyBinding
+{
+    public string key;                      // e.g. "F8"
+    public List<string> skills = new List<string>(); // e.g. ["DarkBolt","BloodyTalons"]
+}
+
+[Serializable]
+public class SavedKeyBindings
+{
+    public List<SavedKeyBinding> bindings = new List<SavedKeyBinding>();
 }

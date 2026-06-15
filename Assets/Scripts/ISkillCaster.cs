@@ -9,4 +9,6 @@ public interface ISkillCaster
     void BindSkill(UnityEngine.KeyCode key, SkillType skill);
     float GetCooldownRemaining();
     float GetCurrentSkillCooldown();
+    SavedKeyBindings GetBindings();
+    void LoadBindings(SavedKeyBindings saved);
 }

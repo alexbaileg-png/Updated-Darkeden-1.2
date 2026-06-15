@@ -4845,6 +4845,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2959125987129688961}
+  - component: {fileID: -4312335583939436561}
   m_Layer: 0
   m_Name: BloodFog
   m_TagString: Untagged
@@ -4868,3 +4869,19 @@ Transform:
   - {fileID: 7560676672605954039}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-4312335583939436561
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8553355492850372897}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a866cce95847618419b661b0cc78c6df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BloodFogArea
+  radius: 8
+  duration: 20
+  casterObject: {fileID: 0}
+  enemyDetectionMultiplier: 0.15

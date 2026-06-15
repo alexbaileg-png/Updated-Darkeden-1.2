@@ -1,13 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
-/// <summary>
-/// Dynamically builds the skill tree at runtime based on the character's class.
-/// Drop a SkillTreeButton prefab into skillButtonPrefab and point buttonContainer
-/// at a child with a GridLayoutGroup — buttons are generated automatically.
-/// No manually placed buttons needed.
-/// </summary>
 public class SkillTreeUI : MonoBehaviour
 {
     [Header("References — set in Inspector")]
@@ -18,39 +13,84 @@ public class SkillTreeUI : MonoBehaviour
     public TMP_Text skillPointsText;
 
     [Header("Dynamic Generation")]
-    [Tooltip("Prefab with SkillTreeButton component. One will be spawned per skill.")]
     public GameObject skillButtonPrefab;
-    [Tooltip("Parent transform with a GridLayoutGroup. Buttons are spawned here.")]
     public Transform buttonContainer;
 
-    // Live list of generated buttons
+    [Header("Category Tabs")]
+    public Button tabMagicAttack;
+    public Button tabMelee;
+    public Button tabBuff;
+    public Button tabDebuff;
+    public Button tabControl;
+
+    [Header("Tab Colors")]
+    public Color tabActiveColor   = Color.white;
+    public Color tabInactiveColor = new Color(0.5f, 0.5f, 0.5f);
+
     private readonly List<SkillTreeButton> _generatedButtons = new List<SkillTreeButton>();
     private string _lastBuiltClass = "";
+    private SkillCategory _activeCategory = SkillCategory.Melee;
 
     void OnEnable()
     {
+        SetupTabListeners();
         BuildSkillButtons();
-        RefreshAll();
+        SelectTab(_activeCategory);
     }
 
     void Update()
     {
-        // Rebuild if character class changed (e.g. after character swap)
         string currentClass = GameSession.Instance?.SelectedCharacter?.GetClassName() ?? "";
         if (currentClass != _lastBuiltClass)
+        {
             BuildSkillButtons();
+            SelectTab(_activeCategory);
+        }
 
         RefreshAll();
     }
 
-    /// <summary>
-    /// Destroys existing buttons and spawns fresh ones for the current character's class.
-    /// </summary>
+    void SetupTabListeners()
+    {
+        if (tabMagicAttack != null) { tabMagicAttack.onClick.RemoveAllListeners(); tabMagicAttack.onClick.AddListener(() => SelectTab(SkillCategory.MagicAttack)); }
+        if (tabMelee       != null) { tabMelee.onClick.RemoveAllListeners();       tabMelee.onClick.AddListener(()       => SelectTab(SkillCategory.Melee));       }
+        if (tabBuff        != null) { tabBuff.onClick.RemoveAllListeners();        tabBuff.onClick.AddListener(()        => SelectTab(SkillCategory.Buff));        }
+        if (tabDebuff      != null) { tabDebuff.onClick.RemoveAllListeners();      tabDebuff.onClick.AddListener(()      => SelectTab(SkillCategory.Debuff));      }
+        if (tabControl     != null) { tabControl.onClick.RemoveAllListeners();     tabControl.onClick.AddListener(()     => SelectTab(SkillCategory.Control));     }
+    }
+
+    void SelectTab(SkillCategory category)
+    {
+        _activeCategory = category;
+
+        // Highlight active tab
+        SetTabColor(tabMagicAttack, category == SkillCategory.MagicAttack);
+        SetTabColor(tabMelee,       category == SkillCategory.Melee);
+        SetTabColor(tabBuff,        category == SkillCategory.Buff);
+        SetTabColor(tabDebuff,      category == SkillCategory.Debuff);
+        SetTabColor(tabControl,     category == SkillCategory.Control);
+
+        // Show only buttons matching this category
+        foreach (SkillTreeButton btn in _generatedButtons)
+        {
+            if (btn == null) continue;
+            SkillData data = skillManager?.GetSkillData(btn.skillType);
+            bool show = data != null && data.skillCategory == category;
+            btn.gameObject.SetActive(show);
+        }
+    }
+
+    void SetTabColor(Button tab, bool active)
+    {
+        if (tab == null) return;
+        Image img = tab.GetComponent<Image>();
+        if (img != null) img.color = active ? tabActiveColor : tabInactiveColor;
+    }
+
     public void BuildSkillButtons()
     {
         if (skillButtonPrefab == null || buttonContainer == null) return;
 
-        // Clear old buttons
         foreach (SkillTreeButton btn in _generatedButtons)
             if (btn != null) Destroy(btn.gameObject);
         _generatedButtons.Clear();
@@ -67,7 +107,7 @@ public class SkillTreeUI : MonoBehaviour
             SkillTreeButton btn = go.GetComponent<SkillTreeButton>();
             if (btn == null) continue;
 
-            btn.skillType   = skillType;
+            btn.skillType    = skillType;
             btn.skillManager = skillManager;
             btn.playerStats  = playerStats;
             btn.skillTreeUI  = this;
@@ -83,17 +123,17 @@ public class SkillTreeUI : MonoBehaviour
 
         foreach (SkillTreeButton btn in _generatedButtons)
             if (btn != null) btn.Refresh();
+
+        // Reapply tab filter after refresh so buttons don't all turn visible again
+        SelectTab(_activeCategory);
     }
 
-    /// <summary>
-    /// Called after the network player spawns so the skill tree knows which
-    /// PlayerSkillManager and PlayerStats to talk to.
-    /// </summary>
     public void WirePlayer(PlayerSkillManager psm, PlayerStats ps)
     {
         skillManager = psm;
         playerStats  = ps;
         BuildSkillButtons();
+        SelectTab(_activeCategory);
         RefreshAll();
     }
 }

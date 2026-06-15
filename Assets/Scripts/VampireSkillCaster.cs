@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using FishNet.Object;
 using UnityEngine;
 
@@ -8,11 +9,18 @@ using UnityEngine;
 /// </summary>
 public class VampireSkillCaster : NetworkBehaviour, ISkillCaster
 {
-    [Header("Keybinds")]
-    public SkillType f8Skill  = SkillType.DarkBolt;
-    public SkillType f9Skill  = SkillType.BloodDrain;
-    public SkillType f10Skill = SkillType.BloodFog;
-    public SkillType f11Skill = SkillType.VoidBurst;
+    // Each F-key holds a list of skills — pressing the key cycles through them
+    private readonly Dictionary<KeyCode, List<SkillType>> _keyBindings = new Dictionary<KeyCode, List<SkillType>>
+    {
+        { KeyCode.F8,  new List<SkillType>() },
+        { KeyCode.F9,  new List<SkillType>() },
+        { KeyCode.F10, new List<SkillType>() },
+        { KeyCode.F11, new List<SkillType>() },
+    };
+    private readonly Dictionary<KeyCode, int> _keyIndex = new Dictionary<KeyCode, int>
+    {
+        { KeyCode.F8, 0 }, { KeyCode.F9, 0 }, { KeyCode.F10, 0 }, { KeyCode.F11, 0 },
+    };
 
     [Header("Dark Bolt")]
     public GameObject darkBoltPrefab;
@@ -32,15 +40,25 @@ public class VampireSkillCaster : NetworkBehaviour, ISkillCaster
 
     [Header("Void Burst")]
     public GameObject voidBurstEffectPrefab;
-    public float voidBurstBaseRadius   = 5f;
+    public float voidBurstBaseRadius     = 5f;
     public float voidBurstRadiusPerLevel = 0.3f;
 
+    [Header("Bloody Talons")]
+    public GameObject bloodyTalonsPrefab;
+    public float talonsConeAngle         = 120f;
+    public float talonsRange             = 4f;
+    public int   talonsMaxTargets        = 10;
+    public float talonsForwardOffset     = 1.5f;
+    public float talonsHeightOffset      = 0.8f;
+    public float talonsMissHeightOffset  = 1.2f;
+
     [Header("Cast Settings")]
-    public float castDelay = 0.1f;
+    public float castDelay        = 0.1f;
+    public float postCastLockTime = 0.6f;
 
     // ── Runtime ───────────────────────────────────────────────────────────────
 
-    private SkillType _selectedSkill = SkillType.DarkBolt;
+    private SkillType _selectedSkill;
     private float _nextCastTime = 0f;
     private bool _isCasting = false;
     private bool _isChanneling = false;
@@ -75,10 +93,22 @@ public class VampireSkillCaster : NetworkBehaviour, ISkillCaster
 
     void HandleSkillSelection()
     {
-        if (Input.GetKeyDown(KeyCode.F8))  _selectedSkill = f8Skill;
-        if (Input.GetKeyDown(KeyCode.F9))  _selectedSkill = f9Skill;
-        if (Input.GetKeyDown(KeyCode.F10)) _selectedSkill = f10Skill;
-        if (Input.GetKeyDown(KeyCode.F11)) _selectedSkill = f11Skill;
+        if (Input.GetKeyDown(KeyCode.F8))  CycleKey(KeyCode.F8);
+        if (Input.GetKeyDown(KeyCode.F9))  CycleKey(KeyCode.F9);
+        if (Input.GetKeyDown(KeyCode.F10)) CycleKey(KeyCode.F10);
+        if (Input.GetKeyDown(KeyCode.F11)) CycleKey(KeyCode.F11);
+    }
+
+    void CycleKey(KeyCode key)
+    {
+        if (!_keyBindings.ContainsKey(key)) return;
+        List<SkillType> list = _keyBindings[key];
+        if (list.Count == 0) return;
+
+        int idx = _keyIndex[key];
+        idx = (idx + 1) % list.Count;
+        _keyIndex[key] = idx;
+        _selectedSkill = list[idx];
     }
 
     void HandleCasting()
@@ -104,6 +134,7 @@ public class VampireSkillCaster : NetworkBehaviour, ISkillCaster
     IEnumerator CastRoutine(SkillType skill)
     {
         _isCasting = true;
+        _netController?.ServerStopMovement();
 
         // Rotate toward mouse / target
         Vector3 aimDir = GetAimDirection();
@@ -131,6 +162,10 @@ public class VampireSkillCaster : NetworkBehaviour, ISkillCaster
             yield return new WaitForSeconds(bloodDrainDuration);
             _isChanneling = false;
         }
+        else
+        {
+            yield return new WaitForSeconds(postCastLockTime);
+        }
 
         _nextCastTime = Time.time + GetCooldown(skill);
         _isCasting = false;
@@ -147,11 +182,58 @@ public class VampireSkillCaster : NetworkBehaviour, ISkillCaster
 
         switch (skill)
         {
-            case SkillType.DarkBolt:   ServerDarkBolt(casterPos, aimDir, skillPower); break;
-            case SkillType.BloodDrain: ServerStartBloodDrain(castPos, skillLevel, skillPower); break;
-            case SkillType.BloodFog:   ServerBloodFog(castPos, skillLevel); break;
-            case SkillType.VoidBurst:  ServerVoidBurst(casterPos, skillLevel, skillPower); break;
+            case SkillType.DarkBolt:     ServerDarkBolt(casterPos, aimDir, skillPower); break;
+            case SkillType.BloodDrain:   ServerStartBloodDrain(castPos, skillLevel, skillPower); break;
+            case SkillType.BloodFog:     ServerBloodFog(castPos, skillLevel); break;
+            case SkillType.VoidBurst:    ServerVoidBurst(casterPos, skillLevel, skillPower); break;
+            case SkillType.BloodyTalons: ServerBloodyTalons(casterPos, aimDir, skillLevel, skillPower); break;
         }
+    }
+
+    // ── Bloody Talons ─────────────────────────────────────────────────────────
+
+    void ServerBloodyTalons(Vector3 casterPos, Vector3 aimDir, int skillLevel, int skillPower)
+    {
+        PlayerStats stats = GetComponent<PlayerStats>();
+        int damage = stats != null ? stats.GetMeleeDamage(skillPower) : skillPower;
+        damage     = stats != null ? stats.ApplyCriticalDamage(damage) : damage;
+
+        float range    = talonsRange + (skillLevel - 1) * 0.3f;
+        float halfCone = talonsConeAngle * 0.5f;
+        int   hits     = 0;
+
+        EnemyHealth[] enemies = FindObjectsByType<EnemyHealth>(FindObjectsSortMode.None);
+        foreach (EnemyHealth enemy in enemies)
+        {
+            if (hits >= talonsMaxTargets) break;
+            if (enemy == null || enemy.IsDead()) continue;
+
+            Vector3 toEnemy = enemy.transform.position - casterPos;
+            toEnemy.y = 0f;
+            if (toEnemy.magnitude > range) continue;
+            if (Vector3.Angle(aimDir, toEnemy.normalized) > halfCone) continue;
+
+            enemy.ReceiveDamage(damage, DamageType.Melee, stats);
+
+            Vector3 fxPos = enemy.transform.position;
+            fxPos.y = talonsHeightOffset;
+            SpawnTalonsEffect(fxPos, Quaternion.LookRotation(aimDir));
+            hits++;
+        }
+
+        if (hits == 0)
+        {
+            Vector3 fxPos = casterPos + aimDir * talonsForwardOffset;
+            fxPos.y = talonsMissHeightOffset;
+            SpawnTalonsEffect(fxPos, Quaternion.LookRotation(aimDir));
+        }
+    }
+
+    [ObserversRpc]
+    void SpawnTalonsEffect(Vector3 pos, Quaternion rot)
+    {
+        if (bloodyTalonsPrefab == null) return;
+        Instantiate(bloodyTalonsPrefab, pos, rot);
     }
 
     // ── Dark Bolt ─────────────────────────────────────────────────────────────
@@ -342,12 +424,52 @@ public class VampireSkillCaster : NetworkBehaviour, ISkillCaster
     public float GetCooldownRemaining()        => Mathf.Max(0f, _nextCastTime - Time.time);
     public float GetCurrentSkillCooldown()     => GetCooldown(_selectedSkill);
     public void  SetSelectedSkill(SkillType s) => _selectedSkill = s;
+
+    public SavedKeyBindings GetBindings()
+    {
+        var saved = new SavedKeyBindings();
+        foreach (var kvp in _keyBindings)
+        {
+            var entry = new SavedKeyBinding { key = kvp.Key.ToString() };
+            foreach (var skill in kvp.Value)
+                entry.skills.Add(skill.ToString());
+            saved.bindings.Add(entry);
+        }
+        return saved;
+    }
+
+    public void LoadBindings(SavedKeyBindings saved)
+    {
+        if (saved?.bindings == null) return;
+        foreach (var entry in saved.bindings)
+        {
+            if (!System.Enum.TryParse(entry.key, out KeyCode key)) continue;
+            if (!_keyBindings.ContainsKey(key)) continue;
+            _keyBindings[key].Clear();
+            foreach (var skillStr in entry.skills)
+                if (System.Enum.TryParse(skillStr, out SkillType skill))
+                    _keyBindings[key].Add(skill);
+            _keyIndex[key] = 0;
+        }
+        // Select the first bound skill so the preview shows immediately
+        foreach (var kvp in _keyBindings)
+            if (kvp.Value.Count > 0) { _selectedSkill = kvp.Value[0]; break; }
+    }
+
     public void  BindSkill(KeyCode key, SkillType skill)
     {
-        if (key == KeyCode.F8)  f8Skill  = skill;
-        if (key == KeyCode.F9)  f9Skill  = skill;
-        if (key == KeyCode.F10) f10Skill = skill;
-        if (key == KeyCode.F11) f11Skill = skill;
+        if (!_keyBindings.ContainsKey(key)) return;
+        List<SkillType> list = _keyBindings[key];
+
+        if (list.Contains(skill))
+            list.Remove(skill); // toggle off if already bound
+        else
+        {
+            list.Add(skill);
+            // immediately select the newly bound skill and reset cycle index to it
+            _keyIndex[key] = list.Count - 1;
+            _selectedSkill = skill;
+        }
     }
 
     Vector3 GetAimDirection()

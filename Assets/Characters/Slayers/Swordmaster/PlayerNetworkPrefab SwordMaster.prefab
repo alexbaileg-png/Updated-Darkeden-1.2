@@ -22,7 +22,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 515305705555684825, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.07
+      value: 0.386
       objectReference: {fileID: 0}
     - target: {fileID: 515305705555684825, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
       propertyPath: m_LocalPosition.z
@@ -108,6 +108,22 @@ PrefabInstance:
       propertyPath: 'allSkills.Array.data[3]'
       value: 
       objectReference: {fileID: 11400000, guid: bc5ed9c2e3608aa47aa102926b249a6d, type: 2}
+    - target: {fileID: 5856355862371513842, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
+      propertyPath: m_Avatar
+      value: 
+      objectReference: {fileID: 9000000, guid: b959efd8564321947bd017699fea8d6e, type: 3}
+    - target: {fileID: 5856355862371513842, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5856355862371513842, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 231f4ef0ca648dc49b71049b4b36654a, type: 2}
+    - target: {fileID: 5875477963710170481, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
+      propertyPath: m_Center.y
+      value: 0.47
+      objectReference: {fileID: 0}
     - target: {fileID: 8507932820495756437, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
       propertyPath: SceneId
       value: 0
@@ -118,15 +134,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8507932820495756437, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
       propertyPath: _initializedTimestamp
-      value: -8584204623269492479
+      value: -8584202430763858174
       objectReference: {fileID: 0}
     - target: {fileID: 8507932820495756437, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
       propertyPath: <PrefabId>k__BackingField
-      value: 14
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 8507932820495756437, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
       propertyPath: NetworkBehaviours.Array.size
-      value: 9
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 8507932820495756437, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
       propertyPath: <AssetPathHash>k__BackingField
@@ -137,12 +153,16 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 2520307157179770321}
     - target: {fileID: 8507932820495756437, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
+      propertyPath: 'NetworkBehaviours.Array.data[9]'
+      value: 
+      objectReference: {fileID: 1145080656985466987}
+    - target: {fileID: 8507932820495756437, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
       propertyPath: SerializedTransformProperties.Position.x
       value: -0.96385
       objectReference: {fileID: 0}
     - target: {fileID: 8507932820495756437, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
       propertyPath: SerializedTransformProperties.Position.y
-      value: -0.07
+      value: 0.386
       objectReference: {fileID: 0}
     - target: {fileID: 8507932820495756437, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
       propertyPath: SerializedTransformProperties.Position.z
@@ -188,30 +208,28 @@ MonoBehaviour:
   _componentIndexCache: 8
   _addedNetworkObject: {fileID: 8101134930106415852}
   _networkObjectCache: {fileID: 8101134930106415852}
-  f8Skill: 8
-  f9Skill: 9
-  f10Skill: 10
-  f11Skill: 11
+  f8Skill: 4
+  f9Skill: 5
+  f10Skill: 6
+  f11Skill: 7
   judgmentRushEffectPrefab: {fileID: 2646870266883286036, guid: 9fa9eb3630c8fd74185b6e13610e45c4, type: 3}
   rushDistance: 10
-  rushDuration: 0.25
+  rushSpeed: 30
   rushKnockback: 3
   rushWidth: 1.2
+  rushEffectHeightOffset: -2
   consecrationEffectPrefab: {fileID: 674034227373322411, guid: 9bedcdaf15ce03b41a8657a338606800, type: 3}
   consecrationRadius: 5
-  aegisShieldEffectPrefab: {fileID: 0}
-  aegisBaseDuration: 8
+  aegisShieldEffectPrefab: {fileID: 5891093748126752186, guid: 758d72fd6faf42649931dde92dd882af, type: 3}
+  aegisBaseDuration: 180
   aegisArmorBonus: 30
   aegisResistBonus: 20
-  radiantHitEffectPrefab: {fileID: 0}
+  radiantHitEffectPrefab: {fileID: 2646870266883286036, guid: 9fa9eb3630c8fd74185b6e13610e45c4, type: 3}
   flurryRadius: 4
   flurryMaxTargets: 5
   flurryHitInterval: 0.15
-  effectHeightOffset: 0.5
-  judgmentRushDelay: 0.15
-  consecrationDelay: 0.5
-  radiantFlurryDelay: 0.15
-  aegisDelay: 0.2
+  flurryEffectHeightOffset: 2
+  castDelay: 0.1
 --- !u!114 &1145080656985466987
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -224,23 +242,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d364f62b496144458540aa221f15346, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealerSkillCaster
-  _componentIndexCache: 255
+  _componentIndexCache: 9
   _addedNetworkObject: {fileID: 8101134930106415852}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 8101134930106415852}
   f8Skill: 0
   f9Skill: 1
   f10Skill: 2
   f11Skill: 3
-  holyBoltProjectilePrefab: {fileID: 0}
+  holyBoltProjectilePrefab: {fileID: 1257221415910334472, guid: 8ba8afbc500b98d4ba911f8e98aadf8c, type: 3}
   boltSpeed: 18
   boltRange: 20
-  holyRainEffectPrefab: {fileID: 0}
+  holyRainEffectPrefab: {fileID: 9091421485519787305, guid: 95b81a83a6542fb4f91d2e664ad0784d, type: 3}
   rainRadius: 6
   rainDuration: 3
   rainTickRate: 0.5
-  holyCircleEffectPrefab: {fileID: 0}
+  rainCastRange: 12
+  holyCircleEffectPrefab: {fileID: 5195297573039092532, guid: 0a694b171e672284889ab1c6ad60723b, type: 3}
   circleRadius: 5
-  orbitEffectPrefab: {fileID: 0}
+  orbitEffectPrefab: {fileID: 4368203913174783380, guid: a0951559de10ff84c9c8e0dd76756ca6, type: 3}
   orbitDuration: 10
   orbitHealAmount: 15
   orbitTickRate: 1
@@ -274,7 +293,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b959efd8564321947bd017699fea8d6e, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -0.148
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: b959efd8564321947bd017699fea8d6e, type: 3}
       propertyPath: m_LocalPosition.z

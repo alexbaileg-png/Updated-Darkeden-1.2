@@ -9,19 +9,26 @@ using UnityEngine;
 /// </summary>
 public class SwordmasterSkillCaster : NetworkBehaviour, ISkillCaster
 {
-    [Header("Keybinds")]
-    public SkillType f8Skill  = SkillType.JudgmentRush;
-    public SkillType f9Skill  = SkillType.Consecration;
-    public SkillType f10Skill = SkillType.AegisOfFaith;
-    public SkillType f11Skill = SkillType.RadiantFlurry;
+    private readonly Dictionary<KeyCode, List<SkillType>> _keyBindings = new Dictionary<KeyCode, List<SkillType>>
+    {
+        { KeyCode.F8,  new List<SkillType>() },
+        { KeyCode.F9,  new List<SkillType>() },
+        { KeyCode.F10, new List<SkillType>() },
+        { KeyCode.F11, new List<SkillType>() },
+    };
+    private readonly Dictionary<KeyCode, int> _keyIndex = new Dictionary<KeyCode, int>
+    {
+        { KeyCode.F8, 0 }, { KeyCode.F9, 0 }, { KeyCode.F10, 0 }, { KeyCode.F11, 0 },
+    };
 
     // ── Judgment Rush ─────────────────────────────────────────────────────────
     [Header("Judgment Rush")]
     public GameObject judgmentRushEffectPrefab;   // VFX spawned along dash path
-    public float rushDistance      = 10f;
-    public float rushSpeed         = 30f;          // how fast the player moves
-    public float rushKnockback     = 3f;
-    public float rushWidth         = 1.2f;         // half-width of the line hitbox
+    public float rushDistance         = 10f;
+    public float rushSpeed            = 30f;
+    public float rushKnockback        = 3f;
+    public float rushWidth            = 1.2f;
+    public float rushEffectHeightOffset = -0.5f;  // tune in play mode
 
     // ── Consecration ─────────────────────────────────────────────────────────
     [Header("Consecration")]
@@ -38,9 +45,10 @@ public class SwordmasterSkillCaster : NetworkBehaviour, ISkillCaster
     // ── Radiant Flurry ────────────────────────────────────────────────────────
     [Header("Radiant Flurry")]
     public GameObject radiantHitEffectPrefab;     // small hit flash per target
-    public float flurryRadius       = 4f;
-    public int   flurryMaxTargets   = 5;
-    public float flurryHitInterval  = 0.15f;      // seconds between each hit
+    public float flurryRadius          = 4f;
+    public int   flurryMaxTargets      = 5;
+    public float flurryHitInterval     = 0.15f;   // seconds between each hit
+    public float flurryEffectHeightOffset = 0.3f; // tune in play mode
 
     // ── Shared ────────────────────────────────────────────────────────────────
     [Header("Cast Settings")]
@@ -51,12 +59,48 @@ public class SwordmasterSkillCaster : NetworkBehaviour, ISkillCaster
 
     public void SetSelectedSkill(SkillType skill) => _selectedSkill = skill;
 
+    public SavedKeyBindings GetBindings()
+    {
+        var saved = new SavedKeyBindings();
+        foreach (var kvp in _keyBindings)
+        {
+            var entry = new SavedKeyBinding { key = kvp.Key.ToString() };
+            foreach (var skill in kvp.Value)
+                entry.skills.Add(skill.ToString());
+            saved.bindings.Add(entry);
+        }
+        return saved;
+    }
+
+    public void LoadBindings(SavedKeyBindings saved)
+    {
+        if (saved?.bindings == null) return;
+        foreach (var entry in saved.bindings)
+        {
+            if (!System.Enum.TryParse(entry.key, out KeyCode key)) continue;
+            if (!_keyBindings.ContainsKey(key)) continue;
+            _keyBindings[key].Clear();
+            foreach (var skillStr in entry.skills)
+                if (System.Enum.TryParse(skillStr, out SkillType skill))
+                    _keyBindings[key].Add(skill);
+            _keyIndex[key] = 0;
+        }
+        foreach (var kvp in _keyBindings)
+            if (kvp.Value.Count > 0) { _selectedSkill = kvp.Value[0]; break; }
+    }
+
     public void BindSkill(KeyCode key, SkillType skill)
     {
-        if (key == KeyCode.F8)  f8Skill  = skill;
-        if (key == KeyCode.F9)  f9Skill  = skill;
-        if (key == KeyCode.F10) f10Skill = skill;
-        if (key == KeyCode.F11) f11Skill = skill;
+        if (!_keyBindings.ContainsKey(key)) return;
+        List<SkillType> list = _keyBindings[key];
+        if (list.Contains(skill))
+            list.Remove(skill);
+        else
+        {
+            list.Add(skill);
+            _keyIndex[key] = list.Count - 1;
+            _selectedSkill = skill;
+        }
     }
 
     public float GetCooldownRemaining()   => Mathf.Max(0f, _nextCastTime - Time.time);
@@ -64,7 +108,7 @@ public class SwordmasterSkillCaster : NetworkBehaviour, ISkillCaster
 
     // ── Runtime ───────────────────────────────────────────────────────────────
 
-    private SkillType _selectedSkill = SkillType.JudgmentRush;
+    private SkillType _selectedSkill;
     private float _nextCastTime  = 0f;
     private float _lastCooldown  = 0f;
     private bool  _isCasting     = false;
@@ -101,10 +145,20 @@ public class SwordmasterSkillCaster : NetworkBehaviour, ISkillCaster
 
     void HandleSkillSelection()
     {
-        if (Input.GetKeyDown(KeyCode.F8))  _selectedSkill = f8Skill;
-        if (Input.GetKeyDown(KeyCode.F9))  _selectedSkill = f9Skill;
-        if (Input.GetKeyDown(KeyCode.F10)) _selectedSkill = f10Skill;
-        if (Input.GetKeyDown(KeyCode.F11)) _selectedSkill = f11Skill;
+        if (Input.GetKeyDown(KeyCode.F8))  CycleKey(KeyCode.F8);
+        if (Input.GetKeyDown(KeyCode.F9))  CycleKey(KeyCode.F9);
+        if (Input.GetKeyDown(KeyCode.F10)) CycleKey(KeyCode.F10);
+        if (Input.GetKeyDown(KeyCode.F11)) CycleKey(KeyCode.F11);
+    }
+
+    void CycleKey(KeyCode key)
+    {
+        if (!_keyBindings.ContainsKey(key)) return;
+        List<SkillType> list = _keyBindings[key];
+        if (list.Count == 0) return;
+        int idx = (_keyIndex[key] + 1) % list.Count;
+        _keyIndex[key] = idx;
+        _selectedSkill = list[idx];
     }
 
     void HandleCasting()
@@ -137,6 +191,15 @@ public class SwordmasterSkillCaster : NetworkBehaviour, ISkillCaster
     IEnumerator CastRoutine(SkillType skill)
     {
         _isCasting = true;
+        _netController?.ServerStopMovement();
+
+        // Rotate toward aim before playing animation
+        Vector3 aimDir = GetAimDirection();
+        if (aimDir.sqrMagnitude > 0.01f)
+        {
+            _netController?.RotateVisualPublic(aimDir.normalized);
+            ServerRotateToward(aimDir.normalized);
+        }
 
         PlayCastAnimation();
         yield return new WaitForSeconds(castDelay);
@@ -146,16 +209,52 @@ public class SwordmasterSkillCaster : NetworkBehaviour, ISkillCaster
         int   manaCost   = GetManaCost(skill);
         float cooldown   = GetCooldown(skill);
 
-        // Aim direction toward mouse
-        Vector3 aimDir = GetAimDirection();
-        if (aimDir.sqrMagnitude > 0.01f && _netController != null)
-            _netController.RotateVisualPublic(aimDir.normalized);
-
         ServerCastSkill(skill, transform.position, aimDir.normalized, skillLevel, skillPower, manaCost);
 
-        _lastCooldown  = cooldown;
-        _nextCastTime  = Time.time + cooldown;
-        _isCasting     = false;
+        _lastCooldown = cooldown;
+        _nextCastTime = Time.time + cooldown;
+
+        // For skills with movement, keep _isCasting true until the movement finishes
+        float lockDuration = GetPostCastLockDuration(skill, skillLevel);
+        if (lockDuration > 0f)
+            yield return new WaitForSeconds(lockDuration);
+
+        _isCasting = false;
+    }
+
+    float GetPostCastLockDuration(SkillType skill, int skillLevel)
+    {
+        switch (skill)
+        {
+            case SkillType.RadiantFlurry:
+                int maxTargets = flurryMaxTargets + (skillLevel - 1);
+                return maxTargets * flurryHitInterval;
+            default:
+                return 0f;
+        }
+    }
+
+    // ── Rotation RPCs ─────────────────────────────────────────────────────────
+
+    [ServerRpc]
+    void ServerRotateToward(Vector3 direction)
+    {
+        if (direction.sqrMagnitude > 0.01f)
+            RpcRotateVisual(direction);
+    }
+
+    // Used for initial cast rotation — owner already rotated locally so excluded
+    [ObserversRpc(ExcludeOwner = true)]
+    void RpcRotateVisual(Vector3 direction)
+    {
+        _netController?.RotateVisualPublic(direction);
+    }
+
+    // Used during Radiant Flurry — owner hasn't rotated yet so include everyone
+    [ObserversRpc]
+    void RpcRotateVisualAll(Vector3 direction)
+    {
+        _netController?.RotateVisualPublic(direction);
     }
 
     // ── Server-side skill execution ───────────────────────────────────────────
@@ -191,23 +290,28 @@ public class SwordmasterSkillCaster : NetworkBehaviour, ISkillCaster
         transform.position = endPos;
 
         // Spawn VFX at midpoint of the dash
-        SpawnEffectOnClients(judgmentRushEffectPrefab, casterPos + aimDir * (distance * 0.5f),
-                             Quaternion.LookRotation(aimDir));
+        Vector3 rushFxPos = casterPos + aimDir * (distance * 0.5f);
+        rushFxPos.y = rushEffectHeightOffset;
+        RpcSpawnJudgmentRushEffect(rushFxPos, Quaternion.LookRotation(aimDir), distance, -1f);
 
-        // Damage + knockback every enemy in the line
-        Collider[] hits = Physics.OverlapCapsule(casterPos, endPos, rushWidth);
-        foreach (Collider col in hits)
+        // Damage + knockback: XZ distance from enemy to the dash line segment
+        PlayerStats stats = GetComponent<PlayerStats>();
+        Vector2 lineStart = new Vector2(casterPos.x, casterPos.z);
+        Vector2 lineEnd   = new Vector2(endPos.x,   endPos.z);
+        EnemyHealth[] enemies = FindObjectsByType<EnemyHealth>(FindObjectsSortMode.None);
+        foreach (EnemyHealth enemy in enemies)
         {
-            EnemyHealth enemy = col.GetComponent<EnemyHealth>();
             if (enemy == null || enemy.IsDead()) continue;
 
-            PlayerStats stats = GetComponent<PlayerStats>();
+            Vector2 ePos = new Vector2(enemy.transform.position.x, enemy.transform.position.z);
+            float distToLine = PointToSegmentDistance(ePos, lineStart, lineEnd);
+            if (distToLine > rushWidth) continue;
+
             int damage = stats != null ? stats.GetMeleeDamage(skillPower) : skillPower;
             damage = stats != null ? stats.ApplyCriticalDamage(damage) : damage;
             enemy.ReceiveDamage(damage, DamageType.Melee, stats);
 
-            // Knockback — push enemy away from the rush direction
-            Rigidbody rb = col.GetComponent<Rigidbody>();
+            Rigidbody rb = enemy.GetComponent<Rigidbody>();
             if (rb != null)
                 rb.AddForce(aimDir * rushKnockback, ForceMode.Impulse);
         }
@@ -219,15 +323,19 @@ public class SwordmasterSkillCaster : NetworkBehaviour, ISkillCaster
     {
         float radius = consecrationRadius + (skillLevel - 1) * 0.5f;
 
-        SpawnEffectOnClients(consecrationEffectPrefab, casterPos, Quaternion.identity);
+        RpcSpawnConsecrationEffect(casterPos);
 
-        Collider[] hits = Physics.OverlapSphere(casterPos, radius);
         PlayerStats stats = GetComponent<PlayerStats>();
+        EnemyHealth[] enemies = FindObjectsByType<EnemyHealth>(FindObjectsSortMode.None);
 
-        foreach (Collider col in hits)
+        foreach (EnemyHealth enemy in enemies)
         {
-            EnemyHealth enemy = col.GetComponent<EnemyHealth>();
             if (enemy == null || enemy.IsDead()) continue;
+
+            float dist = Vector3.Distance(
+                new Vector3(enemy.transform.position.x, casterPos.y, enemy.transform.position.z),
+                casterPos);
+            if (dist > radius) continue;
 
             int damage = stats != null ? stats.GetMagicalSkillDamage(skillPower) : skillPower;
             damage = stats != null ? stats.ApplyCriticalDamage(damage) : damage;
@@ -265,7 +373,7 @@ public class SwordmasterSkillCaster : NetworkBehaviour, ISkillCaster
             stats.RecalculateStats();
         }
 
-        SpawnEffectOnClients(aegisShieldEffectPrefab, transform.position, Quaternion.identity);
+        RpcSpawnAegisEffect(duration);
 
         StartCoroutine(AegisExpiry(duration));
     }
@@ -296,44 +404,116 @@ public class SwordmasterSkillCaster : NetworkBehaviour, ISkillCaster
     IEnumerator RadiantFlurryCoroutine(Vector3 casterPos, int skillLevel, int skillPower)
     {
         int maxTargets = flurryMaxTargets + (skillLevel - 1);
-        float radius   = flurryRadius + (skillLevel - 1) * 0.5f;
+        float radius   = flurryRadius + (skillLevel - 1) * 0.6f;
 
-        Collider[] hits = Physics.OverlapSphere(casterPos, radius);
         PlayerStats stats = GetComponent<PlayerStats>();
+        EnemyHealth[] allEnemies = FindObjectsByType<EnemyHealth>(FindObjectsSortMode.None);
 
-        // Build a sorted list of valid enemies by distance
         List<EnemyHealth> targets = new List<EnemyHealth>();
-        foreach (Collider col in hits)
+        foreach (EnemyHealth enemy in allEnemies)
         {
-            EnemyHealth enemy = col.GetComponent<EnemyHealth>();
-            if (enemy != null && !enemy.IsDead())
+            if (enemy == null || enemy.IsDead()) continue;
+            float dist = Vector3.Distance(
+                new Vector3(enemy.transform.position.x, casterPos.y, enemy.transform.position.z),
+                casterPos);
+            if (dist <= radius)
                 targets.Add(enemy);
             if (targets.Count >= maxTargets) break;
         }
+
+        Vector3 currentPos = transform.position;
+        _netController?.ServerStopMovement();
 
         foreach (EnemyHealth enemy in targets)
         {
             if (enemy == null || enemy.IsDead()) continue;
 
+            Vector3 enemyPos = enemy.transform.position;
+            Vector3 flatDir  = new Vector3(enemyPos.x - currentPos.x, 0f, enemyPos.z - currentPos.z);
+            if (flatDir.sqrMagnitude > 0.01f) flatDir.Normalize();
+            else flatDir = transform.forward;
+
+            // Rotate all clients (including owner) toward this enemy
+            RpcRotateVisualAll(flatDir);
+
+            // Stop 1.2m in front of the enemy, keep current height
+            Vector3 stopPos = enemyPos - flatDir * 1.2f;
+            stopPos.y = currentPos.y;
+
+            // Trail effect: centered between start and stop at ground level
+            float travelDist = Mathf.Max(Vector3.Distance(currentPos, stopPos), 1f);
+            Vector3 effectCenter = new Vector3(
+                (currentPos.x + stopPos.x) * 0.5f,
+                flurryEffectHeightOffset,
+                (currentPos.z + stopPos.z) * 0.5f);
+            RpcSpawnJudgmentRushEffect(effectCenter, Quaternion.LookRotation(flatDir), travelDist, 0.4f);
+
+            // Smooth glide
+            Vector3 glideStart    = transform.position;
+            float   glideDuration = flurryHitInterval * 0.6f;
+            float   elapsed       = 0f;
+            while (elapsed < glideDuration)
+            {
+                elapsed += Time.deltaTime;
+                transform.position = Vector3.Lerp(glideStart, stopPos, Mathf.Clamp01(elapsed / glideDuration));
+                yield return null;
+            }
+            transform.position = stopPos;
+            currentPos = stopPos;
+
+            // Damage
             int damage = stats != null ? stats.GetMeleeDamage(skillPower) : skillPower;
             damage = stats != null ? stats.ApplyCriticalDamage(damage) : damage;
             enemy.ReceiveDamage(damage, DamageType.Melee, stats);
 
-            SpawnEffectOnClients(radiantHitEffectPrefab,
-                                 enemy.transform.position + Vector3.up * 1f,
-                                 Quaternion.identity);
-
-            yield return new WaitForSeconds(flurryHitInterval);
+            // Brief pause before next target
+            yield return new WaitForSeconds(flurryHitInterval * 0.4f);
         }
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     [ObserversRpc]
-    void SpawnEffectOnClients(GameObject prefab, Vector3 pos, Quaternion rot)
+    void RpcSpawnJudgmentRushEffect(Vector3 pos, Quaternion rot, float length, float height)
     {
-        if (prefab == null) return;
-        Instantiate(prefab, pos, rot);
+        if (judgmentRushEffectPrefab == null) return;
+        GameObject fx = Instantiate(judgmentRushEffectPrefab, pos, rot);
+        // Stop any Play On Awake particles — burst effects removed for now
+        foreach (ParticleSystem ps in fx.GetComponentsInChildren<ParticleSystem>(true))
+            ps.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+        JudgmentRushEffect fxComp = fx.GetComponent<JudgmentRushEffect>();
+        if (fxComp != null)
+        {
+            if (length >= 0f) fxComp.rushDistance = length;
+            if (height >= 0f) fxComp.heightScale  = height;
+        }
+    }
+
+    [ObserversRpc]
+    void RpcSpawnConsecrationEffect(Vector3 pos)
+    {
+        if (consecrationEffectPrefab == null) return;
+        Instantiate(consecrationEffectPrefab, pos, Quaternion.identity);
+    }
+
+    [ObserversRpc]
+    void RpcSpawnAegisEffect(float duration)
+    {
+        if (aegisShieldEffectPrefab == null) return;
+        GameObject go = Instantiate(aegisShieldEffectPrefab, transform.position, Quaternion.identity);
+        go.transform.SetParent(transform);
+        go.transform.localPosition = new Vector3(0f, -2.25f, 0f);
+        go.transform.localRotation = Quaternion.identity;
+        AegisShieldEffect fx = go.GetComponent<AegisShieldEffect>();
+        if (fx != null) fx.duration = duration;
+        else Destroy(go, duration); // fallback if script not on prefab
+    }
+
+    [ObserversRpc]
+    void RpcSpawnRadiantHitEffect(Vector3 pos)
+    {
+        if (radiantHitEffectPrefab == null) return;
+        Instantiate(radiantHitEffectPrefab, pos, Quaternion.identity);
     }
 
     void PlayCastAnimation()
@@ -388,5 +568,14 @@ public class SwordmasterSkillCaster : NetworkBehaviour, ISkillCaster
             if (p.skill != null && p.skill.skillType == skill)
                 return p.skill.baseCooldown;
         return 3f;
+    }
+
+    static float PointToSegmentDistance(Vector2 point, Vector2 a, Vector2 b)
+    {
+        Vector2 ab = b - a;
+        float lenSq = ab.sqrMagnitude;
+        if (lenSq < 0.0001f) return Vector2.Distance(point, a);
+        float t = Mathf.Clamp01(Vector2.Dot(point - a, ab) / lenSq);
+        return Vector2.Distance(point, a + t * ab);
     }
 }

@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e976ae5566286845b37c51031801d11, type: 3}
   m_Name: ZombieHead
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  itemId: Zombie_Head
+  factionRestriction: 0
   itemName: Zombie Head
   description: 
   itemIcon: {fileID: 21300000, guid: 38ce6c37c266d624c8083e15c5044071, type: 3}
@@ -19,13 +21,133 @@ MonoBehaviour:
   rarity: 0
   isStackable: 1
   maxStackSize: 99
+  restoreAmount: 0
   sellValue: 5
   worldLootPrefab: {fileID: 3515457108597519889, guid: 73f9356fac52cd049ad36a752190e692, type: 3}
   strengthBonus: 0
   dexterityBonus: 0
   intelligenceBonus: 0
   enduranceBonus: 0
-  armorBonus: 0
-  resistanceBonus: 0
   healthBonus: 0
   manaBonus: 0
+  meleeDamageBonus: 0
+  rangedDamageBonus: 0
+  magicalDamageBonus: 0
+  armorBonus: 0
+  resistanceBonus: 0
+  meleeResistanceBonus: 0
+  magicalResistanceBonus: 0
+  allResistanceBonus: 0
+  hasCrystalStat: 0
+  crystalStat: 0
+  crystalCurrentValue: 0
+  crystalMaxValue: 0
+  beltSlots:
+  - uniqueItemId: 
+    baseItemId: 
+    displayName: 
+    slotIndex: -1
+    equipmentSlotId: 
+    quantity: 0
+    rarity: 0
+    sellValue: 0
+    strengthBonus: 0
+    dexterityBonus: 0
+    intelligenceBonus: 0
+    enduranceBonus: 0
+    healthBonus: 0
+    manaBonus: 0
+    meleeDamageBonus: 0
+    rangedDamageBonus: 0
+    magicalDamageBonus: 0
+    armorBonus: 0
+    resistanceBonus: 0
+    meleeResistanceBonus: 0
+    magicalResistanceBonus: 0
+    allResistanceBonus: 0
+    hasCrystalStat: 0
+    crystalStat: 0
+    crystalCurrentValue: 0
+    crystalMaxValue: 0
+    beltItems: []
+  - uniqueItemId: 
+    baseItemId: 
+    displayName: 
+    slotIndex: -1
+    equipmentSlotId: 
+    quantity: 0
+    rarity: 0
+    sellValue: 0
+    strengthBonus: 0
+    dexterityBonus: 0
+    intelligenceBonus: 0
+    enduranceBonus: 0
+    healthBonus: 0
+    manaBonus: 0
+    meleeDamageBonus: 0
+    rangedDamageBonus: 0
+    magicalDamageBonus: 0
+    armorBonus: 0
+    resistanceBonus: 0
+    meleeResistanceBonus: 0
+    magicalResistanceBonus: 0
+    allResistanceBonus: 0
+    hasCrystalStat: 0
+    crystalStat: 0
+    crystalCurrentValue: 0
+    crystalMaxValue: 0
+    beltItems: []
+  - uniqueItemId: 
+    baseItemId: 
+    displayName: 
+    slotIndex: -1
+    equipmentSlotId: 
+    quantity: 0
+    rarity: 0
+    sellValue: 0
+    strengthBonus: 0
+    dexterityBonus: 0
+    intelligenceBonus: 0
+    enduranceBonus: 0
+    healthBonus: 0
+    manaBonus: 0
+    meleeDamageBonus: 0
+    rangedDamageBonus: 0
+    magicalDamageBonus: 0
+    armorBonus: 0
+    resistanceBonus: 0
+    meleeResistanceBonus: 0
+    magicalResistanceBonus: 0
+    allResistanceBonus: 0
+    hasCrystalStat: 0
+    crystalStat: 0
+    crystalCurrentValue: 0
+    crystalMaxValue: 0
+    beltItems: []
+  - uniqueItemId: 
+    baseItemId: 
+    displayName: 
+    slotIndex: -1
+    equipmentSlotId: 
+    quantity: 0
+    rarity: 0
+    sellValue: 0
+    strengthBonus: 0
+    dexterityBonus: 0
+    intelligenceBonus: 0
+    enduranceBonus: 0
+    healthBonus: 0
+    manaBonus: 0
+    meleeDamageBonus: 0
+    rangedDamageBonus: 0
+    magicalDamageBonus: 0
+    armorBonus: 0
+    resistanceBonus: 0
+    meleeResistanceBonus: 0
+    magicalResistanceBonus: 0
+    allResistanceBonus: 0
+    hasCrystalStat: 0
+    crystalStat: 0
+    crystalCurrentValue: 0
+    crystalMaxValue: 0
+    beltItems: []

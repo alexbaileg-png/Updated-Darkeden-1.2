@@ -5117,7 +5117,7 @@ MonoBehaviour:
   holdTime: 0.15
   fadeTime: 0.2
   maxRadius: 5
-  ringMesh: {fileID: 0}
+  ringMesh: {fileID: 4407504170237153173}
   burstParticles: []
 --- !u!1 &8009383848027624819
 GameObject:

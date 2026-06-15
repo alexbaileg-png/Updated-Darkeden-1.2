@@ -16,12 +16,6 @@ public class CharacterCreationManager : MonoBehaviour
     public Button vampireButton;
     public Button slayerButton;
 
-    [Header("Vampire Bloodline Buttons")]
-    public Button bloodKnightButton;
-    public Button shadowButton;
-    public Button sorcererButton;
-    public Button dominatorButton;
-
     [Header("Slayer Class Buttons")]
     public Button swordmasterButton;
     public Button soldierButton;
@@ -44,10 +38,9 @@ public class CharacterCreationManager : MonoBehaviour
     [Header("Navigation")]
     public Button backButton;
 
-    private PlayerFaction    _selectedFaction;
-    private PlayerGender     _selectedGender = PlayerGender.Male;
-    private VampireBloodline _selectedBloodline;
-    private SlayerClass      _selectedSlayerClass;
+    private PlayerFaction _selectedFaction;
+    private PlayerGender  _selectedGender = PlayerGender.Male;
+    private SlayerClass   _selectedSlayerClass;
     private bool _classSelected = false;
     private int  _step = 0; // 0=faction, 1=class, 2=gender, 3=name
 
@@ -66,9 +59,8 @@ public class CharacterCreationManager : MonoBehaviour
     public void OnVampireSelected()
     {
         _selectedFaction = PlayerFaction.Vampire;
-        _classSelected = false;
-        ShowStep(1);
-        ShowVampireClasses();
+        _classSelected = true;
+        ShowStep(2); // skip class panel — vampires have no class
     }
 
     public void OnSlayerSelected()
@@ -79,24 +71,8 @@ public class CharacterCreationManager : MonoBehaviour
         ShowSlayerClasses();
     }
 
-    void ShowVampireClasses()
-    {
-        SetActive(bloodKnightButton, true);
-        SetActive(shadowButton,      true);
-        SetActive(sorcererButton,    true);
-        SetActive(dominatorButton,   true);
-        SetActive(swordmasterButton, false);
-        SetActive(soldierButton,     false);
-        SetActive(enchanterButton,   false);
-        SetActive(healerButton,      false);
-    }
-
     void ShowSlayerClasses()
     {
-        SetActive(bloodKnightButton, false);
-        SetActive(shadowButton,      false);
-        SetActive(sorcererButton,    false);
-        SetActive(dominatorButton,   false);
         SetActive(swordmasterButton, true);
         SetActive(soldierButton,     true);
         SetActive(enchanterButton,   true);
@@ -104,15 +80,6 @@ public class CharacterCreationManager : MonoBehaviour
     }
 
     // ── Class / Bloodline ─────────────────────────────────────────────────────
-
-    public void OnBloodKnightSelected()  => SelectVampire(VampireBloodline.BloodKnight,
-        "Blood Knight — A melee tank who drains life with every strike. High armor, relentless in close combat.");
-    public void OnShadowSelected()       => SelectVampire(VampireBloodline.Shadow,
-        "Shadow — An assassin of the night. Strikes from darkness with burst damage and vanishes before retaliation.");
-    public void OnSorcererSelected()     => SelectVampire(VampireBloodline.Sorcerer,
-        "Sorcerer — Master of dark magic. Unleashes powerful spells that devastate enemies from range.");
-    public void OnDominatorSelected()    => SelectVampire(VampireBloodline.Dominator,
-        "Dominator — Bends the will of enemies. Controls the battlefield with debuffs and crowd control.");
 
     public void OnSwordmasterSelected()  => SelectSlayer(SlayerClass.Swordmaster,
         "Swordmaster — A warrior trained to hunt vampires in close combat. High damage, fast strikes.");
@@ -122,14 +89,6 @@ public class CharacterCreationManager : MonoBehaviour
         "Enchanter — Empowers allies and weakens vampires with holy magic. Essential in any group.");
     public void OnHealerSelected()       => SelectSlayer(SlayerClass.Healer,
         "Healer — Keeps the party alive with powerful restoration. Can even bring the fallen back.");
-
-    void SelectVampire(VampireBloodline bloodline, string description)
-    {
-        _selectedBloodline = bloodline;
-        _classSelected = true;
-        if (classDescriptionText != null) classDescriptionText.text = description;
-        ShowStep(2);
-    }
 
     void SelectSlayer(SlayerClass slayerClass, string description)
     {
@@ -197,12 +156,11 @@ public class CharacterCreationManager : MonoBehaviour
 
         CharacterData newCharacter = new CharacterData
         {
-            characterId      = Guid.NewGuid().ToString(),
-            characterName    = characterName,
-            faction          = _selectedFaction,
-            gender           = _selectedGender,
-            vampireBloodline = _selectedBloodline,
-            slayerClass      = _selectedSlayerClass,
+            characterId   = Guid.NewGuid().ToString(),
+            characterName = characterName,
+            faction       = _selectedFaction,
+            gender        = _selectedGender,
+            slayerClass   = _selectedSlayerClass,
             level            = 1,
             currentXP        = 0,
             lastPlayedUtc    = DateTimeOffset.UtcNow.ToUnixTimeSeconds()

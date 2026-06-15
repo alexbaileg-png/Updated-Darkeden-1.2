@@ -2630,6 +2630,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1237280848}
   - component: {fileID: 1237280849}
+  - component: {fileID: 1237280850}
   m_Layer: 0
   m_Name: LoginManager
   m_TagString: Untagged
@@ -2670,6 +2671,21 @@ MonoBehaviour:
   registerButton: {fileID: 408555141}
   statusText: {fileID: 491868059}
   loadingOverlay: {fileID: 1404795658}
+--- !u!114 &1237280850
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1237280847}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f1035fe78c4c4744b068a53190ad4bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LoginInputHandler
+  usernameField: {fileID: 254250786}
+  passwordField: {fileID: 1266000785}
+  loginButton: {fileID: 356127762}
 --- !u!1 &1255420307
 GameObject:
   m_ObjectHideFlags: 0

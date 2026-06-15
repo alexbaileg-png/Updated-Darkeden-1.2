@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Void Burst
   m_EditorClassIdentifier: Assembly-CSharp::SkillData
   skillName: Void Burst
-  skillType: 7
+  skillType: 11
   skillIcon: {fileID: 21300000, guid: f98a50e90e5818b4a92b197e5a126a77, type: 3}
   description: 
   requiredPlayerLevel: 15
