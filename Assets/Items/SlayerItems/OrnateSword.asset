@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e976ae5566286845b37c51031801d11, type: 3}
+  m_Name: OrnateSword
+  m_EditorClassIdentifier: Assembly-CSharp::ItemData
+  itemId: Ornate_Sword
+  factionRestriction: 1
+  itemName: Ornate Sword
+  description: 
+  itemIcon: {fileID: 21300000, guid: b2120176516350742abaafd2d8eb6226, type: 3}
+  itemType: 5
+  rarity: 0
+  isStackable: 0
+  maxStackSize: 99
+  restoreAmount: 0
+  sellValue: 0
+  worldLootPrefab: {fileID: 8814407895914073689, guid: f31edc9fabc7a0d4aae4f9dcdf92da97, type: 3}
+  equippedVisualPrefab: {fileID: 5149008390339882221, guid: b2e7d099fff9f9a41b8ce76ee365fad1, type: 3}
+  strengthBonus: 0
+  dexterityBonus: 0
+  intelligenceBonus: 0
+  enduranceBonus: 0
+  healthBonus: 100
+  manaBonus: 0
+  weaponType: 1
+  weaponMinDamage: 10
+  weaponMaxDamage: 25
+  meleeDamageBonus: 0
+  rangedDamageBonus: 0
+  magicalDamageBonus: 0
+  armorBonus: 0
+  resistanceBonus: 0
+  meleeResistanceBonus: 0
+  magicalResistanceBonus: 0
+  allResistanceBonus: 0
+  lifeStealBonus: 0
+  hasCrystalStat: 0
+  crystalStat: 0
+  crystalCurrentValue: 0
+  crystalMaxValue: 0
+  beltSlots: []

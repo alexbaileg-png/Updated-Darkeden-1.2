@@ -1,65 +1,35 @@
 using UnityEngine;
 
+// Pure visual — orbits around the target transform.
+// All healing is handled server-side by HealerSkillCaster.
 public class HealingOrbitBuff : MonoBehaviour
 {
-    [Header("Target")]
     public Transform target;
-
-    [Header("Healing")]
-    public int baseHealAmount = 10;
-
-    [Header("Orbit")]
     public float orbitRadius = 1.5f;
-    public float orbitSpeed = 420f;
+    public float orbitSpeed  = 420f;
+    public float duration    = 10f;
 
-    [Header("Duration")]
-    public float duration = 10f;
+    private float _currentAngle;
+    private float _endTime;
 
-    private float currentAngle;
-    private float endTime;
-    private PlayerStats playerStats;
-
-    void Start()
-    {
-        if (target != null)
-            playerStats = target.GetComponent<PlayerStats>();
-
-        endTime = Time.time + duration;
-    }
+    void Start() => _endTime = Time.time + duration;
 
     void Update()
     {
-        if (target == null || Time.time >= endTime)
+        if (target == null || Time.time >= _endTime)
         {
             Destroy(gameObject);
             return;
         }
 
-        currentAngle += orbitSpeed * Time.deltaTime;
+        _currentAngle += orbitSpeed * Time.deltaTime;
+        if (_currentAngle >= 360f) _currentAngle -= 360f;
 
-        if (currentAngle >= 360f)
-        {
-            currentAngle -= 360f;
-            HealOnce();
-        }
-
-        float radians = currentAngle * Mathf.Deg2Rad;
-
-        Vector3 offset = new Vector3(
-            Mathf.Cos(radians) * orbitRadius,
+        float rad = _currentAngle * Mathf.Deg2Rad;
+        transform.position = target.position + new Vector3(
+            Mathf.Cos(rad) * orbitRadius,
             1.1f,
-            Mathf.Sin(radians) * orbitRadius
+            Mathf.Sin(rad) * orbitRadius
         );
-
-        transform.position = target.position + offset;
-    }
-
-    void HealOnce()
-    {
-        if (playerStats == null)
-            return;
-
-        int healAmount = playerStats.GetMagicalHealing(baseHealAmount);
-        playerStats.Heal(healAmount);
     }
 }

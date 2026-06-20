@@ -26,10 +26,10 @@ public class VampireSkillCaster : NetworkBehaviour, ISkillCaster
     public GameObject darkBoltPrefab;
 
     [Header("Blood Drain")]
-    public GameObject bloodDrainBeamPrefab;   // visual beam effect
-    public float bloodDrainDuration    = 2f;
-    public float bloodDrainTickRate    = 0.5f;
-    public float bloodDrainHealPercent = 0.4f; // 40% of damage returned as HP
+    public GameObject bloodDrainBeamPrefab;
+    public float bloodDrainDuration        = 1.2f;
+    public float bloodDrainTickRate        = 0.3f;
+    public float bloodDrainHealPercent     = 0.4f;
 
     [Header("Blood Fog")]
     public GameObject bloodFogPrefab;
@@ -59,7 +59,7 @@ public class VampireSkillCaster : NetworkBehaviour, ISkillCaster
     // ── Runtime ───────────────────────────────────────────────────────────────
 
     private SkillType _selectedSkill;
-    private float _nextCastTime = 0f;
+    private readonly Dictionary<SkillType, float> _nextCastTimePerSkill = new Dictionary<SkillType, float>();
     private bool _isCasting = false;
     private bool _isChanneling = false;
 
@@ -114,7 +114,6 @@ public class VampireSkillCaster : NetworkBehaviour, ISkillCaster
     void HandleCasting()
     {
         if (!Input.GetMouseButtonDown(1)) return;
-        if (Time.time < _nextCastTime) return;
         if (_isCasting || _isChanneling) return;
         if (!CanCast(_selectedSkill)) return;
 
@@ -123,6 +122,7 @@ public class VampireSkillCaster : NetworkBehaviour, ISkillCaster
 
     bool CanCast(SkillType skill)
     {
+        if (Time.time < GetNextCastTime(skill)) return false;
         CharacterData character = GameSession.Instance?.SelectedCharacter;
         if (character != null && !ClassSkillConfig.CanUseSkill(character, skill)) return false;
         if (_skillManager != null && !_skillManager.IsSkillUnlocked(skill)) return false;
@@ -130,6 +130,8 @@ public class VampireSkillCaster : NetworkBehaviour, ISkillCaster
         if (_playerStats != null && _playerStats.currentMana < cost) return false;
         return true;
     }
+
+    float GetNextCastTime(SkillType skill) => _nextCastTimePerSkill.TryGetValue(skill, out float t) ? t : 0f;
 
     IEnumerator CastRoutine(SkillType skill)
     {
@@ -155,11 +157,17 @@ public class VampireSkillCaster : NetworkBehaviour, ISkillCaster
 
         ServerCastSkill(skill, transform.position, aimDir, castPos, skillLevel, skillPower, manaCost);
 
-        // Blood Drain blocks casting for the channel duration
+        // Blood Drain blocks casting and movement for the full channel duration
         if (skill == SkillType.BloodDrain)
         {
             _isChanneling = true;
-            yield return new WaitForSeconds(bloodDrainDuration);
+            float elapsed = 0f;
+            while (elapsed < bloodDrainDuration)
+            {
+                _netController?.ServerStopMovement();
+                yield return new WaitForSeconds(0.1f);
+                elapsed += 0.1f;
+            }
             _isChanneling = false;
         }
         else
@@ -167,7 +175,7 @@ public class VampireSkillCaster : NetworkBehaviour, ISkillCaster
             yield return new WaitForSeconds(postCastLockTime);
         }
 
-        _nextCastTime = Time.time + GetCooldown(skill);
+        _nextCastTimePerSkill[skill] = Time.time + GetCooldown(skill);
         _isCasting = false;
     }
 
@@ -353,6 +361,7 @@ public class VampireSkillCaster : NetworkBehaviour, ISkillCaster
     [ObserversRpc]
     void HideBloodDrainBeam() { /* beam self-destructs via BloodDrainBeam.duration */ }
 
+
     // ── Blood Fog ─────────────────────────────────────────────────────────────
 
     void ServerBloodFog(Vector3 castPos, int skillLevel)
@@ -421,7 +430,7 @@ public class VampireSkillCaster : NetworkBehaviour, ISkillCaster
     int GetManaCost(SkillType skill)    => _skillManager != null ? _skillManager.GetSkillManaCost(skill) : 0;
 
     public SkillType CurrentSelectedSkill      => _selectedSkill;
-    public float GetCooldownRemaining()        => Mathf.Max(0f, _nextCastTime - Time.time);
+    public float GetCooldownRemaining()        => Mathf.Max(0f, GetNextCastTime(_selectedSkill) - Time.time);
     public float GetCurrentSkillCooldown()     => GetCooldown(_selectedSkill);
     public void  SetSelectedSkill(SkillType s) => _selectedSkill = s;
 

@@ -363,7 +363,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
   _componentIndexCache: 0
   _addedNetworkObject: {fileID: 3031236541679997659}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 3031236541679997659}
   maxHealth: 200
   xpReward: 20000
   destroyDelay: 5
@@ -382,7 +382,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyAI
   _componentIndexCache: 1
   _addedNetworkObject: {fileID: 3031236541679997659}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 3031236541679997659}
   moveSpeed: 1
   chaseRange: 30
   stopDistance: 0.5
@@ -487,7 +487,11 @@ MonoBehaviour:
     dropChance: 80.2
   - item: {fileID: 11400000, guid: d7cd9664c7856de47ab4af7e7f732168, type: 2}
     dropChance: 80.2
-  maxDrops: 5
+  - item: {fileID: 11400000, guid: a83abfbf261744248b05440397760192, type: 2}
+    dropChance: 80.2
+  - item: {fileID: 11400000, guid: 1f83f34617b713148bf8ecf554289773, type: 2}
+    dropChance: 80.2
+  maxDrops: 8
   dropScatterRadius: 1.2
   dropHeight: -0.4
 --- !u!136 &2719033796391859010
@@ -543,22 +547,25 @@ MonoBehaviour:
   _spectatorInterpolation: 2
   _enableTeleport: 0
   _teleportThreshold: 1
-  <PrefabId>k__BackingField: 65535
+  <PrefabId>k__BackingField: 1
   <SpawnableCollectionId>k__BackingField: 0
   <AssetPathHash>k__BackingField: 2517617719273881277
   SceneId: 0
   SerializedTransformProperties:
-    Position: {x: 0, y: 0, z: 0}
-    Rotation: {x: 0, y: 0, z: 0, w: 0}
-    Scale: {x: 0, y: 0, z: 0}
-    IsValid: 0
+    Position: {x: -0.455, y: 3, z: 1.92}
+    Rotation: {x: 0, y: 0, z: 0, w: 1}
+    Scale: {x: 1, y: 1, z: 1}
+    IsValid: 1
   <IsNested>k__BackingField: 0
   WasActiveDuringEdit: 0
   WasActiveDuringEdit_Set1: 1
   <ComponentIndex>k__BackingField: 0
   <PredictedSpawn>k__BackingField: {fileID: 0}
   <PredictedOwner>k__BackingField: {fileID: 0}
-  NetworkBehaviours: []
+  NetworkBehaviours:
+  - {fileID: 8372414133179288515}
+  - {fileID: 2122587727983555116}
+  - {fileID: 7110961358743345489}
   InitializedParentNetworkBehaviour: {fileID: 0}
   InitializedNestedNetworkObjects: []
   RuntimeParentNetworkBehaviour: {fileID: 0}
@@ -569,7 +576,7 @@ MonoBehaviour:
   _initializeOrder: 0
   _preventDespawnOnDisconnect: 0
   _defaultDespawnType: 0
-  _initializedTimestamp: 0
+  _initializedTimestamp: -8584198746503831034
 --- !u!1 &1840938806691661711
 GameObject:
   m_ObjectHideFlags: 0
@@ -675,7 +682,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
   _componentIndexCache: 2
   _addedNetworkObject: {fileID: 3031236541679997659}
-  _networkObjectCache: {fileID: 0}
+  _networkObjectCache: {fileID: 3031236541679997659}
   maxHealth: 50
   xpReward: 25
   destroyDelay: 10

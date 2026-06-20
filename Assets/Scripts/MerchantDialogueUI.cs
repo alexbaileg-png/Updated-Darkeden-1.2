@@ -97,6 +97,13 @@ public class MerchantDialogueUI : MonoBehaviour
         OpenPanel(questPanel);
     }
 
+    public void HealPlayer()
+    {
+        PlayerStats player = PlayerStats.LocalInstance;
+        if (player != null)
+            player.ServerVendorHeal();
+    }
+
     void OpenInventory()
     {
         if (menuRoot != null)

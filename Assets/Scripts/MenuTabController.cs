@@ -1,4 +1,6 @@
+using FishNet;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class MenuTabController : MonoBehaviour
@@ -145,6 +147,16 @@ public class MenuTabController : MonoBehaviour
             menuRoot.SetActive(false);
 
         IsMenuOpen = false;
+    }
+
+    public void ReturnToCharacterSelect()
+    {
+        CloseEverything();
+        if (InstanceFinder.ClientManager != null && InstanceFinder.ClientManager.Started)
+            InstanceFinder.ClientManager.StopConnection();
+        if (InstanceFinder.ServerManager != null && InstanceFinder.ServerManager.Started)
+            InstanceFinder.ServerManager.StopConnection(true);
+        SceneManager.LoadScene("Character Selection");
     }
 
     bool IsAnythingOpen()

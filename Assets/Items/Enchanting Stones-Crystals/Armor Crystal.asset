@@ -16,7 +16,7 @@ MonoBehaviour:
   itemName: Armor Crystal
   description: 
   itemIcon: {fileID: 21300000, guid: 34fc540568ffe0c44aee1d1925308b3e, type: 3}
-  itemType: 11
+  itemType: 9
   rarity: 5
   isStackable: 1
   maxStackSize: 99

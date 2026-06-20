@@ -17,7 +17,7 @@ MonoBehaviour:
   itemName: Kevlar Belt
   description: 
   itemIcon: {fileID: 21300000, guid: 61d64d52ce5813943b967abe69f2245b, type: 3}
-  itemType: 6
+  itemType: 15
   rarity: 0
   isStackable: 0
   maxStackSize: 99

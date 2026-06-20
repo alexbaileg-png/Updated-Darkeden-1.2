@@ -75,6 +75,8 @@ public class EnemyHealth : NetworkBehaviour, IDamageable
         _currentHealth.Value = Mathf.Clamp(_currentHealth.Value - finalDamage, 0, maxHealth);
         SpawnDamageTextRpc(finalDamage, GetEnemyVisualCenter());
 
+        attacker?.ApplyLifeSteal(finalDamage);
+
         if (_currentHealth.Value <= 0)
             Die(attacker);
     }

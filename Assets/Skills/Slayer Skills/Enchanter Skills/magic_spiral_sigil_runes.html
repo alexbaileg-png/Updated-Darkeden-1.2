@@ -1,0 +1,213 @@
+
+<canvas id="c" style="display:block;width:100%;height:680px;"></canvas>
+<script>
+const canvas = document.getElementById('c');
+canvas.width = 680;
+canvas.height = 680;
+const ctx = canvas.getContext('2d');
+const CX = 340, CY = 340;
+
+function spiralPoints(cx, cy, startR, endR, turns, offsetAngle) {
+  const steps = 600;
+  const points = [];
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    const r = startR + (endR - startR) * t;
+    const angle = offsetAngle + t * turns * Math.PI * 2;
+    points.push([cx + Math.cos(angle) * r, cy + Math.sin(angle) * r]);
+  }
+  return points;
+}
+
+function drawSpiral(pts, color, width) {
+  ctx.beginPath();
+  ctx.strokeStyle = color;
+  ctx.lineWidth = width;
+  ctx.moveTo(pts[0][0], pts[0][1]);
+  for (let i = 1; i < pts.length; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+  ctx.stroke();
+}
+
+function drawTextOnArc(text, cx, cy, r, startAngle, clockwise, size, color, spacing) {
+  ctx.save();
+  ctx.fillStyle = color;
+  ctx.font = `${size}px serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  const chars = text.split('');
+  const totalAngle = (text.length * (size * (spacing || 0.9))) / r;
+  let angle = startAngle - (clockwise ? totalAngle / 2 : -totalAngle / 2);
+  const step = (clockwise ? 1 : -1) * (size * (spacing || 0.9)) / r;
+  chars.forEach(ch => {
+    ctx.save();
+    ctx.translate(cx + Math.cos(angle) * r, cy + Math.sin(angle) * r);
+    ctx.rotate(angle + (clockwise ? Math.PI / 2 : -Math.PI / 2));
+    ctx.fillText(ch, 0, 0);
+    ctx.restore();
+    angle += step;
+  });
+  ctx.restore();
+}
+
+ctx.clearRect(0, 0, 680, 680);
+
+const spiralColor1 = 'rgba(210,220,240,0.85)';
+const spiralColor2 = 'rgba(170,185,210,0.7)';
+const spiralColor3 = 'rgba(230,235,248,0.9)';
+
+for (let a = 0; a < 5; a++) {
+  const offset = (a / 5) * Math.PI * 2;
+  drawSpiral(spiralPoints(CX, CY, 4, 268, 3.5, offset), spiralColor1, 1.4);
+}
+for (let a = 0; a < 5; a++) {
+  const offset = (a / 5) * Math.PI * 2 + Math.PI / 5;
+  drawSpiral(spiralPoints(CX, CY, 4, 240, 3.2, offset), spiralColor2, 1.0);
+}
+for (let a = 0; a < 3; a++) {
+  const offset = (a / 3) * Math.PI * 2 + 0.3;
+  drawSpiral(spiralPoints(CX, CY, 4, 100, 2.5, offset), spiralColor3, 1.6);
+}
+
+ctx.strokeStyle = 'rgba(122,134,160,0.9)';
+ctx.lineWidth = 1.8;
+ctx.beginPath(); ctx.arc(CX, CY, 290, 0, Math.PI*2); ctx.stroke();
+
+ctx.strokeStyle = 'rgba(90,100,120,0.7)';
+ctx.lineWidth = 0.8;
+ctx.setLineDash([3,6]);
+ctx.beginPath(); ctx.arc(CX, CY, 302, 0, Math.PI*2); ctx.stroke();
+ctx.setLineDash([]);
+
+ctx.strokeStyle = 'rgba(176,188,208,0.8)';
+ctx.lineWidth = 1.4;
+ctx.beginPath(); ctx.arc(CX, CY, 118, 0, Math.PI*2); ctx.stroke();
+
+ctx.strokeStyle = 'rgba(128,144,168,0.6)';
+ctx.lineWidth = 0.9;
+ctx.setLineDash([4,4]);
+ctx.beginPath(); ctx.arc(CX, CY, 106, 0, Math.PI*2); ctx.stroke();
+ctx.setLineDash([]);
+
+ctx.strokeStyle = 'rgba(192,200,216,0.7)';
+ctx.lineWidth = 1.0;
+ctx.beginPath(); ctx.arc(CX, CY, 38, 0, Math.PI*2); ctx.stroke();
+ctx.beginPath(); ctx.arc(CX, CY, 28, 0, Math.PI*2); ctx.stroke();
+
+// Rune ring — solid border rings enclosing the runes
+const RUNE_R = 200;
+const RUNE_RING_OUTER = 222;
+const RUNE_RING_INNER = 178;
+
+ctx.strokeStyle = 'rgba(210,220,238,0.95)';
+ctx.lineWidth = 1.8;
+ctx.beginPath(); ctx.arc(CX, CY, RUNE_RING_OUTER, 0, Math.PI*2); ctx.stroke();
+
+ctx.strokeStyle = 'rgba(160,172,196,0.85)';
+ctx.lineWidth = 1.2;
+ctx.beginPath(); ctx.arc(CX, CY, RUNE_RING_INNER, 0, Math.PI*2); ctx.stroke();
+
+// 24 rune glyphs evenly spaced
+const runes = ['ᚠ','ᚢ','ᚦ','ᚨ','ᚱ','ᚲ','ᚷ','ᚹ','ᚺ','ᚾ','ᛁ','ᛃ','ᛇ','ᛈ','ᛉ','ᛊ','ᛏ','ᛒ','ᛖ','ᛗ','ᛚ','ᛜ','ᛞ','ᛟ'];
+const runeCount = 24;
+
+// Tick marks between runes
+for (let i = 0; i < runeCount; i++) {
+  const ang = (i / runeCount) * Math.PI * 2 - Math.PI / 2;
+  const ix = CX + Math.cos(ang) * RUNE_RING_INNER;
+  const iy = CY + Math.sin(ang) * RUNE_RING_INNER;
+  const ox = CX + Math.cos(ang) * RUNE_RING_OUTER;
+  const oy = CY + Math.sin(ang) * RUNE_RING_OUTER;
+  ctx.strokeStyle = 'rgba(180,192,214,0.7)';
+  ctx.lineWidth = 0.8;
+  ctx.beginPath();
+  ctx.moveTo(ix, iy);
+  ctx.lineTo(ox, oy);
+  ctx.stroke();
+}
+
+// Small diamond separators every 6 runes
+for (let i = 0; i < runeCount; i += 6) {
+  const ang = (i / runeCount) * Math.PI * 2 - Math.PI / 2;
+  const x = CX + Math.cos(ang) * RUNE_RING_OUTER;
+  const y = CY + Math.sin(ang) * RUNE_RING_OUTER;
+  ctx.save();
+  ctx.fillStyle = 'rgba(220,228,244,0.95)';
+  const s = 5;
+  ctx.beginPath();
+  ctx.moveTo(x, y - s); ctx.lineTo(x + s, y); ctx.lineTo(x, y + s); ctx.lineTo(x - s, y); ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+}
+
+// Draw each rune upright on the ring
+for (let i = 0; i < runeCount; i++) {
+  const ang = (i / runeCount) * Math.PI * 2 - Math.PI / 2;
+  const x = CX + Math.cos(ang) * RUNE_R;
+  const y = CY + Math.sin(ang) * RUNE_R;
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(ang + Math.PI / 2);
+  ctx.fillStyle = 'rgba(238,242,252,0.97)';
+  ctx.font = 'bold 15px serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(runes[i], 0, 0);
+  ctx.restore();
+}
+
+// Latin rings
+const latinOuter = '✦ VERBA ARCANA SPIRITUS IN AETERNUM MANENT · SAPIENTIA ANTIQUA VINCIT OMNIA · LUMEN VERITATIS OMNIBUS LUCET ✦ TENEBRAE EAM NON COMPREHENDERUNT · FIAT LUX ET FACTA EST LUX ·';
+drawTextOnArc(latinOuter, CX, CY, 276, -Math.PI/2, true, 11, 'rgba(232,237,245,0.95)', 1.05);
+
+const latinMid = '✦ OMNIA VINCIT AMOR · EX NIHILO NIHIL FIT · COGITO ERGO SUM · PER ASPERA AD ASTRA · DUM SPIRO SPERO · VERITAS VOS LIBERABIT · CARPE DIEM ✦';
+drawTextOnArc(latinMid, CX, CY, 248, -Math.PI/2, true, 10, 'rgba(192,200,216,0.9)', 1.0);
+
+const latinInner = '✦ AMOR VINCIT · IN HOC SIGNO VINCES · ARS LONGA VITA BREVIS · VENI VIDI VICI · FORTES FORTUNA ADIUVAT ✦';
+drawTextOnArc(latinInner, CX, CY, 134, -Math.PI/2, true, 9, 'rgba(192,200,216,0.85)', 0.98);
+
+const latinCore = '· LUX AETERNA LUCEAT · IN SPIRITU VERITAS · SPIRO SPERO ·';
+drawTextOnArc(latinCore, CX, CY, 118, -Math.PI/2, true, 8.5, 'rgba(220,228,242,0.85)', 0.95);
+
+// Outer ornament stars
+for (let i = 0; i < 8; i++) {
+  const ang = (i / 8) * Math.PI * 2;
+  const x = CX + Math.cos(ang) * 290;
+  const y = CY + Math.sin(ang) * 290;
+  ctx.save();
+  ctx.fillStyle = 'rgba(128,144,168,0.9)';
+  ctx.font = '14px serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(i % 2 === 0 ? '✦' : '✧', x, y);
+  ctx.restore();
+}
+
+// Cardinal and diagonal diamonds
+const diamonds = [
+  [340,44],[340,636],[44,340],[636,340],
+  [554,126],[126,126],[554,554],[126,554]
+];
+diamonds.forEach(([dx,dy], i) => {
+  ctx.save();
+  ctx.fillStyle = i < 4 ? 'rgba(128,144,168,0.9)' : 'rgba(106,116,144,0.7)';
+  const s = i < 4 ? 9 : 7;
+  ctx.beginPath();
+  ctx.moveTo(dx, dy-s); ctx.lineTo(dx+s, dy); ctx.lineTo(dx, dy+s); ctx.lineTo(dx-s, dy); ctx.closePath();
+  ctx.fill();
+  ctx.restore();
+});
+
+// Core star
+ctx.save();
+ctx.fillStyle = '#ffffff';
+ctx.font = 'bold 44px serif';
+ctx.textAlign = 'center';
+ctx.textBaseline = 'middle';
+ctx.fillText('✶', CX, CY);
+ctx.restore();
+
+ctx.beginPath(); ctx.arc(CX, CY, 5, 0, Math.PI*2);
+ctx.fillStyle = '#e0e8f4'; ctx.fill();
+ctx.beginPath(); ctx.arc(CX, CY, 2, 0, Math.PI*2);
+ctx.fillStyle = '#ffffff'; ctx.fill();
+</script>

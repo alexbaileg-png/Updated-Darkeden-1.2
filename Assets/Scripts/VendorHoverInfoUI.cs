@@ -66,6 +66,18 @@ public class VendorHoverInfoUI : MonoBehaviour
     {
         string stats = "";
 
+        if (item.weaponType != WeaponType.None && item.weaponMaxDamage > 0)
+        {
+            string label = item.weaponType switch
+            {
+                WeaponType.Sword => "Physical Damage",
+                WeaponType.Cross => "Magic Damage",
+                WeaponType.Gun   => "Ranged Damage",
+                _                => "Damage",
+            };
+            stats += label + ": " + item.weaponMinDamage + " - " + item.weaponMaxDamage + "\n";
+        }
+
         AddStat(ref stats, "Strength", item.strengthBonus);
         AddStat(ref stats, "Dexterity", item.dexterityBonus);
         AddStat(ref stats, "Intelligence", item.intelligenceBonus);

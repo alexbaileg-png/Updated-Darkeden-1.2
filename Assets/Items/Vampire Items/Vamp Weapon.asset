@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e976ae5566286845b37c51031801d11, type: 3}
   m_Name: Vamp Weapon
   m_EditorClassIdentifier: Assembly-CSharp::ItemData
-  itemId: VampWeapon
+  itemId: VampWeaponPhysical
   factionRestriction: 2
   itemName: tekko-kagi
-  description: 
+  description:
   itemIcon: {fileID: 21300000, guid: b2c544232ecb1be48a462660aff49072, type: 3}
   itemType: 5
   rarity: 0
@@ -30,6 +30,9 @@ MonoBehaviour:
   enduranceBonus: 0
   healthBonus: 0
   manaBonus: 0
+  weaponType: 1
+  weaponMinDamage: 10
+  weaponMaxDamage: 30
   meleeDamageBonus: 0
   rangedDamageBonus: 0
   magicalDamageBonus: 0
@@ -42,104 +45,4 @@ MonoBehaviour:
   crystalStat: 0
   crystalCurrentValue: 0
   crystalMaxValue: 0
-  beltSlots:
-  - uniqueItemId: 
-    baseItemId: 
-    slotIndex: -1
-    equipmentSlotId: 
-    quantity: 0
-    rarity: 0
-    strengthBonus: 0
-    dexterityBonus: 0
-    intelligenceBonus: 0
-    enduranceBonus: 0
-    healthBonus: 0
-    manaBonus: 0
-    meleeDamageBonus: 0
-    rangedDamageBonus: 0
-    magicalDamageBonus: 0
-    armorBonus: 0
-    resistanceBonus: 0
-    meleeResistanceBonus: 0
-    magicalResistanceBonus: 0
-    allResistanceBonus: 0
-    hasCrystalStat: 0
-    crystalStat: 0
-    crystalCurrentValue: 0
-    crystalMaxValue: 0
-    beltItems: []
-  - uniqueItemId: 
-    baseItemId: 
-    slotIndex: -1
-    equipmentSlotId: 
-    quantity: 0
-    rarity: 0
-    strengthBonus: 0
-    dexterityBonus: 0
-    intelligenceBonus: 0
-    enduranceBonus: 0
-    healthBonus: 0
-    manaBonus: 0
-    meleeDamageBonus: 0
-    rangedDamageBonus: 0
-    magicalDamageBonus: 0
-    armorBonus: 0
-    resistanceBonus: 0
-    meleeResistanceBonus: 0
-    magicalResistanceBonus: 0
-    allResistanceBonus: 0
-    hasCrystalStat: 0
-    crystalStat: 0
-    crystalCurrentValue: 0
-    crystalMaxValue: 0
-    beltItems: []
-  - uniqueItemId: 
-    baseItemId: 
-    slotIndex: -1
-    equipmentSlotId: 
-    quantity: 0
-    rarity: 0
-    strengthBonus: 0
-    dexterityBonus: 0
-    intelligenceBonus: 0
-    enduranceBonus: 0
-    healthBonus: 0
-    manaBonus: 0
-    meleeDamageBonus: 0
-    rangedDamageBonus: 0
-    magicalDamageBonus: 0
-    armorBonus: 0
-    resistanceBonus: 0
-    meleeResistanceBonus: 0
-    magicalResistanceBonus: 0
-    allResistanceBonus: 0
-    hasCrystalStat: 0
-    crystalStat: 0
-    crystalCurrentValue: 0
-    crystalMaxValue: 0
-    beltItems: []
-  - uniqueItemId: 
-    baseItemId: 
-    slotIndex: -1
-    equipmentSlotId: 
-    quantity: 0
-    rarity: 0
-    strengthBonus: 0
-    dexterityBonus: 0
-    intelligenceBonus: 0
-    enduranceBonus: 0
-    healthBonus: 0
-    manaBonus: 0
-    meleeDamageBonus: 0
-    rangedDamageBonus: 0
-    magicalDamageBonus: 0
-    armorBonus: 0
-    resistanceBonus: 0
-    meleeResistanceBonus: 0
-    magicalResistanceBonus: 0
-    allResistanceBonus: 0
-    hasCrystalStat: 0
-    crystalStat: 0
-    crystalCurrentValue: 0
-    crystalMaxValue: 0
-    beltItems: []
+  beltSlots: []

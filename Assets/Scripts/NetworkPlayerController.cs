@@ -6,8 +6,20 @@ using UnityEngine.EventSystems;
 public class NetworkPlayerController : NetworkBehaviour
 {
     [Header("Movement")]
-    public float moveSpeed = 6f;
+    public float moveSpeed    = 6f;
     public float stopDistance = 0.35f;
+
+    [Header("Terrain")]
+    [Tooltip("Layers considered walkable ground (terrain, floors, etc.)")]
+    public LayerMask groundLayers = ~0;
+    [Tooltip("Maximum slope angle the player can walk up (degrees)")]
+    public float slopeLimit = 45f;
+    [Tooltip("How high above the player to start the downward ground-snap raycast")]
+    public float groundSnapRayHeight = 3f;
+    [Tooltip("How far below the player to search for ground when snapping")]
+    public float groundSnapRayDepth  = 6f;
+    [Tooltip("Smooth speed for Y height changes — higher = snappier")]
+    public float heightSmoothSpeed   = 20f;
 
     [Header("Visual")]
     public Transform modelTransform;
@@ -102,10 +114,15 @@ public class NetworkPlayerController : NetworkBehaviour
         if (Input.GetMouseButton(0))
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
 
-            if (groundPlane.Raycast(ray, out float dist))
-                ServerSetMoveTarget(ray.GetPoint(dist));
+            // Raycast against actual geometry so terrain clicks land at the correct height
+            if (Physics.Raycast(ray, out RaycastHit hit, 200f, groundLayers))
+            {
+                // Only allow clicking on walkable slopes
+                float angle = Vector3.Angle(hit.normal, Vector3.up);
+                if (angle <= slopeLimit)
+                    ServerSetMoveTarget(hit.point);
+            }
         }
     }
 
@@ -140,7 +157,31 @@ public class NetworkPlayerController : NetworkBehaviour
         if (dir.magnitude > stopDistance)
         {
             Vector3 moveDir = dir.normalized;
-            transform.position += moveDir * moveSpeed * Time.deltaTime;
+            Vector3 nextPos = transform.position + moveDir * moveSpeed * Time.deltaTime;
+
+            // Snap Y to terrain — cast downward from above the next XZ position
+            Vector3 rayOrigin = new Vector3(nextPos.x, nextPos.y + groundSnapRayHeight, nextPos.z);
+            if (Physics.Raycast(rayOrigin, Vector3.down, out RaycastHit hit,
+                                groundSnapRayHeight + groundSnapRayDepth, groundLayers))
+            {
+                float slopeAngle = Vector3.Angle(hit.normal, Vector3.up);
+                if (slopeAngle <= slopeLimit)
+                {
+                    // Smooth Y transition so the player glides up/down slopes
+                    nextPos.y = Mathf.Lerp(transform.position.y, hit.point.y,
+                                           heightSmoothSpeed * Time.deltaTime);
+                }
+                else
+                {
+                    // Slope too steep — stop movement
+                    _moving = false;
+                    _targetPosition = transform.position;
+                    if (_syncMoving.Value) { _syncMoving.Value = false; SetMoveAnimation(false); }
+                    return;
+                }
+            }
+
+            transform.position = nextPos;
             RotateVisual(moveDir);
 
             if (!_syncMoving.Value) { _syncMoving.Value = true; SetMoveAnimation(true); }

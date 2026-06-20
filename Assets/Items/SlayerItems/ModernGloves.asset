@@ -17,7 +17,7 @@ MonoBehaviour:
   itemName: Kevlar Gloves
   description: 
   itemIcon: {fileID: 21300000, guid: 8027e5b264d073a49ab32d9431bfaff6, type: 3}
-  itemType: 5
+  itemType: 14
   rarity: 0
   isStackable: 0
   maxStackSize: 99
@@ -30,6 +30,9 @@ MonoBehaviour:
   enduranceBonus: 10
   healthBonus: 100
   manaBonus: 100
+  weaponType: 0
+  weaponMinDamage: 0
+  weaponMaxDamage: 0
   meleeDamageBonus: 10
   rangedDamageBonus: 10
   magicalDamageBonus: 10
@@ -42,112 +45,4 @@ MonoBehaviour:
   crystalStat: 0
   crystalCurrentValue: 0
   crystalMaxValue: 0
-  beltSlots:
-  - uniqueItemId: 
-    baseItemId: 
-    displayName: 
-    slotIndex: 0
-    equipmentSlotId: 
-    quantity: 0
-    rarity: 0
-    sellValue: 0
-    strengthBonus: 0
-    dexterityBonus: 0
-    intelligenceBonus: 0
-    enduranceBonus: 0
-    healthBonus: 0
-    manaBonus: 0
-    meleeDamageBonus: 0
-    rangedDamageBonus: 0
-    magicalDamageBonus: 0
-    armorBonus: 0
-    resistanceBonus: 0
-    meleeResistanceBonus: 0
-    magicalResistanceBonus: 0
-    allResistanceBonus: 0
-    hasCrystalStat: 0
-    crystalStat: 0
-    crystalCurrentValue: 0
-    crystalMaxValue: 0
-    beltItems: []
-  - uniqueItemId: 
-    baseItemId: 
-    displayName: 
-    slotIndex: 1
-    equipmentSlotId: 
-    quantity: 0
-    rarity: 0
-    sellValue: 0
-    strengthBonus: 0
-    dexterityBonus: 0
-    intelligenceBonus: 0
-    enduranceBonus: 0
-    healthBonus: 0
-    manaBonus: 0
-    meleeDamageBonus: 0
-    rangedDamageBonus: 0
-    magicalDamageBonus: 0
-    armorBonus: 0
-    resistanceBonus: 0
-    meleeResistanceBonus: 0
-    magicalResistanceBonus: 0
-    allResistanceBonus: 0
-    hasCrystalStat: 0
-    crystalStat: 0
-    crystalCurrentValue: 0
-    crystalMaxValue: 0
-    beltItems: []
-  - uniqueItemId: 
-    baseItemId: 
-    displayName: 
-    slotIndex: 2
-    equipmentSlotId: 
-    quantity: 0
-    rarity: 0
-    sellValue: 0
-    strengthBonus: 0
-    dexterityBonus: 0
-    intelligenceBonus: 0
-    enduranceBonus: 0
-    healthBonus: 0
-    manaBonus: 0
-    meleeDamageBonus: 0
-    rangedDamageBonus: 0
-    magicalDamageBonus: 0
-    armorBonus: 0
-    resistanceBonus: 0
-    meleeResistanceBonus: 0
-    magicalResistanceBonus: 0
-    allResistanceBonus: 0
-    hasCrystalStat: 0
-    crystalStat: 0
-    crystalCurrentValue: 0
-    crystalMaxValue: 0
-    beltItems: []
-  - uniqueItemId: 
-    baseItemId: 
-    displayName: 
-    slotIndex: 3
-    equipmentSlotId: 
-    quantity: 0
-    rarity: 0
-    sellValue: 0
-    strengthBonus: 0
-    dexterityBonus: 0
-    intelligenceBonus: 0
-    enduranceBonus: 0
-    healthBonus: 0
-    manaBonus: 0
-    meleeDamageBonus: 0
-    rangedDamageBonus: 0
-    magicalDamageBonus: 0
-    armorBonus: 0
-    resistanceBonus: 0
-    meleeResistanceBonus: 0
-    magicalResistanceBonus: 0
-    allResistanceBonus: 0
-    hasCrystalStat: 0
-    crystalStat: 0
-    crystalCurrentValue: 0
-    crystalMaxValue: 0
-    beltItems: []
+  beltSlots: []

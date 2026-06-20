@@ -16,7 +16,7 @@ MonoBehaviour:
   itemName: Enchanting Stone
   description: 
   itemIcon: {fileID: 21300000, guid: 62bcf588e927d174288504830d6b18e0, type: 3}
-  itemType: 12
+  itemType: 10
   rarity: 5
   isStackable: 1
   maxStackSize: 99

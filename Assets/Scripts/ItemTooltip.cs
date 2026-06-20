@@ -75,6 +75,29 @@ public class ItemTooltip : MonoBehaviour
 
         string stats = "";
 
+        // Weapon damage range shown at the top before stat bonuses
+        if (item.weaponType != WeaponType.None && item.weaponMaxDamage > 0)
+        {
+            string dmgLabel = item.weaponType switch
+            {
+                WeaponType.Sword => "Physical Damage",
+                WeaponType.Cross => "Magic Damage",
+                WeaponType.Gun   => "Ranged Damage",
+                _                => "Damage",
+            };
+            int equippedMin = (equippedItem != null && equippedItem.weaponType == item.weaponType) ? equippedItem.weaponMinDamage : 0;
+            int equippedMax = (equippedItem != null && equippedItem.weaponType == item.weaponType) ? equippedItem.weaponMaxDamage : 0;
+            stats += dmgLabel + ": " + item.weaponMinDamage + " - " + item.weaponMaxDamage;
+            if (equippedMax > 0)
+            {
+                int diffMin = item.weaponMinDamage - equippedMin;
+                int diffMax = item.weaponMaxDamage - equippedMax;
+                if (diffMax > 0)      stats += "  <color=green>(+" + diffMax + ")</color>";
+                else if (diffMax < 0) stats += "  <color=red>(" + diffMax + ")</color>";
+            }
+            stats += "\n";
+        }
+
         AddComparedStat(ref stats, "Strength", item.strengthBonus, equippedItem != null ? equippedItem.strengthBonus : 0);
         AddComparedStat(ref stats, "Dexterity", item.dexterityBonus, equippedItem != null ? equippedItem.dexterityBonus : 0);
         AddComparedStat(ref stats, "Intelligence", item.intelligenceBonus, equippedItem != null ? equippedItem.intelligenceBonus : 0);

@@ -30,6 +30,9 @@ MonoBehaviour:
   enduranceBonus: 2
   healthBonus: 0
   manaBonus: 0
+  weaponType: 0
+  weaponMinDamage: 0
+  weaponMaxDamage: 0
   meleeDamageBonus: 0
   rangedDamageBonus: 0
   magicalDamageBonus: 0
@@ -42,112 +45,4 @@ MonoBehaviour:
   crystalStat: 0
   crystalCurrentValue: 0
   crystalMaxValue: 0
-  beltSlots:
-  - uniqueItemId: 
-    baseItemId: 
-    displayName: 
-    slotIndex: 0
-    equipmentSlotId: 
-    quantity: 0
-    rarity: 0
-    sellValue: 0
-    strengthBonus: 0
-    dexterityBonus: 0
-    intelligenceBonus: 0
-    enduranceBonus: 0
-    healthBonus: 0
-    manaBonus: 0
-    meleeDamageBonus: 0
-    rangedDamageBonus: 0
-    magicalDamageBonus: 0
-    armorBonus: 0
-    resistanceBonus: 0
-    meleeResistanceBonus: 0
-    magicalResistanceBonus: 0
-    allResistanceBonus: 0
-    hasCrystalStat: 0
-    crystalStat: 0
-    crystalCurrentValue: 0
-    crystalMaxValue: 0
-    beltItems: []
-  - uniqueItemId: 
-    baseItemId: 
-    displayName: 
-    slotIndex: 1
-    equipmentSlotId: 
-    quantity: 0
-    rarity: 0
-    sellValue: 0
-    strengthBonus: 0
-    dexterityBonus: 0
-    intelligenceBonus: 0
-    enduranceBonus: 0
-    healthBonus: 0
-    manaBonus: 0
-    meleeDamageBonus: 0
-    rangedDamageBonus: 0
-    magicalDamageBonus: 0
-    armorBonus: 0
-    resistanceBonus: 0
-    meleeResistanceBonus: 0
-    magicalResistanceBonus: 0
-    allResistanceBonus: 0
-    hasCrystalStat: 0
-    crystalStat: 0
-    crystalCurrentValue: 0
-    crystalMaxValue: 0
-    beltItems: []
-  - uniqueItemId: 
-    baseItemId: 
-    displayName: 
-    slotIndex: 2
-    equipmentSlotId: 
-    quantity: 0
-    rarity: 0
-    sellValue: 0
-    strengthBonus: 0
-    dexterityBonus: 0
-    intelligenceBonus: 0
-    enduranceBonus: 0
-    healthBonus: 0
-    manaBonus: 0
-    meleeDamageBonus: 0
-    rangedDamageBonus: 0
-    magicalDamageBonus: 0
-    armorBonus: 0
-    resistanceBonus: 0
-    meleeResistanceBonus: 0
-    magicalResistanceBonus: 0
-    allResistanceBonus: 0
-    hasCrystalStat: 0
-    crystalStat: 0
-    crystalCurrentValue: 0
-    crystalMaxValue: 0
-    beltItems: []
-  - uniqueItemId: 
-    baseItemId: 
-    displayName: 
-    slotIndex: 3
-    equipmentSlotId: 
-    quantity: 0
-    rarity: 0
-    sellValue: 0
-    strengthBonus: 0
-    dexterityBonus: 0
-    intelligenceBonus: 0
-    enduranceBonus: 0
-    healthBonus: 0
-    manaBonus: 0
-    meleeDamageBonus: 0
-    rangedDamageBonus: 0
-    magicalDamageBonus: 0
-    armorBonus: 0
-    resistanceBonus: 0
-    meleeResistanceBonus: 0
-    magicalResistanceBonus: 0
-    allResistanceBonus: 0
-    hasCrystalStat: 0
-    crystalStat: 0
-    crystalCurrentValue: 0
-    crystalMaxValue: 0
-    beltItems: []
+  beltSlots: []

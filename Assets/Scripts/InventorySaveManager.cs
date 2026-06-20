@@ -173,7 +173,7 @@ public class InventorySaveManager : MonoBehaviour
                 slot.SetItemWithoutRecalculate(runtimeItem);
         }
 
-        
+        equipmentManager.SpawnAllVisuals();
     }
 
     EquipmentSlot GetEquipmentSlotById(string slotId)

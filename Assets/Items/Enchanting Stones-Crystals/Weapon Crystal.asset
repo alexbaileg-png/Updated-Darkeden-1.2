@@ -16,7 +16,7 @@ MonoBehaviour:
   itemName: Weapon Crystal
   description: 
   itemIcon: {fileID: 21300000, guid: fa63baa6790309f4ba4f482a07bb7bbb, type: 3}
-  itemType: 10
+  itemType: 8
   rarity: 5
   isStackable: 1
   maxStackSize: 99

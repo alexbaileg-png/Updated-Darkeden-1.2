@@ -28,12 +28,18 @@ public static class ClassSkillConfig
         },
         { "Soldier", new List<SkillType>
             {
-                // Add Soldier skills here as they are created
+                SkillType.SingleShot,
+                SkillType.TripleShot,
+                SkillType.AutomaticFire,
+                SkillType.OrbitalStrike,
             }
         },
         { "Enchanter", new List<SkillType>
             {
-                // Add Enchanter skills here as they are created
+                SkillType.AuraBlast,
+                SkillType.RunicTrap,
+                SkillType.Disenchant,
+                SkillType.RunicNova,
             }
         },
 

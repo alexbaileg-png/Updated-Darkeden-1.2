@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
@@ -35,12 +36,12 @@ public class LootDropTable : MonoBehaviour
 
         Debug.Log($"[LootDropTable] DropLoot called — killer={killer?.name ?? "NULL"} faction={killerFaction?.ToString() ?? "NULL"}");
 
-        int dropsCreated = 0;
+        // Evaluate every entry independently so later entries aren't starved by earlier successes
+        List<LootDropEntry> successes = new List<LootDropEntry>();
 
         foreach (LootDropEntry entry in possibleDrops)
         {
             if (entry == null || entry.item == null) continue;
-            if (dropsCreated >= maxDrops) break;
 
             // Skip items that don't belong to the killer's faction
             if (killerFaction.HasValue)
@@ -56,12 +57,20 @@ public class LootDropTable : MonoBehaviour
             Debug.Log($"[LootDropTable] Rolling for '{entry.item.itemName}' (id='{entry.item.itemId}'): roll={roll:F1} vs chance={entry.dropChance}");
 
             if (roll <= entry.dropChance)
-            {
-                ItemData rolledItem = ItemRoller.RollItem(entry.item);
-                if (rolledItem == null) { Debug.LogWarning($"[LootDropTable] ItemRoller returned null for {entry.item.itemName}"); continue; }
-                DropItem(rolledItem);
-                dropsCreated++;
-            }
+                successes.Add(entry);
+        }
+
+        // If more entries succeeded than maxDrops allows, pick a random subset instead of always favoring earlier entries
+        while (successes.Count > maxDrops)
+            successes.RemoveAt(Random.Range(0, successes.Count));
+
+        int dropsCreated = 0;
+        foreach (LootDropEntry entry in successes)
+        {
+            ItemData rolledItem = ItemRoller.RollItem(entry.item);
+            if (rolledItem == null) { Debug.LogWarning($"[LootDropTable] ItemRoller returned null for {entry.item.itemName}"); continue; }
+            DropItem(rolledItem);
+            dropsCreated++;
         }
 
         Debug.Log($"[LootDropTable] {gameObject.name} dropped {dropsCreated} item(s) for faction={killerFaction?.ToString() ?? "unknown"}");

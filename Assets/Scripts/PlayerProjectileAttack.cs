@@ -298,7 +298,6 @@ public class PlayerProjectileAttack : NetworkBehaviour
         if (orbitBuff != null)
         {
             orbitBuff.target = transform;
-            orbitBuff.baseHealAmount = healAmount;
             orbitBuff.duration = duration;
             orbitBuff.orbitRadius = radius;
             orbitBuff.orbitSpeed = speed;

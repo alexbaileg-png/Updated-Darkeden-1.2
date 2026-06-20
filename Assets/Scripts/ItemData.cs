@@ -1,6 +1,7 @@
 using UnityEngine;
 
 public enum FactionRestriction { Any, SlayerOnly, VampireOnly }
+public enum WeaponType { None, Sword, Cross, Gun }
 
 public enum ItemType
 {
@@ -55,7 +56,8 @@ public enum ItemBonusStat
     Resistance,
     MeleeResistance,
     MagicResistance,
-    AllResistance
+    AllResistance,
+    LifeSteal
 }
 
 [CreateAssetMenu(fileName = "New Item", menuName = "ARPG/Item")]
@@ -93,6 +95,9 @@ public class ItemData : ScriptableObject
     [Header("World Loot")]
     public GameObject worldLootPrefab;
 
+    [Header("Equipped Visual")]
+    public GameObject equippedVisualPrefab; // spawned on the player's rig when this item is equipped
+
     [Header("Core Stat Bonuses")]
     public int strengthBonus;
     public int dexterityBonus;
@@ -102,6 +107,11 @@ public class ItemData : ScriptableObject
     [Header("Resource Bonuses")]
     public int healthBonus;
     public int manaBonus;
+
+    [Header("Weapon")]
+    public WeaponType weaponType = WeaponType.None;
+    public int weaponMinDamage = 0;
+    public int weaponMaxDamage = 0;
 
     [Header("Offensive Bonuses")]
     public int meleeDamageBonus;
@@ -114,6 +124,9 @@ public class ItemData : ScriptableObject
     public int meleeResistanceBonus;
     public int magicalResistanceBonus;
     public int allResistanceBonus;
+
+    [Header("Life Steal")]
+    public float lifeStealBonus; // percentage of damage dealt returned as healing (e.g. 5 = 5%)
 
     [Header("Crystal Bonus")]
     public bool hasCrystalStat = false;

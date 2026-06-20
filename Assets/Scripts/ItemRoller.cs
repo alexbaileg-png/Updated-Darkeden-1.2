@@ -68,6 +68,7 @@ public static class ItemRoller
         item.meleeResistanceBonus = 0;
         item.magicalResistanceBonus = 0;
         item.allResistanceBonus = 0;
+        item.lifeStealBonus = 0f;
     }
 
     static void ApplyRandomStats(ItemData item)
@@ -77,7 +78,7 @@ public static class ItemRoller
 
         for (int i = 0; i < rolls; i++)
         {
-            int stat = Random.Range(0, 14);
+            int stat = Random.Range(0, 15);
             int value = Random.Range(1, power + 1);
 
             switch (stat)
@@ -99,6 +100,7 @@ public static class ItemRoller
                 case 11: item.meleeResistanceBonus += value * 2; break;
                 case 12: item.magicalResistanceBonus += value * 2; break;
                 case 13: item.allResistanceBonus += value; break;
+                case 14: item.lifeStealBonus += value * 0.5f; break; // 0.5–7% per roll depending on rarity
             }
         }
     }
@@ -157,6 +159,7 @@ public static class ItemRoller
         CheckStat("RangedDamage", item.rangedDamageBonus, ref bestStat, ref bestValue);
         CheckStat("MagicDamage", item.magicalDamageBonus, ref bestStat, ref bestValue);
 
+        CheckStat("LifeSteal", (int)(item.lifeStealBonus * 10), ref bestStat, ref bestValue);
         CheckStat("Armor", item.armorBonus, ref bestStat, ref bestValue);
         CheckStat("Resistance", item.resistanceBonus, ref bestStat, ref bestValue);
         CheckStat("MeleeResistance", item.meleeResistanceBonus, ref bestStat, ref bestValue);
@@ -266,6 +269,14 @@ public static class ItemRoller
             if (value <= 7) return "Warden";
             if (value <= 12) return "Protector";
             return "Mythguard";
+        }
+
+        if (statName == "LifeSteal")
+        {
+            if (value <= 10) return "Draining";
+            if (value <= 25) return "Leeching";
+            if (value <= 50) return "Vampiric";
+            return "Sanguine";
         }
 
         return "";

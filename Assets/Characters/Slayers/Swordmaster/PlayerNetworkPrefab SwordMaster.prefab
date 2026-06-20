@@ -80,6 +80,34 @@ PrefabInstance:
       propertyPath: m_Name
       value: PlayerNetworkPrefab SwordMaster
       objectReference: {fileID: 0}
+    - target: {fileID: 3266443201650563871, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
+      propertyPath: topAttach
+      value: 
+      objectReference: {fileID: 1449996335763909615}
+    - target: {fileID: 3266443201650563871, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
+      propertyPath: beltAttach
+      value: 
+      objectReference: {fileID: 5839717409615142532}
+    - target: {fileID: 3266443201650563871, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
+      propertyPath: bottomAttach
+      value: 
+      objectReference: {fileID: 5839717409615142532}
+    - target: {fileID: 3266443201650563871, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
+      propertyPath: helmetAttach
+      value: 
+      objectReference: {fileID: 1855075107258276509}
+    - target: {fileID: 3266443201650563871, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
+      propertyPath: necklaceAttach
+      value: 
+      objectReference: {fileID: 2075754486848654502}
+    - target: {fileID: 3266443201650563871, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
+      propertyPath: leftWeaponAttach
+      value: 
+      objectReference: {fileID: 2745164912504329939}
+    - target: {fileID: 3266443201650563871, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
+      propertyPath: rightWeaponAttach
+      value: 
+      objectReference: {fileID: 1583708748182546728}
     - target: {fileID: 3913169535726895021, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
       propertyPath: modelAnimator
       value: 
@@ -91,6 +119,10 @@ PrefabInstance:
     - target: {fileID: 4957528679881584483, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
       propertyPath: freeStartingSkill
       value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 4957528679881584483, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
+      propertyPath: allSkills.Array.size
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 4957528679881584483, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
       propertyPath: 'allSkills.Array.data[0]'
@@ -108,6 +140,42 @@ PrefabInstance:
       propertyPath: 'allSkills.Array.data[3]'
       value: 
       objectReference: {fileID: 11400000, guid: bc5ed9c2e3608aa47aa102926b249a6d, type: 2}
+    - target: {fileID: 4957528679881584483, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
+      propertyPath: 'allSkills.Array.data[4]'
+      value: 
+      objectReference: {fileID: 11400000, guid: f91031aadbbd0584cb55f360acb63d77, type: 2}
+    - target: {fileID: 4957528679881584483, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
+      propertyPath: 'allSkills.Array.data[5]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 0452001bba6a27f488532ef0911c56f5, type: 2}
+    - target: {fileID: 4957528679881584483, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
+      propertyPath: 'allSkills.Array.data[6]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 1c9d9f63e88fc3d49975a2dfe8c0419c, type: 2}
+    - target: {fileID: 4957528679881584483, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
+      propertyPath: 'allSkills.Array.data[7]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 8391751568327c943b76d748e6d1728a, type: 2}
+    - target: {fileID: 4957528679881584483, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
+      propertyPath: 'allSkills.Array.data[8]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 7e0bebcae8a28a84cb3b1dda2a2f2ce2, type: 2}
+    - target: {fileID: 4957528679881584483, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
+      propertyPath: 'allSkills.Array.data[9]'
+      value: 
+      objectReference: {fileID: 11400000, guid: d736639bb637248409640491ff702ae2, type: 2}
+    - target: {fileID: 4957528679881584483, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
+      propertyPath: 'allSkills.Array.data[10]'
+      value: 
+      objectReference: {fileID: 11400000, guid: f1645bf3f80e79a4c9dab7b0599b5d87, type: 2}
+    - target: {fileID: 4957528679881584483, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
+      propertyPath: 'allSkills.Array.data[11]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 05c619469b620434d9327393af646576, type: 2}
+    - target: {fileID: 4957528679881584483, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
+      propertyPath: skillProgress.Array.size
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5856355862371513842, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
       propertyPath: m_Avatar
       value: 
@@ -134,7 +202,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8507932820495756437, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
       propertyPath: _initializedTimestamp
-      value: -8584202430763858174
+      value: -8584197670990671003
       objectReference: {fileID: 0}
     - target: {fileID: 8507932820495756437, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
       propertyPath: <PrefabId>k__BackingField
@@ -142,7 +210,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8507932820495756437, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
       propertyPath: NetworkBehaviours.Array.size
-      value: 10
+      value: 11
       objectReference: {fileID: 0}
     - target: {fileID: 8507932820495756437, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
       propertyPath: <AssetPathHash>k__BackingField
@@ -156,6 +224,10 @@ PrefabInstance:
       propertyPath: 'NetworkBehaviours.Array.data[9]'
       value: 
       objectReference: {fileID: 1145080656985466987}
+    - target: {fileID: 8507932820495756437, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
+      propertyPath: 'NetworkBehaviours.Array.data[10]'
+      value: 
+      objectReference: {fileID: -1065315647193042446}
     - target: {fileID: 8507932820495756437, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
       propertyPath: SerializedTransformProperties.Position.x
       value: -0.96385
@@ -182,6 +254,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 942416509634964565, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1145080656985466987}
+    - targetCorrespondingSourceObject: {fileID: 942416509634964565, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -1065315647193042446}
   m_SourcePrefab: {fileID: 100100000, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
 --- !u!4 &97257652189002656 stripped
 Transform:
@@ -208,10 +283,6 @@ MonoBehaviour:
   _componentIndexCache: 8
   _addedNetworkObject: {fileID: 8101134930106415852}
   _networkObjectCache: {fileID: 8101134930106415852}
-  f8Skill: 4
-  f9Skill: 5
-  f10Skill: 6
-  f11Skill: 7
   judgmentRushEffectPrefab: {fileID: 2646870266883286036, guid: 9fa9eb3630c8fd74185b6e13610e45c4, type: 3}
   rushDistance: 10
   rushSpeed: 30
@@ -230,6 +301,14 @@ MonoBehaviour:
   flurryHitInterval: 0.15
   flurryEffectHeightOffset: 2
   castDelay: 0.1
+  judgmentRushCooldown: 6
+  consecrationCooldown: 8
+  aegisCooldown: 15
+  radiantFlurryCooldown: 10
+  judgmentRushMana: 15
+  consecrationMana: 20
+  aegisMana: 25
+  radiantFlurryMana: 20
 --- !u!114 &1145080656985466987
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -237,7 +316,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 822784670290180652}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6d364f62b496144458540aa221f15346, type: 3}
   m_Name: 
@@ -245,29 +324,93 @@ MonoBehaviour:
   _componentIndexCache: 9
   _addedNetworkObject: {fileID: 8101134930106415852}
   _networkObjectCache: {fileID: 8101134930106415852}
-  f8Skill: 0
-  f9Skill: 1
-  f10Skill: 2
-  f11Skill: 3
   holyBoltProjectilePrefab: {fileID: 1257221415910334472, guid: 8ba8afbc500b98d4ba911f8e98aadf8c, type: 3}
   boltSpeed: 18
   boltRange: 20
+  holyBoltModelRotationOffset: {x: 90, y: 0, z: 0}
   holyRainEffectPrefab: {fileID: 9091421485519787305, guid: 95b81a83a6542fb4f91d2e664ad0784d, type: 3}
+  holyRainImpactPrefab: {fileID: 0}
+  holyRainObjectCount: 10
+  holyRainFallHeight: 8
+  holyRainFallSpeed: 20
+  holyRainHitCount: 10
+  holyRainImpactLifetime: 4
+  holyRainImpactHeightOffset: 0.02
+  holyRainImpactRotationOffset: {x: 0, y: 0, z: 0}
+  holyRainAllLandWithin: 1
   rainRadius: 6
   rainDuration: 3
-  rainTickRate: 0.5
   rainCastRange: 12
   holyCircleEffectPrefab: {fileID: 5195297573039092532, guid: 0a694b171e672284889ab1c6ad60723b, type: 3}
   circleRadius: 5
+  circleCastRange: 12
   orbitEffectPrefab: {fileID: 4368203913174783380, guid: a0951559de10ff84c9c8e0dd76756ca6, type: 3}
   orbitDuration: 10
+  orbitRadius: 1.5
   orbitHealAmount: 15
   orbitTickRate: 1
+  orbitMaxStacks: 3
   effectHeightOffset: 1.2
   holyBoltDelay: 0.2
   holyRainDelay: 0.4
   holyCircleHealDelay: 0.4
   healingOrbitDelay: 0.3
+  holyBoltCooldown: 1
+  holyRainCooldown: 8
+  holyCircleCooldown: 6
+  healingOrbitCooldown: 12
+  holyBoltManaCost: 5
+  holyRainManaCost: 20
+  holyCircleManaCost: 15
+  healingOrbitManaCost: 25
+--- !u!114 &-1065315647193042446
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 822784670290180652}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b489b3012cbcc9d42a790c302d5c4b56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SoldierSkillCaster
+  _componentIndexCache: 10
+  _addedNetworkObject: {fileID: 8101134930106415852}
+  _networkObjectCache: {fileID: 8101134930106415852}
+  bulletPrefab: {fileID: 3492912338444299764, guid: fd28eb5aa98519e4abe69fe25d9d32eb, type: 3}
+  bulletSpeed: 30
+  bulletRange: 25
+  bulletModelRotationOffset: {x: 0, y: 0, z: 0}
+  tripleFireRate: 0.25
+  autoShotCount: 8
+  autoFireRate: 0.1
+  autoSpreadAngle: 6
+  orbitalWarningPrefab: {fileID: 7461554262641023061, guid: d4d011eb4c80a17468b4d04a431bb7c5, type: 3}
+  orbitalImpactPrefab: {fileID: 1417765112422829384, guid: 2d175894711f0b6488c22917c0e1c561, type: 3}
+  orbitalCastRange: 20
+  orbitalWarningTimeBase: 3
+  orbitalWarningTimeMin: 0.8
+  orbitalRadius: 6
+  orbitalBaseDamage: 80
+  orbitalDamagePerLevel: 20
+  effectHeightOffset: 0.9
+  bulletSpawnLocalOffset: {x: 0, y: 0, z: 0}
+  playerFacingYOffset: 85
+  singleShotDelay: 0.1
+  tripleShotDelay: 0.1
+  autoFireDelay: 0.15
+  orbitalStrikeDelay: 0.3
+  singleShotCooldown: 0.5
+  tripleShotCooldown: 2
+  autoFireCooldown: 5
+  orbitalStrikeCooldown: 30
+  singleShotMana: 3
+  tripleShotMana: 8
+  autoFireMana: 15
+  orbitalStrikeMana: 40
+  bulletKnockback: 4
+  weaponShootHoldDuration: 0.4
 --- !u!114 &8101134930106415852 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 8507932820495756437, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
@@ -339,6 +482,36 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 7094204975664737772}
   m_SourcePrefab: {fileID: 100100000, guid: b959efd8564321947bd017699fea8d6e, type: 3}
+--- !u!4 &1449996335763909615 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8573173560056127949, guid: b959efd8564321947bd017699fea8d6e, type: 3}
+  m_PrefabInstance: {fileID: 7126220809986230818}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1583708748182546728 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -639763325267172598, guid: b959efd8564321947bd017699fea8d6e, type: 3}
+  m_PrefabInstance: {fileID: 7126220809986230818}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &1855075107258276509 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -334426454937481025, guid: b959efd8564321947bd017699fea8d6e, type: 3}
+  m_PrefabInstance: {fileID: 7126220809986230818}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &2075754486848654502 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -131761456609737084, guid: b959efd8564321947bd017699fea8d6e, type: 3}
+  m_PrefabInstance: {fileID: 7126220809986230818}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &2745164912504329939 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4971310860725525745, guid: b959efd8564321947bd017699fea8d6e, type: 3}
+  m_PrefabInstance: {fileID: 7126220809986230818}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &5839717409615142532 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3742407835892290726, guid: b959efd8564321947bd017699fea8d6e, type: 3}
+  m_PrefabInstance: {fileID: 7126220809986230818}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7309295395052760521 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: b959efd8564321947bd017699fea8d6e, type: 3}

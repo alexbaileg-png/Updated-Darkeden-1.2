@@ -18,10 +18,23 @@ public class BloodFogArea : MonoBehaviour
 
     private float _elapsed = 0f;
     private GameObject _visionOverlay;
+    private bool _renderersHidden = false;
+
+    // Standard transparent particle queue is 3000. Setting to 1999 puts the fog
+    // before opaque geometry (2000+) so characters/enemies inside always draw on top.
+    const int QueueBehindGeometry = 1999;
+    const int QueueTransparent    = 3000;
 
     // Track which enemies we already debuffed so we don't spam Apply
     private System.Collections.Generic.HashSet<EnemyAI> _debuffed
         = new System.Collections.Generic.HashSet<EnemyAI>();
+
+    void Start()
+    {
+        CharacterData character = GameSession.Instance?.SelectedCharacter;
+        if (character != null && character.faction == PlayerFaction.Vampire)
+            SetFogRenderQueue(QueueBehindGeometry);
+    }
 
     void Update()
     {
@@ -104,5 +117,13 @@ public class BloodFogArea : MonoBehaviour
         }
         _visionOverlay.SetActive(false);
         _visionOverlay = null;
+    }
+
+    void SetFogRenderQueue(int queue)
+    {
+        // Use instanced materials so the shared prefab asset is never modified
+        foreach (Renderer r in GetComponentsInChildren<Renderer>(true))
+            foreach (Material mat in r.materials)
+                mat.renderQueue = queue;
     }
 }

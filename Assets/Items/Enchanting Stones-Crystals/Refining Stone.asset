@@ -16,7 +16,7 @@ MonoBehaviour:
   itemName: Refinging Stone
   description: 
   itemIcon: {fileID: 21300000, guid: c57de76f65d30db468e6aead97f08315, type: 3}
-  itemType: 13
+  itemType: 11
   rarity: 5
   isStackable: 1
   maxStackSize: 99

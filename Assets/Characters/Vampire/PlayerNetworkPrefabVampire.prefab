@@ -221,7 +221,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8507932820495756437, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
       propertyPath: _initializedTimestamp
-      value: -8584201325015112675
+      value: -8584196765693584702
       objectReference: {fileID: 0}
     - target: {fileID: 8507932820495756437, guid: f3ae67f31975b854abed1edeed8b7be7, type: 3}
       propertyPath: <PrefabId>k__BackingField
@@ -302,24 +302,21 @@ MonoBehaviour:
   _componentIndexCache: 8
   _addedNetworkObject: {fileID: 4272889736491310274}
   _networkObjectCache: {fileID: 4272889736491310274}
-  f8Skill: 8
-  f9Skill: 9
-  f10Skill: 11
-  f11Skill: 10
   darkBoltPrefab: {fileID: 817131789901712087, guid: c7168fd13c584154fbbd96c16a808219, type: 3}
   bloodDrainBeamPrefab: {fileID: 1732051926714997816, guid: cae9a986450eae24bba4472b28bcc9cf, type: 3}
   bloodDrainDuration: 2
   bloodDrainTickRate: 0.5
   bloodDrainHealPercent: 0.4
+  bloodDrainLoopStartFraction: 0.2
   bloodFogPrefab: {fileID: 8553355492850372897, guid: 0b20efefc252cb345a7b35bd8368321c, type: 3}
   bloodFogBaseRadius: 8
   bloodFogBaseDuration: 20
   bloodFogDurationPerInt: 0.5
   bloodFogBaseInt: 18
-  voidBurstEffectPrefab: {fileID: 8132086848355537154, guid: e476e26e2f339dc42a75519e2f446720, type: 3}
+  voidBurstEffectPrefab: {fileID: 3085831776106702894, guid: 8e5fa1eac43d2b741a9c10021de6a088, type: 3}
   voidBurstBaseRadius: 5
   voidBurstRadiusPerLevel: 0.3
-  bloodyTalonsPrefab: {fileID: 0}
+  bloodyTalonsPrefab: {fileID: 4025023098133112310, guid: 20c0141b775ef3344a9e62ee12cf960a, type: 3}
   talonsConeAngle: 120
   talonsRange: 4
   talonsMaxTargets: 10

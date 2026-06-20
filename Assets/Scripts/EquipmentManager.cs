@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class EquipmentManager : MonoBehaviour
@@ -19,6 +20,20 @@ public class EquipmentManager : MonoBehaviour
     public EquipmentSlot beltSlot;
     public EquipmentSlot leftWeaponSlot;
     public EquipmentSlot rightWeaponSlot;
+
+    [Header("Attachment Points (drag bones from the character rig)")]
+    public Transform helmetAttach;
+    public Transform necklaceAttach;
+    public Transform topAttach;
+    public Transform bottomAttach;
+    public Transform bootsAttach;
+    public Transform glovesAttach;
+    public Transform beltAttach;
+    public Transform leftWeaponAttach;
+    public Transform rightWeaponAttach;
+
+    // Tracks the live visual GameObject for each slot so it can be destroyed on unequip.
+    readonly Dictionary<EquipmentSlot, GameObject> _spawnedVisuals = new Dictionary<EquipmentSlot, GameObject>();
 
     public EquipmentSlot[] EquipmentSlots
     {
@@ -42,6 +57,44 @@ public class EquipmentManager : MonoBehaviour
     void Start()
     {
         RecalculateEquipmentStats();
+    }
+
+    Transform GetAttachPoint(EquipmentSlot slot)
+    {
+        if (slot == helmetSlot)      return helmetAttach;
+        if (slot == necklaceSlot)    return necklaceAttach;
+        if (slot == topSlot)         return topAttach;
+        if (slot == bottomSlot)      return bottomAttach;
+        if (slot == bootsSlot)       return bootsAttach;
+        if (slot == glovesSlot)      return glovesAttach;
+        if (slot == beltSlot)        return beltAttach;
+        if (slot == leftWeaponSlot)  return leftWeaponAttach;
+        if (slot == rightWeaponSlot) return rightWeaponAttach;
+        return null;
+    }
+
+    void SpawnVisual(EquipmentSlot slot, ItemData item)
+    {
+        DestroyVisual(slot);
+        if (item == null || item.equippedVisualPrefab == null) return;
+        Transform attach = GetAttachPoint(slot);
+        if (attach == null) return;
+
+        GameObject visual = Instantiate(item.equippedVisualPrefab, attach);
+
+        WeaponFollowBone follow = visual.AddComponent<WeaponFollowBone>();
+        follow.bone           = attach;
+        follow.positionOffset = item.equippedVisualPrefab.transform.localPosition;
+        follow.rotationOffset = item.equippedVisualPrefab.transform.localEulerAngles;
+
+        _spawnedVisuals[slot] = visual;
+    }
+
+    void DestroyVisual(EquipmentSlot slot)
+    {
+        if (_spawnedVisuals.TryGetValue(slot, out GameObject existing) && existing != null)
+            Destroy(existing);
+        _spawnedVisuals.Remove(slot);
     }
 
     public void ClearEquipment()
@@ -99,6 +152,7 @@ public class EquipmentManager : MonoBehaviour
         ItemData oldEquippedItem = targetSlot.currentItem;
 
         targetSlot.SetItemWithoutRecalculate(itemToEquip);
+        SpawnVisual(targetSlot, itemToEquip);
 
         if (oldEquippedItem != null)
             inventorySlot.SetItem(oldEquippedItem, 1);
@@ -132,6 +186,7 @@ public class EquipmentManager : MonoBehaviour
             return false;
 
         equipmentSlot.ClearSlot();
+        DestroyVisual(equipmentSlot);
 
         RecalculateEquipmentStats();
 
@@ -158,16 +213,43 @@ public class EquipmentManager : MonoBehaviour
 
 
             case ItemType.Weapon:
-                if (rightWeaponSlot != null && rightWeaponSlot.currentItem == null)
+                // Only swords can dual-wield — try to fill the empty hand first
+                if (item.weaponType == WeaponType.Sword)
+                {
+                    if (rightWeaponSlot != null && rightWeaponSlot.currentItem == null)
+                        return rightWeaponSlot;
+                    if (leftWeaponSlot  != null && leftWeaponSlot.currentItem  == null)
+                        return leftWeaponSlot;
+                    // Both occupied — replace right hand
                     return rightWeaponSlot;
+                }
 
-                if (leftWeaponSlot != null && leftWeaponSlot.currentItem == null)
-                    return leftWeaponSlot;
-
+                // All other weapon types: right hand only, always
+                // Also unequip the left hand if it has something (only swords go there)
+                if (leftWeaponSlot != null && leftWeaponSlot.currentItem != null)
+                {
+                    // Move the left-hand item back to inventory before equipping
+                    TryUnequipToInventory(leftWeaponSlot);
+                }
                 return rightWeaponSlot;
         }
 
         return null;
+    }
+
+    public GameObject GetSpawnedVisual(EquipmentSlot slot)
+    {
+        _spawnedVisuals.TryGetValue(slot, out GameObject go);
+        return go;
+    }
+
+    public void SpawnAllVisuals()
+    {
+        foreach (EquipmentSlot slot in EquipmentSlots)
+        {
+            if (slot != null && slot.currentItem != null)
+                SpawnVisual(slot, slot.currentItem);
+        }
     }
 
     public void RecalculateEquipmentStats()

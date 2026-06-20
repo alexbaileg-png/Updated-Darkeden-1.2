@@ -95,39 +95,29 @@ public class SkillSelectorUI : MonoBehaviour, IPointerClickHandler
 
     void BuildGridButtons()
     {
-        if (skillGridButtonPrefab == null || gridContainer == null || _skillManager == null)
-        {
-            Debug.Log($"[SkillGrid] BuildGridButtons bailed — prefab={skillGridButtonPrefab != null} container={gridContainer != null} mgr={_skillManager != null}");
+        if (skillGridButtonPrefab == null || gridContainer == null)
             return;
-        }
 
-        // Clear old
         foreach (SkillGridButton btn in _generatedGridButtons)
             if (btn != null) Destroy(btn.gameObject);
         _generatedGridButtons.Clear();
 
         CharacterData character = GameSession.Instance?.SelectedCharacter;
         List<SkillType> classSkills = ClassSkillConfig.GetSkillsForCharacter(character);
-        Debug.Log($"[SkillGrid] Building for class={character?.GetClassName()} skillCount={classSkills?.Count}");
 
         foreach (SkillType skill in classSkills)
         {
-            bool unlocked = _skillManager.IsSkillUnlocked(skill);
-            Debug.Log($"[SkillGrid] Skill {skill} unlocked={unlocked}");
-
-            GameObject go  = Instantiate(skillGridButtonPrefab, gridContainer);
+            GameObject go = Instantiate(skillGridButtonPrefab, gridContainer);
             SkillGridButton btn = go.GetComponent<SkillGridButton>();
             if (btn == null) continue;
 
             btn.skillType       = skill;
-            btn.skillManager    = _skillManager;
+            btn.skillManager    = _skillManager; // may be null for Slayer classes — handled in SkillGridButton
             btn.playerStats     = _playerStats;
             btn.skillSelectorUI = this;
 
             _generatedGridButtons.Add(btn);
         }
-
-        Debug.Log($"[SkillGrid] Generated {_generatedGridButtons.Count} buttons");
     }
 
     // ── Skill selection ───────────────────────────────────────────────────────

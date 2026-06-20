@@ -42,6 +42,7 @@ public class PlayerStats : NetworkBehaviour, IDamageable
 
     [Header("Gear Defensive Bonuses")]
     public int gearArmor, gearResistance, gearMeleeResistance, gearMagicResistance, gearAllResistance;
+    public float gearLifeSteal;
 
     [Header("Resources")]
     public int maxHealth;
@@ -273,16 +274,25 @@ public class PlayerStats : NetworkBehaviour, IDamageable
 
     ISkillCaster EnableClassSkillCaster()
     {
-        string className = GameSession.Instance?.SelectedCharacter?.GetClassName() ?? "";
+        CharacterData character = GameSession.Instance?.SelectedCharacter;
+        string className = character?.GetClassName() ?? "";
+
+        // Fallback: derive class from saved slayerClass field directly
+        if (string.IsNullOrEmpty(className) && character != null && faction == PlayerFaction.Slayer)
+            className = character.slayerClass.ToString();
 
         SwordmasterSkillCaster[]  swordmasters  = GetComponentsInChildren<SwordmasterSkillCaster>(true);
         HealerSkillCaster[]       healers       = GetComponentsInChildren<HealerSkillCaster>(true);
+        SoldierSkillCaster[]      soldiers      = GetComponentsInChildren<SoldierSkillCaster>(true);
+        EnchanterSkillCaster[]    enchanters    = GetComponentsInChildren<EnchanterSkillCaster>(true);
         VampireSkillCaster[]      vampires      = GetComponentsInChildren<VampireSkillCaster>(true);
         BloodKnightSkillCaster[]  bloodKnights  = GetComponentsInChildren<BloodKnightSkillCaster>(true);
         PlayerProjectileAttack[]  projectiles   = GetComponentsInChildren<PlayerProjectileAttack>(true);
 
         foreach (var c in swordmasters) c.enabled = false;
         foreach (var c in healers)      c.enabled = false;
+        foreach (var c in soldiers)     c.enabled = false;
+        foreach (var c in enchanters)   c.enabled = false;
         foreach (var c in vampires)     c.enabled = false;
         foreach (var c in bloodKnights) c.enabled = false;
         foreach (var c in projectiles)  c.enabled = false;
@@ -305,6 +315,18 @@ public class PlayerStats : NetworkBehaviour, IDamageable
             case "Healer":
             {
                 var active = healers.Length > 0 ? healers[healers.Length - 1] : null;
+                if (active != null) active.enabled = true;
+                return active;
+            }
+            case "Soldier":
+            {
+                var active = soldiers.Length > 0 ? soldiers[soldiers.Length - 1] : null;
+                if (active != null) active.enabled = true;
+                return active;
+            }
+            case "Enchanter":
+            {
+                var active = enchanters.Length > 0 ? enchanters[enchanters.Length - 1] : null;
                 if (active != null) active.enabled = true;
                 return active;
             }
@@ -363,6 +385,7 @@ public class PlayerStats : NetworkBehaviour, IDamageable
         gearHealth = gearMana = 0;
         gearMeleeDamage = gearRangedDamage = gearMagicDamage = 0;
         gearArmor = gearResistance = gearMeleeResistance = gearMagicResistance = gearAllResistance = 0;
+        gearLifeSteal = 0f;
     }
 
     public void AddGearBonuses(ItemData item)
@@ -383,6 +406,7 @@ public class PlayerStats : NetworkBehaviour, IDamageable
         gearMeleeResistance += item.meleeResistanceBonus;
         gearMagicResistance += item.magicalResistanceBonus;
         gearAllResistance += item.allResistanceBonus;
+        gearLifeSteal     += item.lifeStealBonus;
 
         ApplyCrystalBonus(item);
     }
@@ -457,6 +481,14 @@ public class PlayerStats : NetworkBehaviour, IDamageable
         _currentMana.Value = Mathf.Clamp(_currentMana.Value + amount, 0, maxMana);
     }
 
+    [ServerRpc]
+    public void ServerVendorHeal()
+    {
+        if (isDead) return;
+        _currentHealth.Value = maxHealth;
+        _currentMana.Value   = maxMana;
+    }
+
     // ── XP & Leveling ─────────────────────────────────────────────────────────
 
     public void GainXP(int amount)
@@ -528,10 +560,52 @@ public class PlayerStats : NetworkBehaviour, IDamageable
 
     // ── Damage Calculations ───────────────────────────────────────────────────
 
-    public int GetMeleeDamage(int baseDamage) => Mathf.RoundToInt(baseDamage + meleeDamageBonus);
-    public int GetRangedDamage(int baseDamage) => Mathf.RoundToInt(baseDamage + rangedDamageBonus);
-    public int GetMagicalSkillDamage(int baseDamage) => Mathf.RoundToInt(baseDamage + magicalSkillPower);
+    public int GetMeleeDamage(int baseDamage)
+    {
+        int weaponRoll = RollWeaponDamage(WeaponType.Sword);
+        return Mathf.RoundToInt(baseDamage + meleeDamageBonus + weaponRoll);
+    }
+
+    public int GetRangedDamage(int baseDamage)
+    {
+        int weaponRoll = RollWeaponDamage(WeaponType.Gun);
+        return Mathf.RoundToInt(baseDamage + rangedDamageBonus + weaponRoll);
+    }
+
+    public int GetMagicalSkillDamage(int baseDamage)
+    {
+        int weaponRoll = RollWeaponDamage(WeaponType.Cross);
+        return Mathf.RoundToInt(baseDamage + magicalSkillPower + weaponRoll);
+    }
+
     public int GetMagicalHealing(int baseHealing) => Mathf.RoundToInt(baseHealing + magicalSkillPower);
+
+    public float GetLifeStealPercent() => gearLifeSteal;
+
+    // Call this after dealing damage to trigger life steal healing.
+    public void ApplyLifeSteal(int damageDealt)
+    {
+        float pct = GetLifeStealPercent();
+        if (pct <= 0f) return;
+        int heal = Mathf.Max(1, Mathf.RoundToInt(damageDealt * pct / 100f));
+        Heal(heal);
+    }
+
+    // Returns a random roll within the equipped weapon's damage range, only if it matches the expected type
+    int RollWeaponDamage(WeaponType expectedType)
+    {
+        EquipmentManager equipManager = GetComponent<EquipmentManager>();
+        if (equipManager == null) return 0;
+
+        ItemData right = equipManager.rightWeaponSlot?.currentItem;
+        ItemData left  = equipManager.leftWeaponSlot?.currentItem;
+        ItemData weapon = (right != null) ? right : left;
+
+        if (weapon == null || weapon.weaponType != expectedType) return 0;
+        if (weapon.weaponMaxDamage <= 0) return 0;
+
+        return Random.Range(weapon.weaponMinDamage, weapon.weaponMaxDamage + 1);
+    }
 
     public int CalculatePhysicalDamageTaken(int incomingDamage)
     {

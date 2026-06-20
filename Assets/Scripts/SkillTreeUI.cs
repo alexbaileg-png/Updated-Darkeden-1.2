@@ -23,6 +23,10 @@ public class SkillTreeUI : MonoBehaviour
     public Button tabDebuff;
     public Button tabControl;
 
+    [Header("Vampire-Only")]
+    [Tooltip("F-key skill type slot buttons — visible only for Vampires")]
+    public GameObject[] skillTypeButtons;
+
     [Header("Tab Colors")]
     public Color tabActiveColor   = Color.white;
     public Color tabInactiveColor = new Color(0.5f, 0.5f, 0.5f);
@@ -52,6 +56,21 @@ public class SkillTreeUI : MonoBehaviour
 
     void SetupTabListeners()
     {
+        CharacterData character = GameSession.Instance?.SelectedCharacter;
+        bool isSlayer = character != null && character.faction == PlayerFaction.Slayer;
+
+        // Slayers don't use skill categories — hide tabs and show all skills flat
+        if (tabMagicAttack != null) tabMagicAttack.gameObject.SetActive(!isSlayer);
+        if (tabMelee       != null) tabMelee.gameObject.SetActive(!isSlayer);
+        if (tabBuff        != null) tabBuff.gameObject.SetActive(!isSlayer);
+        if (tabDebuff      != null) tabDebuff.gameObject.SetActive(!isSlayer);
+        if (tabControl     != null) tabControl.gameObject.SetActive(!isSlayer);
+
+        // Skill type (F-key slot) buttons are Vampire-only
+        if (skillTypeButtons != null)
+            foreach (GameObject btn in skillTypeButtons)
+                if (btn != null) btn.SetActive(!isSlayer);
+
         if (tabMagicAttack != null) { tabMagicAttack.onClick.RemoveAllListeners(); tabMagicAttack.onClick.AddListener(() => SelectTab(SkillCategory.MagicAttack)); }
         if (tabMelee       != null) { tabMelee.onClick.RemoveAllListeners();       tabMelee.onClick.AddListener(()       => SelectTab(SkillCategory.Melee));       }
         if (tabBuff        != null) { tabBuff.onClick.RemoveAllListeners();        tabBuff.onClick.AddListener(()        => SelectTab(SkillCategory.Buff));        }
@@ -70,10 +89,14 @@ public class SkillTreeUI : MonoBehaviour
         SetTabColor(tabDebuff,      category == SkillCategory.Debuff);
         SetTabColor(tabControl,     category == SkillCategory.Control);
 
-        // Show only buttons matching this category
+        // Slayers show all skills with no category filter
+        CharacterData character = GameSession.Instance?.SelectedCharacter;
+        bool isSlayer = character != null && character.faction == PlayerFaction.Slayer;
+
         foreach (SkillTreeButton btn in _generatedButtons)
         {
             if (btn == null) continue;
+            if (isSlayer) { btn.gameObject.SetActive(true); continue; }
             SkillData data = skillManager?.GetSkillData(btn.skillType);
             bool show = data != null && data.skillCategory == category;
             btn.gameObject.SetActive(show);

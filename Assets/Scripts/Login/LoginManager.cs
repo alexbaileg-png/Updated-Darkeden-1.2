@@ -119,7 +119,21 @@ public class LoginManager : MonoBehaviour
         if (GameSession.Instance == null)
             new GameObject("GameSession").AddComponent<GameSession>();
 
-        AccountData account = await CloudDataService.LoadAccountAsync();
+        AccountData account;
+        try
+        {
+            account = await CloudDataService.LoadAccountAsync();
+        }
+        catch (Exception e)
+        {
+            // Do NOT proceed with an empty account on failure — that would let a
+            // later save silently overwrite the real character data in the cloud.
+            SetStatus("Failed to load your account data. Please check your connection and try again.");
+            SetLoading(false);
+            Debug.LogError($"[Login] Account load failed: {e.Message}");
+            return;
+        }
+
         GameSession.Instance.SetAccountData(account);
 
         SceneManager.LoadScene("Character Selection");
